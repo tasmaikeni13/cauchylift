@@ -1,0 +1,19 @@
+{
+  "artifact": "Rejected-candidate checks",
+  "cofactor_exterior_branch": {
+    "decision": "rejected: the proposed condition-number map is the Halley/polar triple-angle map, not a distinct optimizer primitive",
+    "maximum_halley_triple_angle_identity_error": 7.560174708487466e-12
+  },
+  "plaquette_cross_ratio_dual_branch": {
+    "plaquette_dual": {
+      "failures_at_1000": 198,
+      "median_iterations": 1000.0
+    },
+    "sign": {
+      "failures_at_1000": 46,
+      "median_iterations": 252.5
+    }
+  },
+  "plaquette_decision": "rejected: exact cross-ratio inversion frequently destroys useful alignment; making it safe requires a conventional blend that violates the research contract",
+  "seed": 20260827
+}

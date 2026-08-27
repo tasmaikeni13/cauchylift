@@ -1,0 +1,61 @@
+{
+  "artifact": "CauchyLift rank probe",
+  "exact_example": {
+    "input_outer_product_rank": 1,
+    "left_factors": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "output_exact_rank": 4,
+    "right_factors": [
+      1,
+      3,
+      4,
+      7
+    ],
+    "shape": [
+      4,
+      4
+    ]
+  },
+  "floating_stable_rank": {
+    "16": {
+      "input_stable_rank": 1.0,
+      "maximum_output_stable_rank": 1.0008976214546916,
+      "mean_output_stable_rank": 1.0001808014527374,
+      "median_output_stable_rank": 1.0000889819940157,
+      "samples": 200
+    },
+    "32": {
+      "input_stable_rank": 1.0,
+      "maximum_output_stable_rank": 1.0009788770008072,
+      "mean_output_stable_rank": 1.0001158002422743,
+      "median_output_stable_rank": 1.0000465541132253,
+      "samples": 200
+    },
+    "4": {
+      "input_stable_rank": 1.0,
+      "maximum_output_stable_rank": 1.000771011719734,
+      "mean_output_stable_rank": 1.0002224506917385,
+      "median_output_stable_rank": 1.0001393039082584,
+      "samples": 200
+    },
+    "8": {
+      "input_stable_rank": 1.0,
+      "maximum_output_stable_rank": 1.0008775073614398,
+      "mean_output_stable_rank": 1.0002482487545448,
+      "median_output_stable_rank": 1.0001720739237916,
+      "samples": 200
+    }
+  },
+  "interpretation": "Generic exact rank can be full while floating stable rank remains close to one. The algebraic rank theorem must not be marketed as evidence of useful spectral diversity.",
+  "seed": 20260827,
+  "two_by_two_cauchy_determinant_identity": {
+    "direct": "-180/115661",
+    "equal": true,
+    "factorized": "-180/115661",
+    "nonzero": true
+  }
+}

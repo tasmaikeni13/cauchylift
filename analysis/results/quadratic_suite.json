@@ -1,0 +1,492 @@
+{
+  "artifact": "CauchyLift analytic quadratic direction probe",
+  "conditions": {
+    "kappa_100": {
+      "geometries": {
+        "axis_aligned": {
+          "cauchylift": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.026713581541694,
+              "mean": -8.355251755928517,
+              "median": -8.084414060434703,
+              "minimum": -9.250176396241129
+            },
+            "exact_line_search_iterations": {
+              "maximum": 41.0,
+              "mean": 38.25,
+              "median": 39.5,
+              "minimum": 34.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -6.0118946519820575,
+              "mean": -6.658561666482843,
+              "median": -6.612208913837146,
+              "minimum": -7.725049203830337
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -6.536045127650048
+          },
+          "exact_polar": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.000249792695362,
+              "mean": -8.005613899097039,
+              "median": -8.002257486943355,
+              "minimum": -8.013713457897
+            },
+            "exact_line_search_iterations": {
+              "maximum": 443.0,
+              "mean": 333.875,
+              "median": 327.0,
+              "minimum": 227.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -2.2100712872601442,
+              "mean": -4.42916913293636,
+              "median": -5.111528725351495,
+              "minimum": -6.088173821092834
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -5.045375279809965
+          },
+          "normalized_gradient": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.001247467756302,
+              "mean": -8.006223805933885,
+              "median": -8.004696325853065,
+              "minimum": -8.016729636623813
+            },
+            "exact_line_search_iterations": {
+              "maximum": 337.0,
+              "mean": 281.75,
+              "median": 267.5,
+              "minimum": 243.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -4.14538317933191,
+              "mean": -5.221504327120838,
+              "median": -5.284815902046191,
+              "minimum": -6.5142072995357125
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -4.997958040549924
+          },
+          "sign": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.002416123427238,
+              "mean": -8.02554502546335,
+              "median": -8.019305669043124,
+              "minimum": -8.065102713456579
+            },
+            "exact_line_search_iterations": {
+              "maximum": 513.0,
+              "mean": 167.0,
+              "median": 109.0,
+              "minimum": 51.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -4.429816238041775,
+              "mean": -4.995647827023703,
+              "median": -4.914512944205503,
+              "minimum": -5.6224862855290185
+            },
+            "selected_eta": 0.215443469,
+            "tuning_median_log10_relative_objective": -4.675817606780581
+          },
+          "sinkhorn_5": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.019000842645465,
+              "mean": -8.071636811453057,
+              "median": -8.070533758518156,
+              "minimum": -8.129803916228221
+            },
+            "exact_line_search_iterations": {
+              "maximum": 114.0,
+              "mean": 47.625,
+              "median": 37.0,
+              "minimum": 8.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -4.8912759283791845,
+              "mean": -5.723738721254595,
+              "median": -5.7222329365001965,
+              "minimum": -6.561452256145197
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -5.731041460391797
+          }
+        },
+        "rotated": {
+          "cauchylift": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.0068356040844,
+              "mean": -8.092191368689171,
+              "median": -8.034846678537384,
+              "minimum": -8.334696724141551
+            },
+            "exact_line_search_iterations": {
+              "maximum": 117.0,
+              "mean": 85.0,
+              "median": 78.0,
+              "minimum": 67.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -4.480662256941869,
+              "mean": -5.422028223495393,
+              "median": -5.263239668719487,
+              "minimum": -6.5455259392670175
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -5.497700032846233
+          },
+          "exact_polar": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.000382529645918,
+              "mean": -8.006535012017265,
+              "median": -8.006542230389407,
+              "minimum": -8.013770365888423
+            },
+            "exact_line_search_iterations": {
+              "maximum": 428.0,
+              "mean": 333.625,
+              "median": 323.0,
+              "minimum": 240.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -1.7818690576510852,
+              "mean": -3.3672913233736654,
+              "median": -3.0883167815291745,
+              "minimum": -5.934219886671998
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -5.047589952334271
+          },
+          "normalized_gradient": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.000061199069892,
+              "mean": -8.006076221736429,
+              "median": -8.005394373013464,
+              "minimum": -8.01434358435487
+            },
+            "exact_line_search_iterations": {
+              "maximum": 323.0,
+              "mean": 285.75,
+              "median": 306.5,
+              "minimum": 201.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -4.6220715358262146,
+              "mean": -5.224694179721757,
+              "median": -5.24564689339638,
+              "minimum": -5.891375751669135
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -5.394464533162957
+          },
+          "sign": {
+            "exact_line_search_failures": 3,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -4.610844577335967,
+              "mean": -7.163507534985876,
+              "median": -8.003622763404017,
+              "minimum": -8.037295745918778
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 433.625,
+              "median": 571.5,
+              "minimum": 89.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -3.6604711675084878,
+              "mean": -4.09913195835466,
+              "median": -4.036938986637879,
+              "minimum": -5.0246754107375775
+            },
+            "selected_eta": 0.215443469,
+            "tuning_median_log10_relative_objective": -4.2319545179682025
+          },
+          "sinkhorn_5": {
+            "exact_line_search_failures": 1,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -7.575880558851307,
+              "mean": -7.963173453184918,
+              "median": -8.010491659858685,
+              "minimum": -8.039191260059031
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 253.75,
+              "median": 201.5,
+              "minimum": 138.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -2.0099348640192507,
+              "mean": -4.119645571704233,
+              "median": -4.761370801118829,
+              "minimum": -4.993814703306776
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -5.089101673431579
+          }
+        }
+      },
+      "kronecker_hessian_condition_number": 100.0
+    },
+    "kappa_10000": {
+      "geometries": {
+        "axis_aligned": {
+          "cauchylift": {
+            "exact_line_search_failures": 0,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -8.020945877739978,
+              "mean": -8.137766619187971,
+              "median": -8.081529048212307,
+              "minimum": -8.39118976399017
+            },
+            "exact_line_search_iterations": {
+              "maximum": 272.0,
+              "mean": 200.75,
+              "median": 182.0,
+              "minimum": 175.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -2.0469758882975264,
+              "mean": -3.0226451871714164,
+              "median": -2.964276677677308,
+              "minimum": -3.983854663195383
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -3.208250750800319
+          },
+          "exact_polar": {
+            "exact_line_search_failures": 8,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -2.7897909397059197,
+              "mean": -3.7783318855158297,
+              "median": -3.8440977928106523,
+              "minimum": -4.488722825627768
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 600.0,
+              "median": 600.0,
+              "minimum": 600.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -3.728863385737067,
+              "mean": -4.272161919320181,
+              "median": -4.0178797655165175,
+              "minimum": -5.43679019254797
+            },
+            "selected_eta": 0.215443469,
+            "tuning_median_log10_relative_objective": -4.62612611782824
+          },
+          "normalized_gradient": {
+            "exact_line_search_failures": 8,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -3.00517283861656,
+              "mean": -3.6180694993021967,
+              "median": -3.505417170366136,
+              "minimum": -4.392374867335612
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 600.0,
+              "median": 600.0,
+              "minimum": 600.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -2.5310121766994906,
+              "mean": -3.2434564596141273,
+              "median": -3.150289707665319,
+              "minimum": -3.9935872767792655
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -3.5678081358912133
+          },
+          "sign": {
+            "exact_line_search_failures": 6,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -3.3932530172394553,
+              "mean": -5.291710232429861,
+              "median": -4.6887047222013365,
+              "minimum": -8.00847916079884
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 557.625,
+              "median": 600.0,
+              "minimum": 420.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -3.075806325968345,
+              "mean": -4.934751220483985,
+              "median": -5.264800308032278,
+              "minimum": -5.724820122159709
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -4.823559530256539
+          },
+          "sinkhorn_5": {
+            "exact_line_search_failures": 2,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -6.590534715152889,
+              "mean": -7.744771990402036,
+              "median": -8.005171010219998,
+              "minimum": -8.140522376666317
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 315.25,
+              "median": 317.0,
+              "minimum": 12.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -5.082259764708341,
+              "mean": -5.885981810207566,
+              "median": -5.922153729079126,
+              "minimum": -6.4728291456829465
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -5.755424137627915
+          }
+        },
+        "rotated": {
+          "cauchylift": {
+            "exact_line_search_failures": 8,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -4.5570020969319325,
+              "mean": -5.794953197802587,
+              "median": -5.7586059344275355,
+              "minimum": -6.809173539448339
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 600.0,
+              "median": 600.0,
+              "minimum": 600.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -2.6528402944373957,
+              "mean": -3.0229163314318765,
+              "median": -3.077592748078311,
+              "minimum": -3.2971252695181543
+            },
+            "selected_eta": 0.464158883,
+            "tuning_median_log10_relative_objective": -2.8740049078314476
+          },
+          "exact_polar": {
+            "exact_line_search_failures": 8,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -3.418020409846708,
+              "mean": -4.181903077587613,
+              "median": -4.120195148981176,
+              "minimum": -5.084073315314806
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 600.0,
+              "median": 600.0,
+              "minimum": 600.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -3.9655636860888928,
+              "mean": -4.571641335697322,
+              "median": -4.639691030587992,
+              "minimum": -5.10343925762921
+            },
+            "selected_eta": 0.215443469,
+            "tuning_median_log10_relative_objective": -4.314170426750051
+          },
+          "normalized_gradient": {
+            "exact_line_search_failures": 8,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -3.42978918645867,
+              "mean": -3.9324246876237776,
+              "median": -3.984898222410523,
+              "minimum": -4.544566888832814
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 600.0,
+              "median": 600.0,
+              "minimum": 600.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -3.1110342310282557,
+              "mean": -3.3958233494919057,
+              "median": -3.3555201396096552,
+              "minimum": -3.9206378209257755
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -3.0573668010413977
+          },
+          "sign": {
+            "exact_line_search_failures": 8,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -3.3798849077458897,
+              "mean": -3.8679271790912146,
+              "median": -3.6914749648089638,
+              "minimum": -4.522877008020892
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 600.0,
+              "median": 600.0,
+              "minimum": 600.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -1.4061765199760858,
+              "mean": -2.7582236870432744,
+              "median": -2.997788813242762,
+              "minimum": -3.1087294290193777
+            },
+            "selected_eta": 0.1,
+            "tuning_median_log10_relative_objective": -2.457828408100323
+          },
+          "sinkhorn_5": {
+            "exact_line_search_failures": 8,
+            "exact_line_search_final_log10_relative_objective": {
+              "maximum": -3.339961765781551,
+              "mean": -3.8584601518114856,
+              "median": -3.7196744873424845,
+              "minimum": -4.61230201881392
+            },
+            "exact_line_search_iterations": {
+              "maximum": 600.0,
+              "mean": 600.0,
+              "median": 600.0,
+              "minimum": 600.0
+            },
+            "held_out_scheduled_log10_relative_objective": {
+              "maximum": -2.463126538161086,
+              "mean": -3.2033841332614257,
+              "median": -3.3071458911996476,
+              "minimum": -3.6409807825309377
+            },
+            "selected_eta": 0.215443469,
+            "tuning_median_log10_relative_objective": -3.2182419557726134
+          }
+        }
+      },
+      "kronecker_hessian_condition_number": 10000.0
+    }
+  },
+  "exact_line_search_max_steps": 600,
+  "exact_line_search_target_relative_objective": 1e-08,
+  "interpretation_guardrail": "These are tiny deterministic quadratics, not neural training or wall-clock evidence. Exact line search is intentionally paired with a held-out scheduled-step probe.",
+  "matrix_size": 4,
+  "schedule": "eta / sqrt(t), eta selected on tuning split",
+  "scheduled_steps": 400,
+  "seed": 20260827,
+  "split": "first half schedule tuning; second half held-out reporting",
+  "trials": 16
+}

@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this research artifact, please cite it using this metadata."
+title: "CauchyLift: Cotransverse Rational Gradient Fields"
+type: software
+authors:
+  - family-names: "tasmaikeni13"
+repository-code: "https://github.com/tasmaikeni13/cauchylift"
+license: MIT
+version: 0.1.0
+date-released: 2026-08-27
