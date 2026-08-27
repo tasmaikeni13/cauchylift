@@ -52,6 +52,7 @@ The update is \(W_{t+1}=W_t-\eta_t\operatorname{CL}(\nabla f(W_t))\). Momentum, 
 
 ## Repository map
 
+- [phases/](phases/) — eight gated prompts covering theory repair, ROCm implementation, controlled scaling, the 125M/1B-token study, and a submission-ready paper.
 - [`paper/paper.md`](paper/paper.md) — full paper with derivations, theorems, limitations, and proposed empirical protocol.
 - [`research/`](research/) — research contract, query ledger, closest-work matrix, rejected candidates, claim audit, and risk register.
 - [`analysis/`](analysis/) — standard-library-only mathematical and numerical probes; no training code.
