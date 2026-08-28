@@ -1,0 +1,16 @@
+{
+  "gate": "REVISE",
+  "invalidated_downstream_phases": [4, 5, 6, 7, 8],
+  "phase": 3,
+  "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
+  "phase2_handoff_commit": "ef6c726b62cf693216aedcf42afe8669c0a2719e",
+  "reasons": [
+    "The FP64 oracle, PyTorch reference, and native HIP paths agree within every predeclared dtype tolerance over required and adversarial cases.",
+    "ROCprofiler proves the named CauchyLift HIP reductions and fused parameter-update kernel executed on the single MI300X.",
+    "Arithmetic is linear, persistent optimizer state is zero tensors and zero bytes, and stress tests show no nonfinite result, illegal access, leak, or conventional fallback.",
+    "The optimized representative median is 5.3505 ms versus 0.9076 ms for fused AdamW, a 5.8953 ratio that fails the mandatory 1.15 maximum.",
+    "The original two-modern-GPU-family criterion remains unreplicated and cannot be satisfied by this one MI300X."
+  ],
+  "run_id": "phase3-20260828T180051Z",
+  "timestamp_utc": "2026-08-28T18:00:51Z"
+}

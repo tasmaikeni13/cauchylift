@@ -1,0 +1,12 @@
+"Name","Calls","TotalDurationNs","AverageNs","Percentage","MinNs","MaxNs","StdDev"
+"void (anonymous namespace)::marginal_energy_tiled_kernel<float>(float const*, long, long, int const*, float*, float*)",4,584611,146152.750000,40.00,120354,167020,22479.854557
+"void (anonymous namespace)::output_kernel<float, true>(float*, float const*, float*, long, long, long, int const*, float const*, float const*, int const*, float const*, float)",4,289418,72354.500000,19.80,63304,87760,11041.720292
+"void (anonymous namespace)::raw_norm_kernel<float>(float const*, long, long, int const*, float const*, float const*, int const*, float*)",4,138877,34719.250000,9.50,32755,36243,1448.782564
+"void (anonymous namespace)::denominator_min_kernel<float>(float const*, long, long, int const*, float const*, float const*, int*)",4,127730,31932.500000,8.74,29507,34759,2658.984957
+"void (anonymous namespace)::analyze_partial_kernel<float>(float const*, long, int*)",4,85515,21378.750000,5.85,17319,23975,3037.872762
+"(anonymous namespace)::exclusion_scan_kernel(float const*, long, float*, float const*, long, float*)",4,80703,20175.750000,5.52,19885,20727,376.661984
+"void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<float>, std::array<char*, 1ul> >(int, at::native::FillFunctor<float>, std::array<char*, 1ul>)",9,39851,4427.888889,2.73,1764,14954,4253.913799
+"(anonymous namespace)::raw_norm_finalize_kernel(float const*, int, int const*, float*)",4,34198,8549.500000,2.34,6735,12429,2618.641060
+"(anonymous namespace)::analyze_finalize_kernel(int const*, int, int*)",4,29026,7256.500000,1.99,5974,8299,979.131077
+"(anonymous namespace)::denominator_finalize_kernel(int const*, int, int*, int*)",4,27462,6865.500000,1.88,5733,8459,1145.317860
+"void (anonymous namespace)::elementwise_kernel_with_index_grid_stride<int, at::native::linspace_cuda_out(c10::Scalar const&, c10::Scalar const&, long, at::Tensor&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(long)#1}>(int, at::native::linspace_cuda_out(c10::Scalar const&, c10::Scalar const&, long, at::Tensor&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(long)#1}, function_traits<at::native::linspace_cuda_out(c10::Scalar const&, c10::Scalar const&, long, at::Tensor&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(long)#1}>::result_type*)",1,24175,24175.000000,1.65,24175,24175,0.00000000e+00

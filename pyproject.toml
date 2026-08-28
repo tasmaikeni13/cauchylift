@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools==81.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cauchylift"
+version = "0.2.0"
+description = "Phase 3 reference and native ROCm implementation of CauchyLift"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "rocm: requires a PyTorch ROCm build and an available AMD GPU",
+  "stress: repeated-step, dynamic-range, and memory tests",
+]

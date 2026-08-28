@@ -1,6 +1,6 @@
 # Reproducibility record
 
-Artifact freeze dates: 2026-08-27 UTC for the original theory suite; 2026-08-28 UTC for Phases 1 and 2.
+Artifact freeze dates: 2026-08-27 UTC for the original theory suite; 2026-08-28 UTC for Phases 1 through 3.
 
 ## Environment used for checked-in results
 
@@ -77,3 +77,16 @@ python3 analysis/run_property_checks.py --samples 5000 >/dev/null
 ```
 
 No command in this record trains a model or downloads a dataset.
+
+## Phase 3 optimizer implementation
+
+Phase 3 adds third-party dependencies only inside `.venv`; see
+`requirements/rocm10-mi300x.txt` and the resolved `phase3-lock.txt`. Complete
+commands and tolerances are in `docs/phase3.md` and
+`artifacts/phase3/commands.log`. The CPU reference tests run without a GPU;
+ROCm-marked tests skip on other hardware.
+
+Checked-in benchmark JSON contains every warmed event sample. Checked-in
+profiler CSV files contain raw MI300X kernel dispatches. Build products and pip
+caches remain under `/tmp` and are not versioned. Phase 3 ended `REVISE` because
+the optimized HIP median is 5.8953× fused AdamW, exceeding the 1.15× gate.

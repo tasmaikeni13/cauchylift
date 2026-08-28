@@ -1,0 +1,3 @@
+artifacts/phase3/environment.txt -whitespace
+artifacts/phase3/profiler/* -whitespace
+artifacts/phase3/report.md -whitespace

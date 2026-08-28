@@ -2,7 +2,7 @@
 
 **Status:** theory-stage manuscript, version 0.2.0, 2026-08-28
 **Artifacts:** mathematical Python probes and partial Lean formalization accompany this manuscript
-**Empirical status:** no neural-network training has been performed
+**Empirical status:** no neural-network training has been performed; Phase 3 kernel correctness passed but its speed gate is `REVISE`
 
 ## Abstract
 
@@ -539,7 +539,7 @@ Near a dominant cell, computing \(2S-r_i-c_j\) can lose the small positive compl
 
 No additive epsilon is permitted. `finite_precision_suite.json` shows that even a fixed \(10^{-3}S\) epsilon measurably changes an ordinary direction. Underflowed off-dominant amplitudes are less dangerous than raw denominator condition numbers suggest because (8a) makes their projective influence cubic, but that observation justifies a boundary branch only after represented-support and rare-path checks; it does not authorize a tunable stabilizer. The machine-readable Phase 3 contract is `spec/optimizer_v0.2.json`.
 
-This operation graph is GPU-friendly in the limited algorithmic sense of regular dense reads, reductions, and pointwise arithmetic. No kernel has been implemented, so no wall-clock claim is made. Division, extra reductions, launch overhead, and memory traffic could erase the abstract advantage.
+Phase 3 implemented this graph as an FP64 CPU oracle, an exclusion-safe PyTorch reference, and native HIP kernels on one MI300X. Exhaustive and adversarial numerical tests pass within predeclared FP64, FP32, and BF16 tolerances; the optimizer retains zero persistent tensors and zero persistent bytes. ROCprofiler traces prove that the custom marginal, exclusion, denominator, norm, and update kernels executed. Performance is a negative result: after replacing contended reductions, the representative BF16 Transformer-shaped optimizer-only median improved from 141.0779 ms to 5.3505 ms, but fused AdamW takes 0.9076 ms. The ratio 5.8953 exceeds the preregistered maximum 1.15, so Phase 3 is `REVISE`.
 
 ## 9. Numerical methodology
 
@@ -632,21 +632,21 @@ ARO treats rotation as a first-class state and demonstrates that many matrix opt
 ## 11. Limitations
 
 1. **No training evidence.** The central performance target is untested.
-2. **No wall-clock evidence.** \(O(mn)\) does not imply AdamW wall time.
+2. **Negative wall-clock evidence.** The MI300X native path is 5.8953× fused AdamW on the Phase 3 representative suite despite linear arithmetic.
 3. **Only conditional stochastic theory.** The measurable SNR and high-probability conditions are sufficient, not known necessary, and may fail in language-model training.
 4. **Basis dependence.** Only permutations and transpose are symmetries; arbitrary rotations are not.
 5. **Step sensitivity.** The condition-\(10^4\) scheduled result is a direct warning.
 6. **Algebraic versus numerical rank.** Generic full exact rank can carry negligible extra singular mass.
-7. **Boundary implementation remains unbenchmarked.** The projective ray is continuous with a proved modulus, but exclusion reductions and the FP64 rare path still need kernel validation.
+7. **Boundary implementation is validated on only one GPU.** The exact boundary and FP64 rare path pass the Phase 3 suite, but independent hardware replication remains absent.
 8. **Radius scaling is derived but not empirically optimal.** \(\sqrt{\min(m,n)}\) is frozen by symmetric average-fiber constraints; those constraints are not a theorem about best neural-training scale.
 9. **Finite novelty search.** No search can prove that an equivalent unpublished or differently named method does not exist.
 10. **No acceleration theorem.** The stationarity result matches normalized first-order order, and the exact mode result predicts aggressive alternation as well as deflation.
 11. **Sparse concentration risk.** Embedding gradients with few active rows can concentrate a fixed layer radius on that support; no fallback is allowed, so this is a required diagnostic and possible kill result.
 12. **Sensitivity constants are loose.** The regional Lipschitz constant proves control but is far larger than observed local ratios and is not a useful tuning formula.
 
-## 12. Falsifiable next phase
+## 12. Phase 3 outcome and next gate
 
-The next phase should implement only `spec/optimizer_v0.2.json` as a transparent PyTorch reference and native ROCm/HIP kernels, with no momentum, epsilon, or rescue mixture. Small diagnostics must compare the kernel against the decimal/FP64 oracle, exercise every shape and boundary branch, count rare paths, and benchmark the reduction graph. It must not start the training study before its own gate passes.
+Phase 3 implemented only `spec/optimizer_v0.2.json`, with no momentum, epsilon, or rescue mixture. Its correctness, safety, state, memory, and native-execution checks pass, but its optimizer-step speed gate fails. Phase 4 and the training study are therefore not authorized. Any future engineering revision must preserve the exact map, rerun the full oracle/HIP suite, clear the 1.15× limit, and obtain independent replication on a second modern GPU family.
 
 The hypothesis should be rejected if it requires a conventional optimizer component to become stable or competitive, exceeds AdamW optimizer-step time by more than 15% after fusion, or fails the predeclared tokens-to-target criterion on most workloads. The full protocol is in `research/future_experiment_protocol.md`.
 

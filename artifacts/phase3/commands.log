@@ -1,0 +1,58 @@
+# CauchyLift Phase 3 reconstruction commands (UTC 2026-08-28)
+# Commands do not contain credentials. No command builds or trains a model.
+
+# Verify required handoffs and initial source state.
+git status --short --branch
+git log -5 --oneline
+python3 -m json.tool phases/status/phase1.json
+python3 -m json.tool phases/status/phase2.json
+
+# Initial read-only inventory showed global Python without pip/torch.
+uname -a
+cat /etc/os-release
+lspci -nn
+rocminfo
+rocm-smi --showproductname --showuniqueid --showdriverversion --showvbios --showmeminfo vram --showuse --showtemp
+hipconfig --full
+hipcc --version
+amdclang++ --version
+python3 --version
+python3 -m pip --version
+free -h
+df -h /root/cauchylift /tmp
+rocprofv3 --version
+
+# Create the isolated environment. ensurepip was absent, so pip was bootstrapped locally.
+python3 -m venv --without-pip .venv
+curl -fsSL https://bootstrap.pypa.io/get-pip.py -o /tmp/cauchylift-get-pip.py
+.venv/bin/python /tmp/cauchylift-get-pip.py
+PIP_CACHE_DIR=/tmp/cauchylift-pip-cache .venv/bin/python -m pip install --index-url https://stable.repo.amd.com/rocm/whl-next/ 'torch[device-gfx942]==2.13.0+rocm10.0.0'
+PIP_CACHE_DIR=/tmp/cauchylift-pip-cache .venv/bin/python -m pip install 'pytest==8.4.2' 'ninja==1.13.0'
+PIP_CACHE_DIR=/tmp/cauchylift-pip-cache .venv/bin/python -m pip install --index-url https://stable.repo.amd.com/rocm/whl-next/ 'rocm[devel]==10.0.0'
+.venv/bin/rocm-sdk targets
+PATH=/root/cauchylift/.venv/bin:$PATH .venv/bin/rocm-sdk test
+
+# Build products remain outside Git.
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build PYTORCH_ROCM_ARCH=gfx942 MAX_JOBS=8 .venv/bin/python -c 'from cauchylift.hip import load_extension; load_extension(verbose=True)'
+
+# Correctness, stress, checkpoint, and leak tests.
+PYTHONPATH=. .venv/bin/python -m pytest -q tests/test_reference.py
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python -m pytest -q tests/test_rocm.py
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python -m pytest -q
+
+# The initial contended-reduction failure is preserved, then the optimized rerun.
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/benchmark_phase3.py --warmup 5 --iterations 15 --output analysis/results/phase3_benchmark_initial.json
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/benchmark_phase3.py --warmup 5 --iterations 15 --output analysis/results/phase3_benchmark.json
+
+# The system profiler attempt failed from a mixed-library LLVM registration conflict.
+# The pinned profiler/root commands below succeeded and generated the checked-in CSV.
+.venv/bin/rocprofv3 --rocm-root /root/cauchylift/.venv/lib/python3.12/site-packages/_rocm_sdk_devel --disable-signal-handlers true --kernel-trace --stats --summary -f csv json -d /tmp/cauchylift-profiler-hip-optimized -- env PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/profile_phase3.py --backend cauchylift_hip --iterations 3
+.venv/bin/rocprofv3 --rocm-root /root/cauchylift/.venv/lib/python3.12/site-packages/_rocm_sdk_devel --disable-signal-handlers true --kernel-trace --stats --summary -f csv json -d /tmp/cauchylift-profiler-adamw-optimized -- env PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/profile_phase3.py --backend adamw_fused --iterations 3
+
+bash scripts/inventory_phase3.sh > artifacts/phase3/environment.txt 2>&1
+python3 -m json.tool analysis/results/phase3_benchmark.json
+python3 -m json.tool analysis/results/phase3_benchmark_initial.json
+python3 -m json.tool phases/status/phase3.json
+python3 -m compileall -q analysis benchmarks cauchylift tests
+sha256sum analysis/results/phase3_benchmark*.json artifacts/phase3/profiler/* cauchylift/*.py csrc/*.cu tests/*.py requirements/*.txt
+git diff --check

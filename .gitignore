@@ -2,3 +2,9 @@ __pycache__/
 *.py[cod]
 .lake/
 formal/.lake/
+.venv/
+build/
+dist/
+*.egg-info/
+*.so
+.pytest_cache/

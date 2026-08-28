@@ -2,7 +2,7 @@
 
 CauchyLift is a theory-stage optimizer proposal built around one new primitive: a **cotransverse rational gradient field**. For a matrix gradient \(G\), it measures the gradient energy outside each entry's row and outside its column, divides that entry by the combined excluded energy, and normalizes the resulting field once.
 
-This repository intentionally contains no model-training implementation and makes no empirical performance claim. It contains the research paper, a dated novelty audit, formal Lean statements, and deterministic mathematical analyses. The design target is matrix-aware convergence behavior with only linear work, reductions, pointwise operations, and no persistent optimizer state. Whether that target survives neural-network experiments is an open, explicitly falsifiable question.
+This repository intentionally contains no model-training implementation and makes no neural-training performance claim. It contains the research paper, a dated novelty audit, formal Lean statements, deterministic mathematical analyses, and the Phase 3 PyTorch/native-HIP optimizer implementation. The design target is matrix-aware convergence behavior with only linear work, reductions, pointwise operations, and no persistent optimizer state. Whether that target survives neural-network experiments is an open, explicitly falsifiable question.
 
 ## Core map
 
@@ -46,11 +46,12 @@ The update is \(W_{t+1}=W_t-\eta_t\operatorname{CL}(\nabla f(W_t))\). Momentum, 
 - An exact two-mode mode-alternation signature \(q^+=-q^{-3}\), reported with its harmful \(q^{++}=q^9\) counterprediction.
 - A Cauchy-kernel factorization on rank-one gradients and a generic algebraic rank-lift theorem.
 - Reproducible property checks and synthetic quadratic probes, including negative results that prevent premature performance claims.
+- FP64-oracle, PyTorch, and native HIP numerical agreement on the single MI300X with zero persistent optimizer state.
 
 ## What is not established
 
 - No language-model or neural-network training has been run.
-- No wall-clock comparison with AdamW, Muon, SOAP, or any other optimizer has been run.
+- The optimized native HIP path is not competitive with fused AdamW on the representative Phase 3 suite: 5.3505 ms versus 0.9076 ms. Phase 3 is `REVISE`.
 - Algebraic rank lift is not the same as useful numerical stable rank; the included probe demonstrates this distinction.
 - The finite literature search supports only a scoped statement that no close formula was found through 2026-08-28. It cannot prove that nobody has ever considered an equivalent map.
 
@@ -61,6 +62,8 @@ The update is \(W_{t+1}=W_t-\eta_t\operatorname{CL}(\nabla f(W_t))\). Momentum, 
 - [`research/`](research/) — research contract, query ledger, closest-work matrix, rejected candidates, claim audit, and risk register.
 - [`analysis/`](analysis/) — standard-library-only mathematical and numerical probes; no training code.
 - [`formal/`](formal/) — Lean project and proof audit.
+- [`cauchylift/`](cauchylift/) and [`csrc/`](csrc/) — reference optimizer and native HIP kernels.
+- [`docs/phase3.md`](docs/phase3.md) — isolated environment, build, tests, benchmark, profiler, and declared tolerances.
 
 ## Reproduce the mathematical analyses
 
@@ -91,6 +94,12 @@ lake build
 
 See [`formal/README.md`](formal/README.md) for the exact proof boundary.
 
+## Reproduce Phase 3
+
+The ROCm environment, CPU/GPU tests, benchmark, and profiler commands are in
+[`docs/phase3.md`](docs/phase3.md). CPU-only continuous tests skip ROCm cases
+honestly; no model or dataset is built.
+
 ## Status
 
-**Theory-stage research hypothesis, version 0.2.0.** Phases 1 and 2 passed on 2026-08-28. Boundary, stochastic, mechanism, shape/radius, and finite-precision semantics are frozen in [`spec/optimizer_v0.2.json`](spec/optimizer_v0.2.json). Kernel prototyping and controlled training experiments remain deliberately absent here.
+**Theory-stage research hypothesis, version 0.2.0.** Phases 1 and 2 passed on 2026-08-28. Phase 3 is `REVISE`: correctness, safety, zero state, linear work, and MI300X profiler gates pass, but the mandatory optimizer-step performance gate fails. The original two-GPU-family criterion remains unreplicated, and Phase 4 is not authorized. No neural-network training has been run.
