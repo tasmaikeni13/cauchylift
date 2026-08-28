@@ -1,0 +1,434 @@
+{
+  "all_passed": true,
+  "artifact": "CauchyLift Phase 2 width and shape suite",
+  "checks": {
+    "all_parameter_kinds_declared": true,
+    "both_average_fiber_caps": true,
+    "maximal_symmetric_radius": true,
+    "no_fallback": true,
+    "radius_matches_spec": true,
+    "transpose_radius": true,
+    "zero_and_boundary_totality": true
+  },
+  "decoder_parameter_shapes": {
+    "attention_output": {
+      "average_squared_column_norm": 1.0,
+      "average_squared_row_norm": 1.0,
+      "column_fiber_cap_holds": true,
+      "columns": 768,
+      "one_fiber_cap_is_tight": true,
+      "radius": 27.712812921102035,
+      "row_fiber_cap_holds": true,
+      "rows": 768,
+      "transpose_radius_equal": true
+    },
+    "attention_qkv": {
+      "average_squared_column_norm": 1.0,
+      "average_squared_row_norm": 0.3333333333333333,
+      "column_fiber_cap_holds": true,
+      "columns": 768,
+      "one_fiber_cap_is_tight": true,
+      "radius": 27.712812921102035,
+      "row_fiber_cap_holds": true,
+      "rows": 2304,
+      "transpose_radius_equal": true
+    },
+    "mlp_down": {
+      "average_squared_column_norm": 0.25,
+      "average_squared_row_norm": 1.0,
+      "column_fiber_cap_holds": true,
+      "columns": 3072,
+      "one_fiber_cap_is_tight": true,
+      "radius": 27.712812921102035,
+      "row_fiber_cap_holds": true,
+      "rows": 768,
+      "transpose_radius_equal": true
+    },
+    "mlp_up": {
+      "average_squared_column_norm": 1.0,
+      "average_squared_row_norm": 0.25,
+      "column_fiber_cap_holds": true,
+      "columns": 768,
+      "one_fiber_cap_is_tight": true,
+      "radius": 27.712812921102035,
+      "row_fiber_cap_holds": true,
+      "rows": 3072,
+      "transpose_radius_equal": true
+    },
+    "normalization_gain": {
+      "average_squared_column_norm": 1.0,
+      "average_squared_row_norm": 0.0013020833333333333,
+      "column_fiber_cap_holds": true,
+      "columns": 1,
+      "one_fiber_cap_is_tight": true,
+      "radius": 1.0,
+      "row_fiber_cap_holds": true,
+      "rows": 768,
+      "transpose_radius_equal": true
+    },
+    "scalar": {
+      "average_squared_column_norm": 1.0,
+      "average_squared_row_norm": 1.0,
+      "column_fiber_cap_holds": true,
+      "columns": 1,
+      "one_fiber_cap_is_tight": true,
+      "radius": 1.0,
+      "row_fiber_cap_holds": true,
+      "rows": 1,
+      "transpose_radius_equal": true
+    },
+    "token_embedding": {
+      "average_squared_column_norm": 1.0,
+      "average_squared_row_norm": 0.015267175572519083,
+      "column_fiber_cap_holds": true,
+      "columns": 768,
+      "one_fiber_cap_is_tight": true,
+      "radius": 27.712812921102035,
+      "row_fiber_cap_holds": true,
+      "rows": 50304,
+      "transpose_radius_equal": true
+    }
+  },
+  "radius_derivation": "rho^2 <= m and rho^2 <= n are exactly the requirements that average squared row and column update norms are both at most one. The maximal transpose-symmetric choice is rho^2=min(m,n).",
+  "run_id": "phase2-width-20260828",
+  "small_shape_totality": [
+    {
+      "expected_radius": 1.0,
+      "one_sparse_radius": 1.0,
+      "one_sparse_sign_preserved": true,
+      "shape": [
+        1,
+        1
+      ],
+      "zero_maps_to_zero": true
+    },
+    {
+      "expected_radius": 1.0,
+      "one_sparse_radius": 1.0,
+      "one_sparse_sign_preserved": true,
+      "shape": [
+        1,
+        7
+      ],
+      "zero_maps_to_zero": true
+    },
+    {
+      "expected_radius": 1.0,
+      "one_sparse_radius": 1.0,
+      "one_sparse_sign_preserved": true,
+      "shape": [
+        7,
+        1
+      ],
+      "zero_maps_to_zero": true
+    },
+    {
+      "expected_radius": 1.4142135623730951,
+      "one_sparse_radius": 1.4142135623730951,
+      "one_sparse_sign_preserved": true,
+      "shape": [
+        2,
+        9
+      ],
+      "zero_maps_to_zero": true
+    },
+    {
+      "expected_radius": 1.4142135623730951,
+      "one_sparse_radius": 1.4142135623730951,
+      "one_sparse_sign_preserved": true,
+      "shape": [
+        9,
+        2
+      ],
+      "zero_maps_to_zero": true
+    }
+  ],
+  "specification": "spec/optimizer_v0.2.json",
+  "width_transfer_families": {
+    "contraction_4x": [
+      {
+        "average_squared_column_norm": 0.25,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 256,
+        "one_fiber_cap_is_tight": true,
+        "radius": 8.0,
+        "row_fiber_cap_holds": true,
+        "rows": 64,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 0.25,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 512,
+        "one_fiber_cap_is_tight": true,
+        "radius": 11.313708498984761,
+        "row_fiber_cap_holds": true,
+        "rows": 128,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 0.25,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 1024,
+        "one_fiber_cap_is_tight": true,
+        "radius": 16.0,
+        "row_fiber_cap_holds": true,
+        "rows": 256,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 0.25,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 2048,
+        "one_fiber_cap_is_tight": true,
+        "radius": 22.627416997969522,
+        "row_fiber_cap_holds": true,
+        "rows": 512,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 0.25,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 4096,
+        "one_fiber_cap_is_tight": true,
+        "radius": 32.0,
+        "row_fiber_cap_holds": true,
+        "rows": 1024,
+        "transpose_radius_equal": true
+      }
+    ],
+    "expansion_4x": [
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.25,
+        "column_fiber_cap_holds": true,
+        "columns": 64,
+        "one_fiber_cap_is_tight": true,
+        "radius": 8.0,
+        "row_fiber_cap_holds": true,
+        "rows": 256,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.25,
+        "column_fiber_cap_holds": true,
+        "columns": 128,
+        "one_fiber_cap_is_tight": true,
+        "radius": 11.313708498984761,
+        "row_fiber_cap_holds": true,
+        "rows": 512,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.25,
+        "column_fiber_cap_holds": true,
+        "columns": 256,
+        "one_fiber_cap_is_tight": true,
+        "radius": 16.0,
+        "row_fiber_cap_holds": true,
+        "rows": 1024,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.25,
+        "column_fiber_cap_holds": true,
+        "columns": 512,
+        "one_fiber_cap_is_tight": true,
+        "radius": 22.627416997969522,
+        "row_fiber_cap_holds": true,
+        "rows": 2048,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.25,
+        "column_fiber_cap_holds": true,
+        "columns": 1024,
+        "one_fiber_cap_is_tight": true,
+        "radius": 32.0,
+        "row_fiber_cap_holds": true,
+        "rows": 4096,
+        "transpose_radius_equal": true
+      }
+    ],
+    "square": [
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 64,
+        "one_fiber_cap_is_tight": true,
+        "radius": 8.0,
+        "row_fiber_cap_holds": true,
+        "rows": 64,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 128,
+        "one_fiber_cap_is_tight": true,
+        "radius": 11.313708498984761,
+        "row_fiber_cap_holds": true,
+        "rows": 128,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 256,
+        "one_fiber_cap_is_tight": true,
+        "radius": 16.0,
+        "row_fiber_cap_holds": true,
+        "rows": 256,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 512,
+        "one_fiber_cap_is_tight": true,
+        "radius": 22.627416997969522,
+        "row_fiber_cap_holds": true,
+        "rows": 512,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 1.0,
+        "column_fiber_cap_holds": true,
+        "columns": 1024,
+        "one_fiber_cap_is_tight": true,
+        "radius": 32.0,
+        "row_fiber_cap_holds": true,
+        "rows": 1024,
+        "transpose_radius_equal": true
+      }
+    ],
+    "vector": [
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.015625,
+        "column_fiber_cap_holds": true,
+        "columns": 1,
+        "one_fiber_cap_is_tight": true,
+        "radius": 1.0,
+        "row_fiber_cap_holds": true,
+        "rows": 64,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.0078125,
+        "column_fiber_cap_holds": true,
+        "columns": 1,
+        "one_fiber_cap_is_tight": true,
+        "radius": 1.0,
+        "row_fiber_cap_holds": true,
+        "rows": 128,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.00390625,
+        "column_fiber_cap_holds": true,
+        "columns": 1,
+        "one_fiber_cap_is_tight": true,
+        "radius": 1.0,
+        "row_fiber_cap_holds": true,
+        "rows": 256,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.001953125,
+        "column_fiber_cap_holds": true,
+        "columns": 1,
+        "one_fiber_cap_is_tight": true,
+        "radius": 1.0,
+        "row_fiber_cap_holds": true,
+        "rows": 512,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.0009765625,
+        "column_fiber_cap_holds": true,
+        "columns": 1,
+        "one_fiber_cap_is_tight": true,
+        "radius": 1.0,
+        "row_fiber_cap_holds": true,
+        "rows": 1024,
+        "transpose_radius_equal": true
+      }
+    ],
+    "vocabulary_table": [
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.001272264631043257,
+        "column_fiber_cap_holds": true,
+        "columns": 64,
+        "one_fiber_cap_is_tight": true,
+        "radius": 8.0,
+        "row_fiber_cap_holds": true,
+        "rows": 50304,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.002544529262086514,
+        "column_fiber_cap_holds": true,
+        "columns": 128,
+        "one_fiber_cap_is_tight": true,
+        "radius": 11.313708498984761,
+        "row_fiber_cap_holds": true,
+        "rows": 50304,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.005089058524173028,
+        "column_fiber_cap_holds": true,
+        "columns": 256,
+        "one_fiber_cap_is_tight": true,
+        "radius": 16.0,
+        "row_fiber_cap_holds": true,
+        "rows": 50304,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.010178117048346057,
+        "column_fiber_cap_holds": true,
+        "columns": 512,
+        "one_fiber_cap_is_tight": true,
+        "radius": 22.627416997969522,
+        "row_fiber_cap_holds": true,
+        "rows": 50304,
+        "transpose_radius_equal": true
+      },
+      {
+        "average_squared_column_norm": 1.0,
+        "average_squared_row_norm": 0.020356234096692113,
+        "column_fiber_cap_holds": true,
+        "columns": 1024,
+        "one_fiber_cap_is_tight": true,
+        "radius": 32.0,
+        "row_fiber_cap_holds": true,
+        "rows": 50304,
+        "transpose_radius_equal": true
+      }
+    ]
+  }
+}

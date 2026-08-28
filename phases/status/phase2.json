@@ -1,0 +1,15 @@
+{
+  "gate": "PASS",
+  "invalidated_downstream_phases": [],
+  "phase": 2,
+  "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
+  "reasons": [
+    "The update and finite-precision execution rule are total and frozen for all intended trainable parameter shapes.",
+    "Conditional stochastic alignment and smooth descent are proved under measurable assumptions, with an explicit unbiased-noise expected-ascent counterexample.",
+    "The exact two-mode recurrence supplies a control-distinguishing mechanism signature and an explicit concentration counterprediction.",
+    "The radius is derived and frozen; all expanded deterministic suites and declared Lean targets pass with negative cases retained.",
+    "The paper and machine-readable Phase 3 specification separate proved, checked, hypothesized, and unknown claims."
+  ],
+  "run_id": "phase2-20260828T103838Z",
+  "timestamp_utc": "2026-08-28T10:38:38Z"
+}

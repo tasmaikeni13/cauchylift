@@ -1,0 +1,57 @@
+{
+  "artifact": "CauchyLift Phase 2 manifest",
+  "commands": "artifacts/phase2/commands.log",
+  "decisive_artifact_hashes": {
+    "analysis/results/adversarial_audit.json": "09a4edc7c49a170abd82037721e84b45ce0ff690b07ee38b2245fd3acfc18802",
+    "analysis/results/boundary_suite.json": "67ea885781e6a0d14bdc5cb8e62880bd673b8d294507dc621171fa0978a42abb",
+    "analysis/results/finite_precision_suite.json": "4b4b514615eb68daeba46539f97c8e1ecd96b0d7fa2cc32a9a727b3f5470cba4",
+    "analysis/results/mechanism_suite.json": "a2b7319ca2fcbb3e20fa293c5b9666313e28ecf7a53dbb6b75ff007894343de3",
+    "analysis/results/property_checks.json": "62a0222b4c4324a5bc3f289b07a0599613eaad432641a6e37e65640c8fe539c1",
+    "analysis/results/quadratic_suite.json": "0fe0a9a2cbeec382a1b12c1aa962e6c986281f044e232f8e9ae65bdc1b50fec9",
+    "analysis/results/rank_probe.json": "d95b469f93481ed27cdbc3ccbc2cba6d0183229249be34ba45780d14fedade68",
+    "analysis/results/rejection_checks.json": "54fc805a17c7b2cf4da0a85efc2b64b5f48bb93e88f06a4aa84bc3c7faf4a2a0",
+    "analysis/results/stochastic_suite.json": "f82f7fe0dd6de2120689a5c0073baf224e39bc6a6b8e163574cbf5e03e3d9076",
+    "analysis/results/width_suite.json": "5ba05c482ef81f91801816751ece2a5426bda58628280a1be524177f85bdbc60",
+    "formal/CauchyLift/Mechanism.lean": "1171bf0a05c5a583b35039bdac1aaea48eeb9d0833edb853a168da8b0201c779",
+    "formal/CauchyLift/Noise.lean": "daf9d6842862db4b5cc6e69b0e3b3e9b8abf7d7bdb38950cd77aadf2b962f12c",
+    "paper/paper.md": "8ad7be2c5e194c3ec196d93a79a7335e6591d5023d3652cfb567994adc7879b8",
+    "research/proof_audit.md": "62cc1a4f9779db5babb3ef9c8ac2683415eadaca826bbd81f00aa27f9adccde4",
+    "research/research_contract.md": "a1310e0d66d7a878d65fd42b1f061e43a16a96a6b5db7e9f0763311fc23dcf3c",
+    "spec/optimizer_v0.2.json": "695719241c6a36aa68730fb4b1d26bb9220709aec7d1dfa4d8f48a7a77ba6c1e"
+  },
+  "environment": {
+    "gpu_host": "AMD MI300X host detected; unused",
+    "lean": "4.19.0",
+    "mathlib_revision": "c44e0c8ee63ca166450922a373c7409c5d26b00b",
+    "operating_system": "Linux 6.8.0-138-generic x86_64",
+    "python": "3.12.3"
+  },
+  "gate": "PASS",
+  "inputs": [
+    "README.md",
+    "phases/README.md",
+    "phases/phase1.md",
+    "phases/phase2.md",
+    "artifacts/phase1/report.md",
+    "phases/status/phase1.json",
+    "research/research_contract.md",
+    "research/future_experiment_protocol.md",
+    "research/evidence_ledger.md",
+    "research/risk_register.md",
+    "paper/paper.md"
+  ],
+  "outputs": [
+    "artifacts/phase2/report.md",
+    "analysis/results/boundary_suite.json",
+    "analysis/results/stochastic_suite.json",
+    "analysis/results/mechanism_suite.json",
+    "analysis/results/width_suite.json",
+    "analysis/results/finite_precision_suite.json",
+    "spec/optimizer_v0.2.json",
+    "phases/status/phase2.json"
+  ],
+  "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
+  "run_id": "phase2-20260828T103838Z",
+  "seeds": [20260827, 20260828, 20260829],
+  "timestamp_utc": "2026-08-28T10:38:38Z"
+}

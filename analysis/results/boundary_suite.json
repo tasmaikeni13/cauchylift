@@ -1,0 +1,124 @@
+{
+  "all_passed": true,
+  "angle_equality_case": "none; the bound is strict for every nonzero matrix",
+  "artifact": "CauchyLift Phase 2 boundary and sensitivity suite",
+  "checks": {
+    "boundary_continuity": true,
+    "denominator_dynamic_range": true,
+    "exhaustive_angle": true,
+    "exhaustive_norm": true,
+    "interior_lipschitz": true,
+    "property_angle": true,
+    "property_norm": true,
+    "zero_counterexample": true
+  },
+  "exhaustive_small_shapes": {
+    "alphabet": [
+      -1.0,
+      0.0,
+      1.0
+    ],
+    "maximum_norm_error": 2.220446049250313e-16,
+    "minimum_cosine": 0.9801960588196068,
+    "shapes": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        3,
+        2
+      ]
+    ],
+    "tested_nonzero_matrices": 1554
+  },
+  "interior_lipschitz": {
+    "all_cases_within_bound": true,
+    "delta": 0.1,
+    "maximum_observed_ratio": 2.048634479553063,
+    "proved_lipschitz_constant": 1639.9999999999998,
+    "samples": 2000,
+    "seed": 20260829
+  },
+  "one_sparse_boundary": {
+    "all_continuity_bounds_hold": true,
+    "all_denominator_bounds_hold": true,
+    "cases": [
+      {
+        "active_denominator_ratio": 14.000000000000039,
+        "direction_error": 0.038783222859459704,
+        "error_to_bound_ratio": 0.5235735086027059,
+        "proved_denominator_ratio_upper_bound": 20.0,
+        "proved_upper_bound": 0.07407407407407408,
+        "tau": 0.1
+      },
+      {
+        "active_denominator_ratio": 148.9999999999978,
+        "direction_error": 0.0011613851105625745,
+        "error_to_bound_ratio": 0.57200397935296,
+        "proved_denominator_ratio_upper_bound": 200.0,
+        "proved_upper_bound": 0.0020303794247660853,
+        "tau": 0.01
+      },
+      {
+        "active_denominator_ratio": 14999.000000001652,
+        "direction_error": 1.1547668323248675e-06,
+        "error_to_bound_ratio": 0.5772968108152332,
+        "proved_denominator_ratio_upper_bound": 20000.0,
+        "proved_upper_bound": 2.0003000375043757e-06,
+        "tau": 0.0001
+      },
+      {
+        "active_denominator_ratio": 150000001.5769552,
+        "direction_error": 1.1547005450080884e-12,
+        "error_to_bound_ratio": 0.5773502638437901,
+        "proved_denominator_ratio_upper_bound": 200000000.0,
+        "proved_upper_bound": 2.0000000300000006e-12,
+        "tau": 1e-08
+      },
+      {
+        "active_denominator_ratio": 1500199742627.413,
+        "direction_error": 1.154700538379915e-18,
+        "error_to_bound_ratio": 0.5773502691890915,
+        "proved_denominator_ratio_upper_bound": 2000000000000.0,
+        "proved_upper_bound": 2.000000000003e-18,
+        "tau": 1e-12
+      }
+    ],
+    "definition": "tau is total normalized energy outside the dominant cell"
+  },
+  "outside_proved_region_counterexample": {
+    "conclusion": "the scale-invariant nonzero map has no continuous extension at zero",
+    "constant_output_distance": 1.4142135623730951,
+    "sequence_input_distances": [
+      0.14142135623730953,
+      0.0001414213562373095,
+      1.4142135623730952e-08,
+      1.4142135623730949e-16
+    ]
+  },
+  "property_cases": {
+    "maximum_norm_error": 8.881784197001252e-16,
+    "minimum_cosine": 0.9266833832350886,
+    "samples": 10000,
+    "seed": 20260828
+  },
+  "run_id": "phase2-boundary-20260828",
+  "seed": 20260828
+}

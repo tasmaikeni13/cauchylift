@@ -40,6 +40,10 @@ The update is \(W_{t+1}=W_t-\eta_t\operatorname{CL}(\nabla f(W_t))\). Momentum, 
   \(\langle G,\operatorname{CL}(G)\rangle\ge
   \lVert G\rVert_F\lVert\operatorname{CL}(G)\rVert_F/\sqrt3\).
 - A deterministic \(O(T^{-1/2})\) stationarity bound for smooth objectives under normalized steps.
+- A continuous one-sparse projective extension with an explicit boundary modulus and an interior Lipschitz bound.
+- Conditional expected stochastic descent under measurable minibatch-noise assumptions, plus an explicit unbiased-noise expected-ascent counterexample.
+- Frozen scalar, vector, matrix, embedding, and higher-tensor semantics with a machine-readable finite-precision specification.
+- An exact two-mode mode-alternation signature \(q^+=-q^{-3}\), reported with its harmful \(q^{++}=q^9\) counterprediction.
 - A Cauchy-kernel factorization on rank-one gradients and a generic algebraic rank-lift theorem.
 - Reproducible property checks and synthetic quadratic probes, including negative results that prevent premature performance claims.
 
@@ -48,7 +52,7 @@ The update is \(W_{t+1}=W_t-\eta_t\operatorname{CL}(\nabla f(W_t))\). Momentum, 
 - No language-model or neural-network training has been run.
 - No wall-clock comparison with AdamW, Muon, SOAP, or any other optimizer has been run.
 - Algebraic rank lift is not the same as useful numerical stable rank; the included probe demonstrates this distinction.
-- The finite literature search supports only a scoped statement that no close formula was found through 2026-08-27. It cannot prove that nobody has ever considered an equivalent map.
+- The finite literature search supports only a scoped statement that no close formula was found through 2026-08-28. It cannot prove that nobody has ever considered an equivalent map.
 
 ## Repository map
 
@@ -67,6 +71,12 @@ python3 analysis/run_property_checks.py
 python3 analysis/run_quadratic_suite.py
 python3 analysis/run_rank_probe.py
 python3 analysis/run_rejection_checks.py
+python3 analysis/run_adversarial_audit.py
+python3 analysis/run_boundary_suite.py
+python3 analysis/run_stochastic_suite.py
+python3 analysis/run_mechanism_suite.py
+python3 analysis/run_width_suite.py
+python3 analysis/run_finite_precision_suite.py
 ```
 
 Each command prints deterministic JSON. The checked-in outputs under `analysis/results/` were generated with those commands.
@@ -83,4 +93,4 @@ See [`formal/README.md`](formal/README.md) for the exact proof boundary.
 
 ## Status
 
-**Theory-stage research hypothesis, version 0.1.1.** Phase 1's adversarial novelty and mathematical audit passed on 2026-08-28 after repairing the generic rank-lift hypotheses. Kernel prototyping and controlled training experiments remain deliberately absent here.
+**Theory-stage research hypothesis, version 0.2.0.** Phases 1 and 2 passed on 2026-08-28. Boundary, stochastic, mechanism, shape/radius, and finite-precision semantics are frozen in [`spec/optimizer_v0.2.json`](spec/optimizer_v0.2.json). Kernel prototyping and controlled training experiments remain deliberately absent here.

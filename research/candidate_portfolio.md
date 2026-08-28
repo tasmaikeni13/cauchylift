@@ -79,8 +79,8 @@ Z_{ij}=\frac{G_{ij}}{(S-r_i)+(S-c_j)}.
 
 **Unique predictions.** Dimension-independent descent angle; generic Cauchy factorization on rank-one inputs; dense, smooth concentration on energetic row-column intersections; linear reduction-only implementation.
 
-**Attacks completed.** Algebraic proof, 5,000 randomized property checks, exact and scheduled quadratic probes at condition 100 and 10,000, exact-rank and stable-rank probes, and a closest-family literature audit.
+**Attacks completed.** Algebraic proof, 5,000 original randomized property checks, Phase 1 hostile shape/boundary/noise cases, 1,554 exhaustive small matrices, 10,000 Phase 2 property cases, exact and scheduled quadratic probes at condition 100 and 10,000, exact-rank and stable-rank probes, boundary/sensitivity proofs, stochastic finite distributions, two-mode mechanism controls, width transfer, finite precision, and a refreshed closest-family literature audit.
 
-**Result.** Survives as a theory hypothesis. It performs strongly on several condition-100 and axis-aligned exact-line probes, but degrades under the scheduled condition-10,000 probe and gains essentially no stable rank in the sampled rank-one cases.
+**Result.** Survives as a theory hypothesis. The projective boundary is stable, conditional noisy-gradient descent is valid under an explicit SNR margin, and the exact local signature is mode alternation \(q^+=-q^{-3}\). It performs strongly on several condition-100 and axis-aligned exact-line probes, but unbiased noise can produce expected ascent, two idealized mode steps give \(q^9\) concentration, scheduled condition-10,000 performance degrades, and sampled rank-one outputs gain essentially no stable rank.
 
 **Decision.** Retained for formalization, not promoted as empirically validated.

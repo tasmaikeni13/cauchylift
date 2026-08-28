@@ -12,7 +12,7 @@
   "maximum_fixed_norm_error": 8.881784197001252e-16,
   "maximum_odd_error": 0.0,
   "maximum_positive_scale_error": 8.881784197001252e-16,
-  "maximum_transpose_error": 8.881784197001252e-16,
+  "maximum_transpose_error": 0.0,
   "observed_minimum_cosine": 0.9242201826795767,
   "observed_minimum_inner_product": 6.245445079321467e-06,
   "samples": 5000,

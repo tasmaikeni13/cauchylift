@@ -1,0 +1,95 @@
+{
+  "all_passed": true,
+  "artifact": "CauchyLift Phase 2 finite-precision suite",
+  "checks": {
+    "all_dtype_cases_finite": true,
+    "all_dtype_cases_match_oracle": true,
+    "epsilon_is_not_neutral": true,
+    "exclusion_safe_cancellation_case": true,
+    "projective_scaling_prevents_square_overflow": true
+  },
+  "epsilon_collision": {
+    "changes_ordinary_direction": true,
+    "conclusion": "an additive epsilon is a different optimizer, not a numerical implementation detail",
+    "direction_distance": 0.000612255736007315,
+    "fixed_epsilon": 0.001
+  },
+  "input_dtype_reports": {
+    "bf16": {
+      "balanced": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 4,
+        "safe_direction_finite": true
+      },
+      "near_boundary": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 4,
+        "safe_direction_finite": true
+      },
+      "one_sparse": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 1,
+        "safe_direction_finite": true
+      },
+      "wide_bf16_range": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 2,
+        "safe_direction_finite": true
+      }
+    },
+    "fp16": {
+      "balanced": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 4,
+        "safe_direction_finite": true
+      },
+      "near_boundary": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 4,
+        "safe_direction_finite": true
+      },
+      "one_sparse": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 1,
+        "safe_direction_finite": true
+      },
+      "wide_bf16_range": {
+        "cosine_with_decimal_oracle": 1.0,
+        "represented_nonzero_entries": 1,
+        "safe_direction_finite": true
+      }
+    }
+  },
+  "overflow_regime": {
+    "adversarial_input_magnitude": 1e+30,
+    "fp32_max": 3.4028234663852886e+38,
+    "max_scaled_square_upper_bound": 1.0,
+    "naive_square_overflow_threshold": 1.844674352395373e+19,
+    "naive_square_would_overflow": true
+  },
+  "run_id": "phase2-finite-precision-20260828",
+  "subtractive_cancellation": {
+    "dominant_true_complement": 8.673617379884035e-19,
+    "interpretation": "Subtractive cancellation can trigger an early boundary branch, but the proved boundary modulus makes the direction error cubic in off-cell amplitude. The frozen implementation nevertheless requires exclusion-safe sums.",
+    "safe_cosine_with_decimal_oracle": 1.0,
+    "safe_path_retains_tiny_component": true,
+    "source": [
+      [
+        1.0,
+        9.313225746154785e-10
+      ],
+      [
+        0.0,
+        0.0
+      ]
+    ],
+    "subtractive_cosine_with_decimal_oracle": 1.0,
+    "subtractive_path_treats_as_boundary": true
+  },
+  "underflow_regime": {
+    "boundary_error_order": "O(q^3) when q is off-dominant amplitude",
+    "flush_to_zero_square_input_scale_approx": "2^-63",
+    "fp32_smallest_subnormal_square_input_scale_approx": "2^-74",
+    "required_action": "fp64 rare-path recomputation or exact represented boundary; never epsilon"
+  }
+}

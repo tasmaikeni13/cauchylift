@@ -1,6 +1,6 @@
 # CauchyLift: Cotransverse Rational Gradient Fields for State-Free Matrix Optimization
 
-**Status:** theory-stage manuscript, version 0.1.1, 2026-08-28
+**Status:** theory-stage manuscript, version 0.2.0, 2026-08-28
 **Artifacts:** mathematical Python probes and partial Lean formalization accompany this manuscript
 **Empirical status:** no neural-network training has been performed
 
@@ -8,7 +8,9 @@
 
 Matrix optimizers for deep learning commonly obtain their geometry from historical moments, covariance factors, singular vectors, polar factors, norm-ball linear oracles, row/column balancing, or learned rotations. We investigate a different primitive. Given a matrix gradient \(G\), define the energy excluded by entry \((i,j)\) as the sum of all gradient energy outside row \(i\) and all gradient energy outside column \(j\). CauchyLift divides each gradient entry by this **cotransverse energy** and then takes one projective normalization. The map has linear arithmetic cost, requires only reductions and pointwise operations, and stores no persistent optimizer state.
 
-We prove that the resulting direction is scale invariant, odd, sign preserving, permutation and transpose equivariant, and uniformly descent aligned: its cosine with every nonzero exact gradient is at least \(1/\sqrt3\), independent of matrix dimensions. This gives an \(O(T^{-1/2})\) deterministic stationarity bound for smooth nonconvex objectives under normalized steps. On a rank-one gradient, the unnormalized field factorizes through an additive Cauchy kernel; under generic exact conditions this changes rank one to full algebraic rank. A numerical audit shows why this fact must be interpreted cautiously: sampled floating stable rank remains nearly one.
+We prove that the resulting direction is scale invariant, odd, sign preserving, permutation and transpose equivariant, and uniformly descent aligned: its cosine with every nonzero exact gradient is strictly greater than \(1/\sqrt3\), independent of matrix dimensions. This gives an \(O(T^{-1/2})\) deterministic stationarity bound for smooth nonconvex objectives under normalized steps. We also prove continuity at every one-sparse boundary with an explicit \(O(\tau^{3/2})\) modulus in off-cell energy \(\tau\), an interior Lipschitz bound, and conditional expected stochastic descent when minibatch noise is small relative to the true gradient. A scalar unbiased-noise counterexample shows why the condition cannot simply be discarded.
+
+On a rank-one gradient, the unnormalized field factorizes through an additive Cauchy kernel; under generic exact conditions this changes rank one to full algebraic rank. A numerical audit shows why this fact must be interpreted cautiously: sampled floating stable rank remains nearly one. On an isolated two-mode diagonal quadratic, exact line search maps the gradient ratio \(q\) to \(-q^{-3}\), versus \(-q^{-1}\) for normalized gradient and unit magnitude for sign, row/column-normalized, and polar controls. This is a sharply testable mode-alternation signature, not an acceleration theorem.
 
 Small quadratic probes show promising direction quality at moderate conditioning and a serious basis/schedule weakness at condition \(10^4\). Consequently, this paper does **not** claim AdamW-like wall time, SOAP/Muon-like convergence, stochastic acceleration, or neural-training efficacy. Its contribution is a new, falsifiable mathematical optimizer hypothesis; a finite literature audit found no close formula through 2026-08-28, but cannot certify universal historical novelty.
 
@@ -82,7 +84,7 @@ The CauchyLift direction is
 \tag{3}
 \]
 
-whenever \(Z\) is finite. The radius equals the Frobenius norm of a full-rank rectangular partial isometry. This is a scale convention, not a claim that the direction is orthogonal or polar.
+whenever \(Z\) is finite. The radius is the maximal transpose-symmetric choice for which both the average squared row norm and average squared column norm of every update are at most one. Indeed, a radius \(\rho\) gives averages \(\rho^2/m\) and \(\rho^2/n\), so both fiber constraints require \(\rho^2\le\min(m,n)\). This also equals the Frobenius norm of a full-rank rectangular partial isometry, but no orthogonal or polar structure is claimed.
 
 At the one-sparse boundary we define (3) projectively:
 
@@ -110,29 +112,33 @@ W_{t+1}=W_t-\eta_t\operatorname{CL}(\nabla f(W_t)).
 
 There is no momentum, running moment, clipping rule, rotation, whitening pass, matrix root, low-rank projector, trust gate, or fallback optimizer. Weight decay is not part of the primitive.
 
-For a vector, treat it as a \(1\times n\) matrix; then \(E_{1j}=S-G_{1j}^2\). A scalar uses the boundary rule. Higher-order tensors can be flattened along their semantic output axis versus all remaining axes, but this choice requires an architecture study and is not analyzed here.
+The same primitive is total on every trainable decoder parameter shape. A scalar is reshaped to \(1\times1\); a vector of length \(d\) to \(d\times1\); a stored matrix keeps its row-column shape; and a tensor of rank at least three is reshaped to \(d_0\times\prod_{k>0}d_k\), with the first axis serving as its semantic output or record axis. Transposition does not change the direction after mapping back or the radius, so the vector orientation is immaterial.
+
+For the initial bias-free decoder contract, token embeddings and output heads use their stored vocabulary-by-hidden shape; tied weights are transformed once after their shared gradient is accumulated. Attention and MLP weights use output-by-input storage. RMS-normalization gains use \(d\times1\). Scalars use the boundary rule. If a later architecture has biases, each bias uses the same vector rule; it does not receive Adam or SGD. Sparse layouts must implement the mathematically identical support-aware field or materialize the dense gradient—never switch optimizer families.
 
 ### 2.4 Pseudocode
 
 ```text
-input: nonzero G in R^(m x n), scalar step eta
+input: finite G in R^(m x n), scalar step eta
 
-Q <- G^2                                      # pointwise, FP32 accumulation
-S <- sum(Q)
+if all(G == 0): return 0
+if exactly_one_nonzero(G): return signed_boundary_direction
+
+Gq <- G / max(abs(G))                         # projectively neutral
+Q <- Gq^2                                     # pointwise, FP32 accumulation
 r <- row_sum(Q)
 c <- col_sum(Q)
-E_ij <- (S - r_i) + (S - c_j)                # broadcast
-
-if an active E_ij is exactly zero:
-    Z <- projective boundary direction
-else:
-    Z_ij <- G_ij / E_ij
+outside_row_i <- exclusion_sum(r, i)          # nonnegative prefix/suffix sums
+outside_col_j <- exclusion_sum(c, j)
+E_ij <- outside_row_i + outside_col_j         # no dominant-total subtraction
+e_min <- min(E_ij over active entries)
+Z_ij <- Gq_ij * e_min / E_ij                  # bounded ray representative
 
 D <- sqrt(min(m,n)) * Z / FrobeniusNorm(Z)
 W <- W - eta * D
 ```
 
-The reference Python implementation rescales \(G\) before squaring and multiplies all reciprocals by the smallest positive denominator. Both changes cancel under projective normalization and avoid overflow without changing the mathematical direction.
+The reference Python implementation follows this exclusion-safe form. Rescaling \(G\) before squaring and multiplying all reciprocals by the smallest positive active denominator both cancel under projective normalization. They prevent overflow without adding a stabilizer or changing the mathematical direction.
 
 ## 3. Why this is not row/column normalization
 
@@ -186,7 +192,7 @@ For every nonzero \(G\in\mathbb R^{m\times n}\),
 \boxed{
 \frac{\langle G,\operatorname{CL}(G)\rangle}
 {\lVert G\rVert_F\lVert\operatorname{CL}(G)\rVert_F}
-\ge \frac1{\sqrt3}
+> \frac1{\sqrt3}
 }
 \tag{7}
 \]
@@ -243,6 +249,64 @@ where the penultimate inequality uses
 
 The bound is conservative. Across 5,000 seeded random matrices spanning shapes from \(1\times1\) to \(17\times5\), zeros, signs, and roughly 20 orders of magnitude of scaling, the smallest observed cosine was 0.9242. A numerical observation is not a sharper theorem.
 
+### 5.1 Equality and boundary strata
+
+The bound in (7) has no equality case. Away from the one-sparse boundary, every active cell has \(R_i+C_j>0\), so \(h_{ij}<2\) and therefore its active reciprocal weight is strictly greater than \(1/2\). Hence \(A>1/2\), making the closing inequality strict if equality at \(1/\sqrt3\) were attempted. At the one-sparse boundary the cosine is one. The best global constant may be larger than \(1/\sqrt3\); this work does not claim a sharp replacement.
+
+The normalized-energy simplex also resolves boundary continuity. Let \(X=G/\|G\|_F\), let cell \(p\) have energy share \(a_p=1-\tau\), and let \(e_p\) denote its signed coordinate direction. For \(0<\tau<1\), the dominant denominator obeys
+
+\[
+\tau\le h_p\le2\tau,
+\]
+
+because every off-cell energy term lies outside at least one of the dominant cell's two fibers and outside at most both. For every other cell \(q\), the union bound gives \(h_q\ge1-a_q\ge1-\tau\). If \(F_{ij}=X_{ij}/h_{ij}\), then
+
+\[
+\frac{\|F_{-p}\|_F}{|F_p|}
+\le
+2\left(\frac{\tau}{1-\tau}\right)^{3/2}.
+\]
+
+Normalizing a vector whose transverse-to-dominant norm ratio is \(u\) changes it from the dominant coordinate by at most \(u\). Consequently,
+
+\[
+\boxed{
+\left\|\frac{\operatorname{CL}(G)}{\rho_{m,n}}-e_p\right\|_F
+\le2\left(\frac{\tau}{1-\tau}\right)^{3/2}.
+}
+\tag{8a}
+\]
+
+Thus the projective extension is continuous on every one-sparse stratum and is cubic in off-cell amplitude \(\sqrt\tau\). The active denominator ratio is at most \(2/\tau\), and the examples in `boundary_suite.json` show \(\Theta(1/\tau)\) growth, so the raw field is ill-conditioned even while its normalized ray is stable.
+
+### 5.2 Interior sensitivity
+
+On the unit sphere, restrict to a region where every normalized denominator satisfies \(h_{ij}\ge\delta>0\). Row and column energy differences obey
+
+\[
+\|h(X)-h(Y)\|_\infty\le4\|X-Y\|_F.
+\]
+
+For \(F(X)=X/h(X)\), entrywise division and \(\|Y\|_F=1\) give
+
+\[
+\|F(X)-F(Y)\|_F
+\le(\delta^{-1}+4\delta^{-2})\|X-Y\|_F.
+\]
+
+Because \(h\le2\), \(\|F(X)\|_F\ge1/2\). The standard normalization inequality therefore yields
+
+\[
+\boxed{
+\left\|\frac{\operatorname{CL}(X)}\rho-
+\frac{\operatorname{CL}(Y)}\rho\right\|_F
+\le(4\delta^{-1}+16\delta^{-2})\|X-Y\|_F.
+}
+\tag{8b}
+\]
+
+This is an explicit regional Lipschitz bound, not a claim that its constant is sharp. There is no continuous extension at the zero matrix: two different rays \(tX\) and \(tY\) both approach zero while their scale-invariant outputs remain separated. The zero-gradient value in (4) is therefore an algorithmically total convention, not topological continuity at zero.
+
 ## 6. Deterministic convergence
 
 ### Theorem 2 — normalized smooth descent
@@ -287,7 +351,75 @@ f(W_{t+1})
 
 Sum from \(t=0\) to \(T-1\), lower-bound the final objective by \(f_\inf\), divide by \(T\), and minimize the resulting two-term bound over \(\eta\). ∎
 
-This is a safety theorem, not an acceleration theorem. It uses exact gradients and the standard normalized-gradient rate. Because \(G\mapsto\operatorname{CL}(G)\) is nonlinear, an unbiased stochastic gradient does not imply an unbiased transformed direction. An unconditional stochastic theorem remains open.
+This is a safety theorem, not an acceleration theorem. It uses exact gradients and the standard normalized-gradient rate.
+
+### 6.1 Conditional stochastic alignment
+
+Let \(\mu=\nabla f(W)\), let \(g\) be an integrable stochastic gradient with \(\mathbb E g=\mu\), and put \(D=\operatorname{CL}(g)\). Write \(\gamma=1/\sqrt3\) and \(\rho=\rho_{m,n}\). The deterministic angle theorem and Cauchy--Schwarz give the pointwise inequality
+
+\[
+\langle\mu,D\rangle
+=\langle g,D\rangle+\langle\mu-g,D\rangle
+\ge\rho\left(\gamma\|g\|_F-\|g-\mu\|_F\right),
+\tag{10a}
+\]
+
+where the inequality remains valid when \(g=0\) because then \(D=0\). Therefore
+
+\[
+\mathbb E\langle\mu,D\rangle
+\ge\rho\left(\gamma\mathbb E\|g\|_F-
+\mathbb E\|g-\mu\|_F\right).
+\tag{10b}
+\]
+
+If \(\sigma^2=\mathbb E\|g-\mu\|_F^2<\infty\), Jensen and Cauchy--Schwarz yield the more directly interpretable bound
+
+\[
+\boxed{
+\mathbb E\langle\mu,D\rangle
+\ge\rho(\gamma\|\mu\|_F-\sigma).
+}
+\tag{10c}
+\]
+
+Thus \(\sigma<\gamma\|\mu\|_F\) is a sufficient signal-to-noise condition for positive expected alignment. For an \(L\)-smooth objective,
+
+\[
+\mathbb E f(W-\eta D)
+\le f(W)-\eta\rho(\gamma\|\mu\|_F-\sigma)
++\frac{L\eta^2\rho^2}{2},
+\tag{10d}
+\]
+
+so strict one-step expected descent follows when the margin is positive and
+
+\[
+0<\eta<\frac{2(\gamma\|\mu\|_F-\sigma)}{L\rho}.
+\]
+
+A high-probability alternative is also explicit. If \(\|g-\mu\|_F\le\kappa\|\mu\|_F\) with probability at least \(1-\zeta\), then bounding the remaining event by \(-\rho\|\mu\|_F\) gives
+
+\[
+\mathbb E\langle\mu,D\rangle
+\ge\rho\|\mu\|_F
+\left[(1-\zeta)(\gamma-(1+\gamma)\kappa)-\zeta\right].
+\tag{10e}
+\]
+
+These conditions use quantities estimable during training: a large-batch proxy for \(\|\mu\|_F\), repeated microbatch deviations for \(\sigma\), or an empirical relative-error quantile for \((\kappa,\zeta)\). They are sufficient, not claimed necessary.
+
+On an interior region with normalized denominators at least \(\delta\), (8b) also controls transformation bias. If \(g\ne0\) almost surely and \(\mu\ne0\),
+
+\[
+\|\mathbb E D-\operatorname{CL}(\mu)\|_F
+\le
+2\rho(4\delta^{-1}+16\delta^{-2})
+\frac{\mathbb E\|g-\mu\|_F}{\|\mu\|_F}.
+\tag{10f}
+\]
+
+Unbiasedness alone is decisively insufficient. In one dimension, let \(g=10\) with probability \(0.1\) and \(g=-0.5\) with probability \(0.9\). Then \(\mu=0.55>0\), but \(\mathbb E\operatorname{CL}(g)=-0.8\), so expected alignment is \(-0.44\). This negative case is retained in both the Phase 1 adversarial result and the Phase 2 stochastic suite. No unconditional stochastic-convergence claim is made.
 
 ## 7. The Cauchy law on rank-one gradients
 
@@ -347,18 +479,42 @@ For \(2\times2\), the identity is explicit:
 
 The Lean artifact checks the two-by-two rational identity and nondegeneracy assumptions.
 
-### 7.1 Why algebraic rank is not the proposed acceleration mechanism
+### 7.1 Algebraic rank is not the mechanism
 
 Exact rank is discontinuous and can be created by arbitrarily small singular values. In the included exact rational example, a rank-one \(4\times4\) outer product maps to exact rank four. Yet for 200 random log-normal factor pairs at each of sizes 4, 8, 16, and 32, median output stable rank was only about 1.00005–1.00017. The algebraic result therefore does **not** establish useful spectral diversity.
 
-The remaining performance hypothesis is more modest: reciprocal cotransverse energy creates a dense smooth analogue of greedy mode emphasis. When one row and one column jointly carry much of the gradient energy, their intersection receives the largest multiplier. If an accurate scalar step removes that dominant curvature mode, later directions can expose weaker modes. The hard-condition scheduled probes show exactly why this hypothesis may fail without reliable step control.
+The mechanism claim can be made sharper on an isolated two-mode problem. Let a diagonal \(2\times2\) gradient have nonzero diagonal entries \(g_1,g_2\) and ratio \(q=g_1/g_2\). The two active cotransverse denominators are \(2g_2^2\) and \(2g_1^2\), so the CauchyLift direction has diagonal ratio
+
+\[
+\frac{d_1}{d_2}=q^3.
+\tag{13a}
+\]
+
+Now consider a positive diagonal quadratic with arbitrary curvatures \(\lambda_1,\lambda_2\), and take an exact line search along this direction. The next gradient \(g^+\) is orthogonal to \(d\). In the nondegenerate case \(g_2^+\ne0\),
+
+\[
+q^3g_1^++g_2^+=0
+\quad\Longrightarrow\quad
+\boxed{q^+=\frac{g_1^+}{g_2^+}=-q^{-3}.}
+\tag{13b}
+\]
+
+The curvature values cancel from this ratio law. Normalized gradient gives \(q^+=-q^{-1}\). Sign descent, a fully row/column-normalized diagonal direction, and the exact polar direction all have unit-magnitude coordinate ratios and give \(|q^+|=1\). CauchyLift therefore predicts the falsifiable log-slope
+
+\[
+\log|q^+|=-3\log|q|,
+\]
+
+versus slope \(-1\) for normalized gradient and zero for the three unit-ratio controls.
+
+This is **mode alternation**, not a monotone deflation or acceleration theorem. Applying the idealized law twice yields \(q^{++}=q^9\): after strongly suppressing one mode, the rule can concentrate even more strongly on the other. The signature explains both the strong axis-aligned exact-line cases and the danger of scheduled steps, curvature mixing, stochasticity, and rotations. Phase 3 diagnostics should test the local log-slope and alternating concentration; failure to observe it where the two-mode approximation is accurate falsifies the mechanism, while observing it still does not prove task-level speedup.
 
 ## 8. Complexity and implementation model
 
 For an \(m\times n\) gradient, CauchyLift needs:
 
 - one elementwise square;
-- a total sum and row/column sums;
+- row/column sums and linear prefix/suffix exclusion sums;
 - one broadcasted denominator and reciprocal multiplication;
 - one Frobenius-norm reduction;
 - one scalar multiply and parameter update.
@@ -372,6 +528,16 @@ Arithmetic work is \(O(mn)\). Parallel reduction depth is logarithmic in the red
 | Muon | Usually momentum tensor | Several matrix multiplications for Newton–Schulz | Shape-dependent GEMMs |
 | SinkGD | None | Repeated row/column normalization | \(O(Lmn)\) for \(L\) rounds |
 | CauchyLift | None | Two marginal reductions + pointwise rational field | \(O(mn)\) |
+
+The radius \(\sqrt{\min(m,n)}\) is frozen for the initial experiments. It is not a tuned layer multiplier: it is the largest transpose-symmetric radius satisfying both average-fiber bounds. For a vocabulary-by-hidden embedding or head it gives squared radius equal to hidden width; for square attention matrices it gives squared radius equal to width; for expansion and contraction matrices it gives squared radius equal to the smaller dimension; and for vectors and scalars it gives unit radius. `width_suite.json` checks these identities from width 64 through 1,024 and on representative 125M-scale decoder shapes.
+
+### 8.1 Finite-precision execution
+
+Input gradients may be BF16, FP16, FP32, or FP64, but squares, marginal sums, exclusions, and the raw-field norm must accumulate in FP32 or higher. Max-absolute rescaling before squaring prevents overflow: all scaled squares are at most one. A naive FP32 square can overflow above approximately \(1.84\times10^{19}\), while this rescaling remains projectively exact.
+
+Near a dominant cell, computing \(2S-r_i-c_j\) can lose the small positive complement by cancellation. The implementation must instead sum nonnegative energies outside the row and column, using linear-work prefix/suffix or an equivalent exclusion reduction. If an active complement still rounds to zero, the specified rare path recomputes it in FP64. Only an input represented as exactly one-sparse may take the projective boundary branch. Any other zero active denominator is a diagnostic failure.
+
+No additive epsilon is permitted. `finite_precision_suite.json` shows that even a fixed \(10^{-3}S\) epsilon measurably changes an ordinary direction. Underflowed off-dominant amplitudes are less dangerous than raw denominator condition numbers suggest because (8a) makes their projective influence cubic, but that observation justifies a boundary branch only after represented-support and rare-path checks; it does not authorize a tunable stabilizer. The machine-readable Phase 3 contract is `spec/optimizer_v0.2.json`.
 
 This operation graph is GPU-friendly in the limited algorithmic sense of regular dense reads, reductions, and pointwise arithmetic. No kernel has been implemented, so no wall-clock claim is made. Division, extra reductions, launch overhead, and memory traffic could erase the abstract advantage.
 
@@ -418,8 +584,8 @@ Entries are `exact-line iterations / held-out log10 relative objective after 400
 | Hessian condition | Geometry | Normalized gradient | Sign | Sinkhorn-5 | Exact polar | CauchyLift |
 |---:|---|---:|---:|---:|---:|---:|
 | \(10^2\) | axis aligned | 267.5 / −5.285 | 109 / −4.915 | 37 / −5.722 | 327 / −5.112 | **39.5 / −6.612** |
-| \(10^2\) | rotated | 306.5 / −5.246 | 571.5 / −4.037 | 201.5 / −4.761 | 323 / −3.088 | **78 / −5.263** |
-| \(10^4\) | axis aligned | 600 / −3.150 | 600 / **−5.265** | 317 / **−5.922** | 600 / −4.018 | **182 / −2.964** |
+| \(10^2\) | rotated | 306.5 / −5.246 | 571.5 / −4.037 | 201.5 / −4.761 | 323 / −3.088 | **78 / −5.196** |
+| \(10^4\) | axis aligned | 600 / −3.150 | 600 / **−5.265** | 317 / **−5.922** | 600 / −4.018 | **208 / −2.964** |
 | \(10^4\) | rotated | 600 / −3.356 | 600 / −2.998 | 600 / −3.307 | 600 / **−4.640** | 600 / −3.078 |
 
 At condition \(10^2\), CauchyLift is strong under both probes. At condition \(10^4\), it retains good axis-aligned exact-line direction quality but performs poorly with the scheduled step, and every rotated exact-line run hits the cap. This is evidence of step sensitivity and basis dependence, not evidence of SOAP/Muon-like convergence.
@@ -427,6 +593,19 @@ At condition \(10^2\), CauchyLift is strong under both probes. At condition \(10
 ### 9.3 Rejected-candidate checks
 
 The exterior/cofactor candidate's condition map matches a Halley triple-angle identity to numerical precision. The cross-ratio plaquette dual fails 198 of 200 exact-line probes at the 1,000-step cap, versus 46 for sign. These results are kept so that rejected ideas are not later rediscovered and marketed under new names.
+
+### 9.4 Phase 2 boundary, noise, shape, and precision suites
+
+The expanded standard-library-only suite records seed `20260828` and includes:
+
+- exhaustive enumeration of 1,554 nonzero matrices over \(\{-1,0,1\}\) in every shape from \(1\times1\) through \(3\times2\) listed in the artifact;
+- 10,000 additional property cases over all shapes from \(1\times1\) through \(6\times6\), with zeros and log-uniform dynamic range;
+- direct checks of the boundary modulus, \(\Theta(1/\tau)\) denominator growth, the interior Lipschitz bound, and discontinuity at zero;
+- exact finite-distribution checks of (10b)--(10f), including a benign positive-margin distribution and the expected-ascent counterexample;
+- the exact cubic two-mode recurrence against normalized-gradient, sign, row/column-normalized, and polar controls;
+- width-transfer identities, zero/boundary totality for scalar/vector/matrix shapes, BF16/FP16 input quantization, a high-precision decimal oracle, overflow, underflow, cancellation, and epsilon-collision cases.
+
+Every positive gate passed. The expected-ascent noise distribution, zero-discontinuity sequence, subtractive-cancellation case, raw denominator growth, two-step \(q^9\) concentration, hard rotated quadratics, and near-one stable-rank results remain explicit negatives.
 
 ## 10. Closest work and novelty analysis
 
@@ -454,24 +633,26 @@ ARO treats rotation as a first-class state and demonstrates that many matrix opt
 
 1. **No training evidence.** The central performance target is untested.
 2. **No wall-clock evidence.** \(O(mn)\) does not imply AdamW wall time.
-3. **No unconditional stochastic theory.** Nonlinear transformation introduces bias.
+3. **Only conditional stochastic theory.** The measurable SNR and high-probability conditions are sufficient, not known necessary, and may fail in language-model training.
 4. **Basis dependence.** Only permutations and transpose are symmetries; arbitrary rotations are not.
 5. **Step sensitivity.** The condition-\(10^4\) scheduled result is a direct warning.
 6. **Algebraic versus numerical rank.** Generic full exact rank can carry negligible extra singular mass.
-7. **Boundary behavior.** The projective one-sparse limit is exact, but near-boundary finite-precision behavior needs kernel-level study.
-8. **Radius scaling.** \(\sqrt{\min(m,n)}\) is a principled convention, not a neural-architecture theorem.
+7. **Boundary implementation remains unbenchmarked.** The projective ray is continuous with a proved modulus, but exclusion reductions and the FP64 rare path still need kernel validation.
+8. **Radius scaling is derived but not empirically optimal.** \(\sqrt{\min(m,n)}\) is frozen by symmetric average-fiber constraints; those constraints are not a theorem about best neural-training scale.
 9. **Finite novelty search.** No search can prove that an equivalent unpublished or differently named method does not exist.
-10. **No acceleration theorem.** The stationarity result matches normalized first-order order, with a constant-factor alignment loss.
+10. **No acceleration theorem.** The stationarity result matches normalized first-order order, and the exact mode result predicts aggressive alternation as well as deflation.
+11. **Sparse concentration risk.** Embedding gradients with few active rows can concentrate a fixed layer radius on that support; no fallback is allowed, so this is a required diagnostic and possible kill result.
+12. **Sensitivity constants are loose.** The regional Lipschitz constant proves control but is far larger than observed local ratios and is not a useful tuning formula.
 
 ## 12. Falsifiable next phase
 
-The next phase should implement only the primitive in (1)–(5), with no momentum or rescue mixture. At equal tuning budgets it should be compared with AdamW, Muon, SOAP, SinkGD, normalized gradient, and sign across predeclared language, vision, and non-square-tensor workloads. Primary metrics are tokens/examples to target, validation quality, optimizer-only time, full-step time, memory, update concentration, stable rank, and loss spikes.
+The next phase should implement only `spec/optimizer_v0.2.json` as a transparent PyTorch reference and native ROCm/HIP kernels, with no momentum, epsilon, or rescue mixture. Small diagnostics must compare the kernel against the decimal/FP64 oracle, exercise every shape and boundary branch, count rare paths, and benchmark the reduction graph. It must not start the training study before its own gate passes.
 
 The hypothesis should be rejected if it requires a conventional optimizer component to become stable or competitive, exceeds AdamW optimizer-step time by more than 15% after fusion, or fails the predeclared tokens-to-target criterion on most workloads. The full protocol is in `research/future_experiment_protocol.md`.
 
 ## 13. Conclusion
 
-CauchyLift proposes a mathematical direction absent from the searched optimizer families: projective dualization by cotransverse row-column energy. The primitive is simple enough for linear reduction-only execution yet structured enough to yield a nontrivial uniform-angle theorem and an exact Cauchy-kernel law. Those are genuine theoretical results. They do not establish the desired empirical outcome. The hard quadratic and stable-rank negatives narrow the mechanism and make the next experiment decisive.
+CauchyLift proposes a mathematical direction absent from the searched optimizer families: projective dualization by cotransverse row-column energy. The primitive is simple enough for linear reduction-only execution yet structured enough to yield a uniform-angle theorem, a stable projective boundary, conditional noisy-gradient descent, an exact Cauchy-kernel law, and a cubic two-mode recurrence. Those are genuine theoretical results. They do not establish the desired empirical outcome. The expected-ascent noise example, two-step concentration, hard rotated quadratics, sparse-shape risk, and stable-rank negatives make implementation diagnostics decisive.
 
 The appropriate current claim is therefore precise: **CauchyLift is a new, scoped-search-distinct, formally analyzable optimizer hypothesis—not a demonstrated replacement for AdamW, SOAP, or Muon.**
 

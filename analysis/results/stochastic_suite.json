@@ -1,0 +1,93 @@
+{
+  "all_passed": true,
+  "artifact": "CauchyLift Phase 2 finite-distribution stochastic suite",
+  "benign_unbiased_distribution": {
+    "interior_bias": {
+      "bound_holds": true,
+      "lipschitz_bias_upper_bound": 6.054033661152975,
+      "minimum_normalized_denominator": 0.3654687637290216,
+      "observed_bias_norm": 0.0036640229192028665
+    },
+    "report": {
+      "bounds_hold": true,
+      "expected_alignment": 3.07155107524464,
+      "expected_noise_norm": 0.08297063367088037,
+      "expected_sample_norm": 2.3062560494983346,
+      "first_moment_condition_holds": true,
+      "first_moment_lower_bound": 1.7657119837432262,
+      "noise_rms_sigma": 0.08944271909999163,
+      "rho": 1.4142135623730951,
+      "second_moment_lower_bound": 1.7554405253659675,
+      "signal_to_noise_condition_holds": true,
+      "true_gradient_norm": 2.3048861143232218
+    },
+    "smooth_descent": {
+      "expected_next_value": 0.7306802429163594,
+      "initial_value": 2.65625,
+      "objective": "f(W)=0.5*||W||_F^2",
+      "smoothness_upper_bound": 0.7306802429163594,
+      "step": 0.8777202626829836,
+      "strict_descent": true,
+      "upper_bound_holds": true
+    },
+    "support_size": 8
+  },
+  "checks": {
+    "alignment_bounds": true,
+    "benign_first_moment_condition": true,
+    "benign_snr_condition": true,
+    "counterexample_violates_sufficient_condition": true,
+    "interior_bias_bound": true,
+    "one_step_smooth_descent": true,
+    "unbiased_noise_counterexample": true
+  },
+  "expected_ascent_counterexample": {
+    "alignment": -0.44000000000000006,
+    "expected_direction": [
+      [
+        -0.8
+      ]
+    ],
+    "interpretation": "unbiasedness alone does not control a normalized nonlinear direction",
+    "mean_gradient": [
+      [
+        0.55
+      ]
+    ],
+    "report": {
+      "bounds_hold": true,
+      "expected_alignment": -0.44000000000000006,
+      "expected_noise_norm": 1.8900000000000001,
+      "expected_sample_norm": 1.45,
+      "first_moment_condition_holds": false,
+      "first_moment_lower_bound": -1.0528421096750427,
+      "noise_rms_sigma": 3.15,
+      "rho": 1.0,
+      "second_moment_lower_bound": -2.8324573519457057,
+      "signal_to_noise_condition_holds": false,
+      "true_gradient_norm": 0.55
+    },
+    "support": [
+      {
+        "gradient": [
+          [
+            10.0
+          ]
+        ],
+        "probability": 0.1
+      },
+      {
+        "gradient": [
+          [
+            -0.5
+          ]
+        ],
+        "probability": 0.9
+      }
+    ]
+  },
+  "run_id": "phase2-stochastic-20260828",
+  "theory_constants": {
+    "gamma": 0.5773502691896258
+  }
+}

@@ -1,6 +1,6 @@
 # Reproducibility record
 
-Artifact freeze date: 2026-08-27 UTC.
+Artifact freeze dates: 2026-08-27 UTC for the original theory suite; 2026-08-28 UTC for Phases 1 and 2.
 
 ## Environment used for checked-in results
 
@@ -32,6 +32,27 @@ python3 analysis/run_rank_probe.py \
 python3 analysis/run_rejection_checks.py \
   --trials 200 \
   --output analysis/results/rejection_checks.json
+
+python3 analysis/run_adversarial_audit.py \
+  --output analysis/results/adversarial_audit.json
+
+python3 analysis/run_boundary_suite.py \
+  --seed 20260828 \
+  --samples 10000 \
+  --output analysis/results/boundary_suite.json
+
+python3 analysis/run_stochastic_suite.py \
+  --output analysis/results/stochastic_suite.json
+
+python3 analysis/run_mechanism_suite.py \
+  --output analysis/results/mechanism_suite.json
+
+python3 analysis/run_width_suite.py \
+  --spec spec/optimizer_v0.2.json \
+  --output analysis/results/width_suite.json
+
+python3 analysis/run_finite_precision_suite.py \
+  --output analysis/results/finite_precision_suite.json
 ```
 
 The scripts use deterministic pseudo-random generators and sorted JSON keys. Re-running them in the recorded Python version should reproduce the checked-in files byte for byte.
@@ -51,6 +72,7 @@ The successful build target is `CauchyLift`. See `formal/README.md` and `researc
 ```bash
 python3 -m compileall -q analysis
 python3 analysis/run_property_checks.py --samples 5000 >/dev/null
+(python3 analysis/run_boundary_suite.py --samples 1000 >/dev/null)
 (cd formal && lake build)
 ```
 

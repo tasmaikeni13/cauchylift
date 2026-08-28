@@ -1,0 +1,26 @@
+# CauchyLift Phase 2 reconstruction commands (UTC 2026-08-28)
+# No command trains a model or consumes meaningful GPU time.
+
+git show --no-patch --oneline 5221b458405119b0da297500b210ddc7a34bf0c5
+python3 --version
+PATH=/root/.elan/bin:$PATH lean --version
+
+python3 -m compileall -q analysis
+python3 analysis/run_property_checks.py --samples 5000 --output analysis/results/property_checks.json
+python3 analysis/run_quadratic_suite.py --trials 16 --exact-steps 600 --scheduled-steps 400 --output analysis/results/quadratic_suite.json
+python3 analysis/run_rank_probe.py --samples 200 --output analysis/results/rank_probe.json
+python3 analysis/run_rejection_checks.py --trials 200 --output analysis/results/rejection_checks.json
+python3 analysis/run_adversarial_audit.py --output analysis/results/adversarial_audit.json
+python3 analysis/run_boundary_suite.py --seed 20260828 --samples 10000 --output analysis/results/boundary_suite.json
+python3 analysis/run_stochastic_suite.py --output analysis/results/stochastic_suite.json
+python3 analysis/run_mechanism_suite.py --output analysis/results/mechanism_suite.json
+python3 analysis/run_width_suite.py --spec spec/optimizer_v0.2.json --output analysis/results/width_suite.json
+python3 analysis/run_finite_precision_suite.py --output analysis/results/finite_precision_suite.json
+
+cd formal
+PATH=/root/.elan/bin:$PATH lake update
+PATH=/root/.elan/bin:$PATH lake build
+
+python3 -m json.tool spec/optimizer_v0.2.json
+sha256sum analysis/results/*.json spec/optimizer_v0.2.json paper/paper.md research/*.md formal/CauchyLift/*.lean
+git diff --check

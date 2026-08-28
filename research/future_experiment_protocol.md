@@ -37,6 +37,9 @@ At least one workload must be held out from all method design and initial hyperp
 - row/column concentration, effective support, and update stable rank;
 - loss-spike count under a predeclared threshold;
 - sensitivity curves over learning rate and radius scaling.
+- minibatch gradient SNR estimates \(\hat\sigma/\|\hat\mu\|_F\), conditional-alignment margin, and observed expected-alignment failures;
+- local two-mode log-ratio slope and alternating update concentration where a two-mode approximation is measurable;
+- exact-boundary and FP64 rare-path counts.
 
 ## Tuning
 
@@ -50,10 +53,14 @@ At least one workload must be held out from all method design and initial hyperp
 
 - denominator computed in FP32 versus FP64 diagnostic arithmetic;
 - fused versus unfused implementation;
-- radius choices motivated by width scaling;
+- the frozen radius \(\sqrt{\min(m,n)}\) may be compared diagnostically with alternatives, but the confirmatory CauchyLift result uses the frozen value from `spec/optimizer_v0.2.json`;
 - exact projective-boundary branch frequency.
 
 Momentum, moments, rotation, clipping, blending, or periodic polar steps are **not** ablations; they create different composite optimizers and cannot rescue the core hypothesis under this contract.
+
+## Frozen parameter coverage
+
+The initial decoder is bias-free. Every trainable tensor—including embeddings or a tied head, attention/MLP matrices, normalization gains, and scalars—uses the matrixization and zero/boundary semantics in `spec/optimizer_v0.2.json`. Sparse layouts may use an exactly equivalent support-aware implementation, but there is no Adam/SGD fallback. Any need for a different optimizer on a parameter class is a contract-level negative result.
 
 ## Decision rule
 

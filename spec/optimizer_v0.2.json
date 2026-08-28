@@ -1,0 +1,72 @@
+{
+  "name": "CauchyLift",
+  "version": "0.2.0",
+  "status": "phase2-theory-frozen-for-phase3",
+  "mathematical_map": {
+    "energy": "E[i,j] = outside_row_energy[i] + outside_column_energy[j] = 2*S-r[i]-c[j]",
+    "raw_field": "Z[i,j] = G[i,j] / E[i,j] away from the one-sparse boundary",
+    "direction": "D = rho(m,n) * Z / ||Z||_F",
+    "radius": "rho(m,n) = sqrt(min(m,n))",
+    "zero_gradient": "D = 0",
+    "one_sparse_gradient": "D is supported on the active cell with its sign and Frobenius norm rho(m,n)",
+    "forbidden_epsilon": "No additive epsilon is part of the optimizer map."
+  },
+  "parameter_matrixization": {
+    "rank_0_scalar": "reshape to [1,1]",
+    "rank_1_vector": "reshape to [length,1]",
+    "rank_2_matrix": "preserve stored row-column shape",
+    "rank_ge_3_tensor": "reshape [axis0, product(axis1:)] with axis0 the semantic output or record axis",
+    "linear_weight": "[out_features,in_features]",
+    "embedding_table": "[vocabulary,hidden]",
+    "untied_output_head": "[vocabulary,hidden]",
+    "tied_embedding_head": "one shared [vocabulary,hidden] parameter transformed once after gradient accumulation",
+    "normalization_gain": "[hidden,1]",
+    "bias_if_present": "[length,1]",
+    "convolution_or_higher_order": "[out_channels,product(remaining_axes)]",
+    "sparse_layout": "Materialize the mathematically equivalent dense gradient or implement an exactly equivalent sparse-support transform; do not fall back to another optimizer."
+  },
+  "initial_decoder_contract": {
+    "architecture": "bias-free decoder-only Transformer with trainable normalization gains",
+    "parameter_groups": [
+      "token embedding and tied/untied output head",
+      "attention projection matrices",
+      "MLP projection matrices",
+      "normalization gain vectors",
+      "any scalar trainable parameters"
+    ],
+    "fallback_optimizer": null,
+    "momentum": false,
+    "running_moments": false,
+    "weight_decay_in_primitive": false,
+    "clipping_in_primitive": false
+  },
+  "finite_precision_execution": {
+    "input_training_dtype": ["bf16", "fp16", "fp32", "fp64"],
+    "minimum_accumulation_dtype": "fp32",
+    "diagnostic_oracle_dtype": "fp64",
+    "steps": [
+      "Reject nonfinite input values.",
+      "If every entry is zero, return exact zero.",
+      "If exactly one entry is nonzero, return the exact projective boundary direction.",
+      "Scale G by max(abs(G)) before squaring; this common positive scaling does not change the output ray.",
+      "Accumulate nonnegative row and column energies in fp32 or higher.",
+      "Compute outside-row and outside-column energy with exclusion-safe nonnegative reductions (for example prefix/suffix reductions), not cancellation-prone 2*S-r-c subtraction near the boundary.",
+      "For each active entry compute E as outside_row + outside_column.",
+      "Let e_min be the smallest positive active denominator and compute raw[i,j] = scaled_G[i,j] * e_min / E[i,j]; set inactive raw entries to zero.",
+      "If an active denominator still rounds to zero, recompute affected exclusions in fp64; if the represented input has become exactly one-sparse, use the boundary branch, otherwise raise a numerical diagnostic rather than add epsilon.",
+      "Accumulate ||raw||_F in fp32 or higher and normalize once to rho(m,n)."
+    ],
+    "tunable_stabilizer": null,
+    "overflow_rule": "max-absolute projective scaling before squaring",
+    "underflow_rule": "exclusion-safe accumulation plus fp64 rare-path recomputation; exact represented one-sparse inputs use the declared boundary"
+  },
+  "observable_diagnostics_for_phase3": [
+    "zero-gradient count",
+    "exact one-sparse boundary count",
+    "fp64 rare-path count",
+    "minimum positive normalized denominator",
+    "active denominator ratio",
+    "gradient-direction cosine",
+    "update row/column concentration"
+  ]
+}

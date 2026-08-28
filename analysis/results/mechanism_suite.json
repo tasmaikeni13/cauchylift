@@ -1,0 +1,363 @@
+{
+  "all_passed": true,
+  "artifact": "CauchyLift Phase 2 exact two-mode mechanism suite",
+  "cases": [
+    {
+      "initial_gradient_ratio": 0.25,
+      "methods": {
+        "cauchylift": {
+          "absolute_error": 1.2505552149377763e-12,
+          "direction_ratio": 0.015625,
+          "exact_line_step": 0.20077634733642297,
+          "expected_direction_ratio": 0.015625,
+          "expected_next_gradient_ratio": -64.0,
+          "next_gradient_ratio": -64.00000000000125
+        },
+        "exact_polar": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.15625,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "normalized_gradient": {
+          "absolute_error": 1.2878587085651816e-14,
+          "direction_ratio": 0.25,
+          "exact_line_step": 0.2111228784201814,
+          "expected_direction_ratio": 0.25,
+          "expected_next_gradient_ratio": -4.0,
+          "next_gradient_ratio": -3.999999999999987
+        },
+        "row_column_normalization": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.15625,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "sign": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.15625,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        }
+      }
+    },
+    {
+      "initial_gradient_ratio": 0.5,
+      "methods": {
+        "cauchylift": {
+          "absolute_error": 2.4868995751603507e-14,
+          "direction_ratio": 0.125,
+          "exact_line_step": 0.21216467758680396,
+          "expected_direction_ratio": 0.125,
+          "expected_next_gradient_ratio": -8.0,
+          "next_gradient_ratio": -7.999999999999975
+        },
+        "exact_polar": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.1875,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "normalized_gradient": {
+          "absolute_error": 3.774758283725532e-15,
+          "direction_ratio": 0.5,
+          "exact_line_step": 0.24305086711954238,
+          "expected_direction_ratio": 0.5,
+          "expected_next_gradient_ratio": -2.0,
+          "next_gradient_ratio": -1.9999999999999962
+        },
+        "row_column_normalization": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.1875,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "sign": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.1875,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        }
+      }
+    },
+    {
+      "initial_gradient_ratio": 2.0,
+      "methods": {
+        "cauchylift": {
+          "absolute_error": 2.7755575615628914e-17,
+          "direction_ratio": 8.0,
+          "exact_line_step": 0.6957278259953062,
+          "expected_direction_ratio": 8.0,
+          "expected_next_gradient_ratio": -0.125,
+          "next_gradient_ratio": -0.12499999999999997
+        },
+        "exact_polar": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.375,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "normalized_gradient": {
+          "absolute_error": 4.440892098500626e-16,
+          "direction_ratio": 2.0,
+          "exact_line_step": 0.6576670522058206,
+          "expected_direction_ratio": 2.0,
+          "expected_next_gradient_ratio": -0.5,
+          "next_gradient_ratio": -0.49999999999999956
+        },
+        "row_column_normalization": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.375,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "sign": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.375,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        }
+      }
+    },
+    {
+      "initial_gradient_ratio": 4.0,
+      "methods": {
+        "cauchylift": {
+          "absolute_error": 5.134781488891349e-16,
+          "direction_ratio": 64.0,
+          "exact_line_step": 1.3381605539711874,
+          "expected_direction_ratio": 64.0,
+          "expected_next_gradient_ratio": -0.015625,
+          "next_gradient_ratio": -0.015624999999999487
+        },
+        "exact_polar": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.625,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "normalized_gradient": {
+          "absolute_error": 1.942890293094024e-16,
+          "direction_ratio": 4.0,
+          "exact_line_step": 1.3225055780283064,
+          "expected_direction_ratio": 4.0,
+          "expected_next_gradient_ratio": -0.25,
+          "next_gradient_ratio": -0.2499999999999998
+        },
+        "row_column_normalization": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.625,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "sign": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 0.625,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        }
+      }
+    },
+    {
+      "initial_gradient_ratio": 8.0,
+      "methods": {
+        "cauchylift": {
+          "absolute_error": 7.255480938272996e-16,
+          "direction_ratio": 512.0,
+          "exact_line_step": 2.667305837559457,
+          "expected_direction_ratio": 512.0,
+          "expected_next_gradient_ratio": -0.001953125,
+          "next_gradient_ratio": -0.0019531249999992745
+        },
+        "exact_polar": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 1.125,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "normalized_gradient": {
+          "absolute_error": 3.3306690738754696e-16,
+          "direction_ratio": 8.0,
+          "exact_line_step": 2.660135805276171,
+          "expected_direction_ratio": 8.0,
+          "expected_next_gradient_ratio": -0.125,
+          "next_gradient_ratio": -0.12500000000000033
+        },
+        "row_column_normalization": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 1.125,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        },
+        "sign": {
+          "absolute_error": 0.0,
+          "direction_ratio": 1.0,
+          "exact_line_step": 1.125,
+          "expected_direction_ratio": 1.0,
+          "expected_next_gradient_ratio": -1.0,
+          "next_gradient_ratio": -1.0
+        }
+      }
+    },
+    {
+      "initial_gradient_ratio": -2.0,
+      "methods": {
+        "cauchylift": {
+          "absolute_error": 2.7755575615628914e-17,
+          "direction_ratio": -8.0,
+          "exact_line_step": 0.6957278259953062,
+          "expected_direction_ratio": -8.0,
+          "expected_next_gradient_ratio": 0.125,
+          "next_gradient_ratio": 0.12499999999999997
+        },
+        "exact_polar": {
+          "absolute_error": 0.0,
+          "direction_ratio": -1.0,
+          "exact_line_step": 0.375,
+          "expected_direction_ratio": -1.0,
+          "expected_next_gradient_ratio": 1.0,
+          "next_gradient_ratio": 1.0
+        },
+        "normalized_gradient": {
+          "absolute_error": 4.440892098500626e-16,
+          "direction_ratio": -2.0,
+          "exact_line_step": 0.6576670522058206,
+          "expected_direction_ratio": -2.0,
+          "expected_next_gradient_ratio": 0.5,
+          "next_gradient_ratio": 0.49999999999999956
+        },
+        "row_column_normalization": {
+          "absolute_error": 0.0,
+          "direction_ratio": -1.0,
+          "exact_line_step": 0.375,
+          "expected_direction_ratio": -1.0,
+          "expected_next_gradient_ratio": 1.0,
+          "next_gradient_ratio": 1.0
+        },
+        "sign": {
+          "absolute_error": 0.0,
+          "direction_ratio": -1.0,
+          "exact_line_step": 0.375,
+          "expected_direction_ratio": -1.0,
+          "expected_next_gradient_ratio": 1.0,
+          "next_gradient_ratio": 1.0
+        }
+      }
+    },
+    {
+      "initial_gradient_ratio": -4.0,
+      "methods": {
+        "cauchylift": {
+          "absolute_error": 5.134781488891349e-16,
+          "direction_ratio": -64.0,
+          "exact_line_step": 1.3381605539711874,
+          "expected_direction_ratio": -64.0,
+          "expected_next_gradient_ratio": 0.015625,
+          "next_gradient_ratio": 0.015624999999999487
+        },
+        "exact_polar": {
+          "absolute_error": 0.0,
+          "direction_ratio": -1.0,
+          "exact_line_step": 0.625,
+          "expected_direction_ratio": -1.0,
+          "expected_next_gradient_ratio": 1.0,
+          "next_gradient_ratio": 1.0
+        },
+        "normalized_gradient": {
+          "absolute_error": 1.942890293094024e-16,
+          "direction_ratio": -4.0,
+          "exact_line_step": 1.3225055780283064,
+          "expected_direction_ratio": -4.0,
+          "expected_next_gradient_ratio": 0.25,
+          "next_gradient_ratio": 0.2499999999999998
+        },
+        "row_column_normalization": {
+          "absolute_error": 0.0,
+          "direction_ratio": -1.0,
+          "exact_line_step": 0.625,
+          "expected_direction_ratio": -1.0,
+          "expected_next_gradient_ratio": 1.0,
+          "next_gradient_ratio": 1.0
+        },
+        "sign": {
+          "absolute_error": 0.0,
+          "direction_ratio": -1.0,
+          "exact_line_step": 0.625,
+          "expected_direction_ratio": -1.0,
+          "expected_next_gradient_ratio": 1.0,
+          "next_gradient_ratio": 1.0
+        }
+      }
+    }
+  ],
+  "checks": {
+    "cauchylift_cubic_recurrence": true,
+    "normalized_gradient_linear_recurrence": true,
+    "polar_control": true,
+    "row_column_control": true,
+    "sign_control": true,
+    "two_step_alternation": true
+  },
+  "falsifiable_signature": "On an isolated diagonal two-mode local model with exact line search, log|q_next| = -3 log|q| for CauchyLift, versus slope -1 for normalized gradient and collapse to |q_next|=1 for sign, row/column-normalized, and polar controls.",
+  "guardrail": "The second step gives |q_2|=|q_0|^9, so the theorem predicts aggressive mode alternation, not an unconditional acceleration or balancing result.",
+  "maximum_absolute_errors": {
+    "cauchylift": 1.2505552149377763e-12,
+    "exact_polar": 0.0,
+    "normalized_gradient": 1.2878587085651816e-14,
+    "row_column_normalization": 0.0,
+    "sign": 0.0
+  },
+  "quadratic_curvatures": [
+    3.0,
+    5.0
+  ],
+  "run_id": "phase2-mechanism-20260828",
+  "two_step_alternation": [
+    {
+      "identity_q2_equals_q0_to_nine": true,
+      "q0": 2.0,
+      "q1": -0.125,
+      "q2": 512.0
+    },
+    {
+      "identity_q2_equals_q0_to_nine": true,
+      "q0": 4.0,
+      "q1": -0.015625,
+      "q2": 262144.0
+    },
+    {
+      "identity_q2_equals_q0_to_nine": true,
+      "q0": 8.0,
+      "q1": -0.001953125,
+      "q2": 134217728.0
+    }
+  ]
+}

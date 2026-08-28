@@ -1,6 +1,6 @@
 # Research contract
 
-Frozen on 2026-08-27 UTC.
+Originally frozen on 2026-08-27 UTC; Phase 2 implementation semantics frozen on 2026-08-28 UTC.
 
 ## Objective
 
@@ -37,6 +37,16 @@ G_{ij}\longmapsto
 
 followed only by the scalar normalization required to assign an update radius. Its denominator is the sum of energy outside the entry's row and outside its column. This **complement**, rather than a row or column statistic itself, is the defining departure from existing marginal-normalization families.
 
+## Phase 2 frozen semantics
+
+- Every trainable parameter uses the same primitive. Scalars map to \(1\times1\), vectors to \(d\times1\), matrices keep their stored shape, and higher-order tensors flatten the first semantic output/record axis against the remaining axes.
+- The update radius is \(\rho_{m,n}=\sqrt{\min(m,n)}\), the maximal transpose-symmetric radius whose average squared row and column update norms are both at most one. It is frozen for initial experiments rather than tuned by layer.
+- Zero gradients map to zero. Exactly one-sparse represented gradients use the signed projective boundary. All other active denominators are positive mathematically and must be computed with exclusion-safe nonnegative sums.
+- Accumulation is FP32 or higher, with a rare FP64 complement recomputation when an active FP32 denominator rounds to zero. No additive epsilon, momentum, moment, clipping, fallback, or learned stabilizer is permitted.
+- The initial decoder is bias-free with trainable normalization gains. Embeddings, tied or untied heads, attention/MLP matrices, gain vectors, and scalars all remain inside this contract.
+
+The authoritative machine-readable form is `spec/optimizer_v0.2.json`.
+
 ## Claim levels
 
 - **Proved:** exact algebraic statements supported by a written proof and, where listed, Lean.
@@ -47,7 +57,7 @@ followed only by the scalar normalization required to assign an update radius. I
 ## Primary predictions
 
 1. The field remains uniformly descent aligned despite its reciprocal complement coupling.
-2. On problems where large gradient energy identifies a temporarily dominant curvature mode, the field behaves like a dense, smooth mode-deflation rule and can reduce exact-line-search iterations.
+2. On an isolated diagonal two-mode local model, the exact-line gradient ratio follows \(q^+=-q^{-3}\). Later diagnostics should recover this mode-alternation signature where the approximation is valid; the signature does not itself imply acceleration.
 3. The transform can change algebraic rank through a Cauchy kernel even when the input is rank one.
 4. A fused implementation should require only row/column reductions and elementwise passes, with no persistent state.
 

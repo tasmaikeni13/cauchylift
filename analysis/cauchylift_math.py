@@ -42,6 +42,22 @@ def scale(matrix: Sequence[Sequence[float]], factor: float) -> Matrix:
     return [[factor * value for value in row] for row in matrix]
 
 
+def _exclusive_nonnegative_sums(values: Sequence[float]) -> list[float]:
+    """Return each sum with its own entry excluded, without total-minus-entry.
+
+    Prefix/suffix accumulation is linear work and avoids the catastrophic
+    cancellation of ``total - dominant`` near the one-sparse boundary.
+    """
+
+    prefix = [0.0]
+    for value in values:
+        prefix.append(prefix[-1] + value)
+    suffix = [0.0] * (len(values) + 1)
+    for index in range(len(values) - 1, -1, -1):
+        suffix[index] = suffix[index + 1] + values[index]
+    return [prefix[index] + suffix[index + 1] for index in range(len(values))]
+
+
 def cotransverse_energy(matrix: Sequence[Sequence[float]]) -> Matrix:
     """Return E_ij = (S-r_i) + (S-c_j), computed after safe rescaling.
 
@@ -55,14 +71,15 @@ def cotransverse_energy(matrix: Sequence[Sequence[float]]) -> Matrix:
     if maximum == 0.0:
         return [[0.0] * columns for _ in range(rows)]
     normalized = [[value / maximum for value in row] for row in gradient]
-    total = frobenius_sq(normalized)
     row_energy = [math.fsum(value * value for value in row) for row in normalized]
     column_energy = [
         math.fsum(normalized[i][j] * normalized[i][j] for i in range(rows))
         for j in range(columns)
     ]
+    outside_row = _exclusive_nonnegative_sums(row_energy)
+    outside_column = _exclusive_nonnegative_sums(column_energy)
     return [
-        [max(0.0, 2.0 * total - row_energy[i] - column_energy[j]) for j in range(columns)]
+        [outside_row[i] + outside_column[j] for j in range(columns)]
         for i in range(rows)
     ]
 

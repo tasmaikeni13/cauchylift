@@ -9,32 +9,32 @@
     "near_one_sparse": [
       {
         "cosine": 0.9862728891222986,
-        "direction_error_from_boundary": 0.005491997909835144,
+        "direction_error_from_boundary": 0.005491997909835141,
         "epsilon": 0.1
       },
       {
         "cosine": 0.9998501336825921,
-        "direction_error_from_boundary": 5.655157702079366e-06,
+        "direction_error_from_boundary": 5.65515770207999e-06,
         "epsilon": 0.01
       },
       {
         "cosine": 0.9999999850000012,
-        "direction_error_from_boundary": 5.656854108211088e-12,
+        "direction_error_from_boundary": 5.656854079786758e-12,
         "epsilon": 0.0001
       },
       {
         "cosine": 1.0,
-        "direction_error_from_boundary": 6.2803698347350994e-24,
+        "direction_error_from_boundary": 5.65685424949238e-24,
         "epsilon": 1e-08
       },
       {
         "cosine": 1.0,
-        "direction_error_from_boundary": 0.0,
+        "direction_error_from_boundary": 5.65685424949238e-36,
         "epsilon": 1e-12
       },
       {
         "cosine": 1.0,
-        "direction_error_from_boundary": 0.0,
+        "direction_error_from_boundary": 5.656854249492378e-120,
         "epsilon": 1e-40
       },
       {
