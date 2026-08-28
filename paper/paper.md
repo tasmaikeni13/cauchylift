@@ -1,6 +1,6 @@
 # CauchyLift: Cotransverse Rational Gradient Fields for State-Free Matrix Optimization
 
-**Status:** theory-stage manuscript, version 0.1.0, 2026-08-27
+**Status:** theory-stage manuscript, version 0.1.1, 2026-08-28
 **Artifacts:** mathematical Python probes and partial Lean formalization accompany this manuscript
 **Empirical status:** no neural-network training has been performed
 
@@ -10,7 +10,7 @@ Matrix optimizers for deep learning commonly obtain their geometry from historic
 
 We prove that the resulting direction is scale invariant, odd, sign preserving, permutation and transpose equivariant, and uniformly descent aligned: its cosine with every nonzero exact gradient is at least \(1/\sqrt3\), independent of matrix dimensions. This gives an \(O(T^{-1/2})\) deterministic stationarity bound for smooth nonconvex objectives under normalized steps. On a rank-one gradient, the unnormalized field factorizes through an additive Cauchy kernel; under generic exact conditions this changes rank one to full algebraic rank. A numerical audit shows why this fact must be interpreted cautiously: sampled floating stable rank remains nearly one.
 
-Small quadratic probes show promising direction quality at moderate conditioning and a serious basis/schedule weakness at condition \(10^4\). Consequently, this paper does **not** claim AdamW-like wall time, SOAP/Muon-like convergence, stochastic acceleration, or neural-training efficacy. Its contribution is a new, falsifiable mathematical optimizer hypothesis; a finite literature audit found no close formula through 2026-08-27, but cannot certify universal historical novelty.
+Small quadratic probes show promising direction quality at moderate conditioning and a serious basis/schedule weakness at condition \(10^4\). Consequently, this paper does **not** claim AdamW-like wall time, SOAP/Muon-like convergence, stochastic acceleration, or neural-training efficacy. Its contribution is a new, falsifiable mathematical optimizer hypothesis; a finite literature audit found no close formula through 2026-08-28, but cannot certify universal historical novelty.
 
 ## 1. Motivation and research boundary
 
@@ -325,14 +325,16 @@ and substitution into (2) gives (11). ∎
 
 ### Corollary 3.1 — generic algebraic rank lift
 
-If the nonzero \(u_i^2\) are pairwise distinct, the nonzero \(v_j^2\) are pairwise distinct, and the denominators in (11) are positive, then
+If every entry of \(u\) and \(v\) is nonzero, the values \(u_i^2\) are pairwise distinct, the values \(v_j^2\) are pairwise distinct, and the denominators in (11) are positive, then
 
 \[
 \operatorname{rank}\operatorname{CL}(uv^\top)=\min(m,n).
 \tag{12}
 \]
 
-**Proof sketch.** Diagonal multiplication by nonzero \(u_i\) and \(v_j\), and scalar normalization, preserve rank. Every square submatrix of \(C\) with distinct \(x_i\) and \(y_j\) is a Cauchy matrix. Its determinant is a nonzero product of pairwise differences divided by \(\prod_{ij}(x_i+y_j)\). ∎
+**Proof sketch.** The all-entries-nonzero hypotheses make both diagonal factors injective on every selected square submatrix, and scalar normalization preserves rank. Every square submatrix of \(C\) with distinct \(x_i\) and \(y_j\) is a Cauchy matrix. Its determinant is a nonzero product of pairwise differences divided by \(\prod_{ij}(x_i+y_j)\). ∎
+
+The requirement that every factor entry be nonzero is essential. For example, \(u=(1,0)^\top\) and \(v=(1,2)^\top\) have distinct nonzero squared magnitudes, but the zero row remains zero after the transform and the output rank is one. The Phase 1 adversarial suite retains this counterexample because the earlier wording omitted the all-entries-nonzero hypothesis.
 
 For \(2\times2\), the identity is explicit:
 

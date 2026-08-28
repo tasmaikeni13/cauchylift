@@ -26,6 +26,8 @@ All performance figures below are reports by the cited authors, not findings of 
 | E20 | [A Large Batch Optimizer Reality Check](https://arxiv.org/abs/2102.06356) | Critiques optimizer comparisons under unequal tuning | Motivates held-out tuning and predeclared budgets | No result from that paper is attributed to CauchyLift |
 | E21 | [XGrad](https://arxiv.org/abs/2305.18240) | Predicts future weights/gradients | Closest temporal-extrapolation item for a rejected candidate | Not close to final primitive |
 | E22 | [Symmetry-Compatible Principle for Optimizer Design](https://arxiv.org/abs/2605.18106) | Relates layer symmetries to compatible update families, including bi-orthogonal spectral rules | Supports treating permutation symmetry and orthogonal symmetry as materially different design choices | Does not study cotransverse energy |
+| E23 | [Adaptive Matrix Online Learning through Smoothing with Guarantees for Nonsmooth Nonconvex Optimization](https://proceedings.mlr.press/v336/jiang26a.html) | Adaptive online matrix learning through smoothed nuclear-norm potentials | 2026-08-28 recency sweep; confirms a geometry/potential family rather than the cotransverse formula | Online matrix constraints, not an instantaneous row-column complement field |
+| E24 | [Reassessing Muon for Matrix Factorization](https://proceedings.mlr.press/v334/parviz26a.html) | Studies approximate orthogonalization in matrix factorization | 2026-08-28 proceedings sweep; reinforces the polar/orthogonalization comparison boundary | Does not propose a reduction-only rational field |
 
 ## Internal evidence
 
@@ -35,3 +37,4 @@ All performance figures below are reports by the cited authors, not findings of 
 | I02 | `analysis/results/quadratic_suite.json` | On held-out 4×4 Kronecker quadratics at condition 100, CauchyLift was competitive in exact-line and scheduled probes; at condition 10,000 its scheduled performance degraded and rotated exact-line runs hit the cap | Diagnostic only; no ML inference |
 | I03 | `analysis/results/rank_probe.json` | A rational 4×4 rank-one input maps to exact rank four, but sampled floating stable rank stays near one | Algebraic theorem plus negative numerical qualification |
 | I04 | `analysis/results/rejection_checks.json` | Cofactor candidate matches a Halley triple-angle map; plaquette dual stalls in 198/200 probes | Rejection evidence |
+| I05 | `analysis/results/adversarial_audit.json` | Exact boundary/shape cases pass; the old rank hypothesis and unbiased-noise inference have explicit retained counterexamples | Phase 1 regression and negative evidence |

@@ -12,3 +12,4 @@
 | One-sparse projective boundary may be numerically abrupt | Medium | Exact limit is defined and property tests pass | Measure near-boundary continuity in finite precision and derive an implementation-safe equivalent |
 | Lack of momentum may hurt noisy language modeling | High | No training performed | Test the primitive alone first; needing momentum is a contract-level negative result |
 | Weight decay omitted | Low | Deliberate scope choice | Evaluate regularization separately; do not fold it into the novelty claim |
+| Generic rank hypotheses are easy to understate | Medium | Phase 1 found that distinct nonzero magnitudes still allow zero factor coordinates and rank loss | Keep the all-entries-nonzero condition in the paper, proof audit, and regression suite |

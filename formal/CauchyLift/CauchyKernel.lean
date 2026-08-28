@@ -4,7 +4,9 @@ import Mathlib
 # Two-by-two Cauchy-kernel identity
 
 This checks the smallest nontrivial rank-lift certificate.  The paper's general
-rank statement uses the classical Cauchy determinant product formula and is not
+rank statement additionally requires every entry of both rank-one factors to
+be nonzero, because the outer diagonal factors must preserve rank.  The general
+Cauchy determinant product formula and those diagonal-matrix rank steps are not
 claimed as fully formalized here.
 -/
 

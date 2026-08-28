@@ -1,0 +1,41 @@
+{
+  "artifact": "CauchyLift Phase 1 manifest",
+  "commands": "artifacts/phase1/commands.log",
+  "decisive_artifact_hashes": {
+    "analysis/results/adversarial_audit.json": "edc7fc0284f38e0252aa2fefadfaba0a948749d94c700d08469f321cf308f755",
+    "analysis/results/property_checks.json": "d438ff1b500cac43a04461bc8464e98dfbe901b5921e2e6700db373abc8ea903",
+    "analysis/results/quadratic_suite.json": "3f1544dffea20ec58a8aadb5f898facc90aac5f55de3fd116aabc5e860820aa0",
+    "analysis/results/rank_probe.json": "d95b469f93481ed27cdbc3ccbc2cba6d0183229249be34ba45780d14fedade68",
+    "analysis/results/rejection_checks.json": "54fc805a17c7b2cf4da0a85efc2b64b5f48bb93e88f06a4aa84bc3c7faf4a2a0",
+    "formal/CauchyLift/CauchyKernel.lean": "53a0d91e59a52945096371d59852ae531a89d9824efb69ffb74bc88d74e42fa7",
+    "paper/paper.md": "569ef6f897280bb8a3d0673f9d40bb70c5dea8a154e48d522a02c0f19125bce7",
+    "research/proof_audit.md": "3e181ee3aaf2d62b2f66b96992ff470960ae338bb13e1ec2708d0917988d3008"
+  },
+  "environment": {
+    "gpu_host": "AMD MI300X host detected; unused",
+    "lean": "4.19.0",
+    "mathlib_revision": "c44e0c8ee63ca166450922a373c7409c5d26b00b",
+    "operating_system": "Linux 6.8.0-138-generic x86_64",
+    "python": "3.12.3"
+  },
+  "gate": "PASS",
+  "inputs": [
+    "README.md",
+    "phases/README.md",
+    "phases/phase1.md",
+    "paper/paper.md",
+    "research/research_contract.md",
+    "research/future_experiment_protocol.md",
+    "research/evidence_ledger.md",
+    "research/risk_register.md"
+  ],
+  "outputs": [
+    "artifacts/phase1/report.md",
+    "analysis/results/adversarial_audit.json",
+    "phases/status/phase1.json"
+  ],
+  "repository_commit_at_start": "0038f39",
+  "run_id": "phase1-20260828T102240Z",
+  "seeds": [20260827],
+  "timestamp_utc": "2026-08-28T10:22:40Z"
+}

@@ -83,4 +83,4 @@ See [`formal/README.md`](formal/README.md) for the exact proof boundary.
 
 ## Status
 
-**Theory-stage research hypothesis, version 0.1.0.** The next authorized phase would be kernel prototyping and controlled training experiments. Those are deliberately absent here.
+**Theory-stage research hypothesis, version 0.1.1.** Phase 1's adversarial novelty and mathematical audit passed on 2026-08-28 after repairing the generic rank-lift hypotheses. Kernel prototyping and controlled training experiments remain deliberately absent here.

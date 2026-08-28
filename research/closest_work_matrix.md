@@ -14,9 +14,12 @@
 | ARO | Rotation state | QR + base optimizer | Learns/tracks a rotation, then applies another map | No rotation and no base optimizer | None beyond matrix awareness |
 | Low-rank methods (GaLore/Alice/Dion) | Subspace state | Projection/factor operations | Restrict or transport updates in low-dimensional subspaces | No subspace selection or truncation; exact rank can increase | “Rank” language could create superficial confusion |
 | Gauss–Southwell | Usually none | Selection/top-k | Update largest-gradient coordinates/blocks | CauchyLift is dense and smooth away from its projective boundary | Its concentration behavior resembles a soft greedy rule |
+| Smoothed nuclear-norm online methods | Potential-dependent | Matrix-potential gradients | Adaptive online matrix learning via smoothed spectral/nuclear-norm potentials | CauchyLift has no cumulative online state or spectral potential evaluation | Both provide matrix-valued geometry; formula and operation graphs differ |
 
 ## Non-compositionality test
 
 The final rule contains one tensor-valued operation: construct the cotransverse field and take its projective dual. Scalar radius assignment is unavoidable for any direction method and is not counted as a second optimizer. There is no momentum, adaptive moment, whitening, rotation, low-rank projector, sign branch, clipping branch, or fallback optimizer.
 
 The strongest objection is that the update can be written entrywise as \(D_{ij}=p_{ij}(G)G_{ij}\). That observation is true but not discriminative: every sign-preserving direction has such a representation. The novelty question is therefore about the specific coupled field \(p_{ij}(G)=1/[(S-r_i)+(S-c_j)]\), its projective boundary, and its derived theorems.
+
+The 2026-08-28 operational decomposition audit also tried the following rewrites: one left diagonal scaling followed by one right diagonal scaling, a finite row/column balancing pass, a fixed-norm steepest-descent/LMO step, and a polar/whitening map. The reciprocal additive denominator is generically nonseparable, one evaluation has no balancing fixed point, its direction is not the optimizer of a fixed gradient-independent norm ball, and it changes singular vectors without computing a spectral map. No reusable known-module decomposition was found within these tested families.
