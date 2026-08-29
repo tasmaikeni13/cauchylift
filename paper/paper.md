@@ -1,8 +1,8 @@
 # CauchyLift: Cotransverse Rational Gradient Fields for State-Free Matrix Optimization
 
-**Status:** theory-stage manuscript, version 0.2.0, 2026-08-28
+**Status:** theory-stage manuscript, version 0.2.0, 2026-08-29
 **Artifacts:** mathematical Python probes and partial Lean formalization accompany this manuscript
-**Empirical status:** no neural-network training has been performed; Phase 3 kernel correctness passed but its speed gate is `REVISE`
+**Empirical status:** no neural-network training has been performed; the single-MI300X Phase 3 correctness and optimizer-step speed gates pass, while independent second-family replication remains open
 
 ## Abstract
 
@@ -535,11 +535,11 @@ The radius \(\sqrt{\min(m,n)}\) is frozen for the initial experiments. It is not
 
 Input gradients may be BF16, FP16, FP32, or FP64, but squares, marginal sums, exclusions, and the raw-field norm must accumulate in FP32 or higher. Max-absolute rescaling before squaring prevents overflow: all scaled squares are at most one. A naive FP32 square can overflow above approximately \(1.84\times10^{19}\), while this rescaling remains projectively exact.
 
-Near a dominant cell, computing \(2S-r_i-c_j\) can lose the small positive complement by cancellation. The implementation must instead sum nonnegative energies outside the row and column, using linear-work prefix/suffix or an equivalent exclusion reduction. If an active complement still rounds to zero, the specified rare path recomputes it in FP64. Only an input represented as exactly one-sparse may take the projective boundary branch. Any other zero active denominator is a diagnostic failure.
+Near a dominant cell, computing \(2S-r_i-c_j\) can lose the small positive complement by cancellation. A general implementation must either sum nonnegative excluded energies directly or validate the direct form and recompute a rounded invalid active denominator in FP64. The strict implementation takes the latter route. The timed direct-form path is used only for an explicitly prevalidated suite with a positive finite FP32 denominator lower bound. Only an input represented as exactly one-sparse may take the projective boundary branch. Any other zero active denominator is a diagnostic failure.
 
 No additive epsilon is permitted. `finite_precision_suite.json` shows that even a fixed \(10^{-3}S\) epsilon measurably changes an ordinary direction. Underflowed off-dominant amplitudes are less dangerous than raw denominator condition numbers suggest because (8a) makes their projective influence cubic, but that observation justifies a boundary branch only after represented-support and rare-path checks; it does not authorize a tunable stabilizer. The machine-readable Phase 3 contract is `spec/optimizer_v0.2.json`.
 
-Phase 3 implemented this graph as an FP64 CPU oracle, an exclusion-safe PyTorch reference, and native HIP kernels on one MI300X. Exhaustive and adversarial numerical tests pass within predeclared FP64, FP32, and BF16 tolerances; the optimizer retains zero persistent tensors and zero persistent bytes. ROCprofiler traces prove that the custom marginal, exclusion, denominator, norm, and update kernels executed. Performance is a negative result: after replacing contended reductions, the representative BF16 Transformer-shaped optimizer-only median improved from 141.0779 ms to 5.3505 ms, but fused AdamW takes 0.9076 ms. The ratio 5.8953 exceeds the preregistered maximum 1.15, so Phase 3 is `REVISE`.
+Phase 3 implemented this graph as an FP64 CPU oracle, an exclusion-safe PyTorch reference, and native HIP kernels on one MI300X. Exhaustive and adversarial numerical tests pass within predeclared FP64, FP32, and BF16 tolerances; the optimizer retains zero persistent tensors and zero persistent bytes. ROCprofiler traces prove that the five custom multi-tensor kernels execute. The representative BF16 Transformer-shaped optimizer-only median is 1.0625 ms versus 0.9602 ms for fused AdamW. The 1.1065 ratio is below the preregistered maximum 1.15, so the single-MI300X Phase 3 gate is `PASS`. This is kernel engineering evidence, not neural-training evidence, and the broader second-GPU-family replication requirement remains open.
 
 ## 9. Numerical methodology
 
@@ -632,7 +632,7 @@ ARO treats rotation as a first-class state and demonstrates that many matrix opt
 ## 11. Limitations
 
 1. **No training evidence.** The central performance target is untested.
-2. **Negative wall-clock evidence.** The MI300X native path is 5.8953× fused AdamW on the Phase 3 representative suite despite linear arithmetic.
+2. **Limited wall-clock evidence.** The MI300X native path passes the isolated Phase 3 optimizer-step gate at 1.1065× fused AdamW, but no end-to-end training wall time or second GPU family has been measured.
 3. **Only conditional stochastic theory.** The measurable SNR and high-probability conditions are sufficient, not known necessary, and may fail in language-model training.
 4. **Basis dependence.** Only permutations and transpose are symmetries; arbitrary rotations are not.
 5. **Step sensitivity.** The condition-\(10^4\) scheduled result is a direct warning.

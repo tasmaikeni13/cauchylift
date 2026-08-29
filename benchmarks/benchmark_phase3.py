@@ -66,6 +66,25 @@ def parameter_bytes(parameters: list[torch.Tensor]) -> int:
     return sum(parameter.numel() * parameter.element_size() for parameter in parameters)
 
 
+def native_logical_bytes(shapes: list[tuple[int, ...]], element_size: int) -> int:
+    """Count declared global-memory operations in the prevalidated HIP graph."""
+    total = 0
+    for shape in shapes:
+        rows = shape[0] if shape else 1
+        columns = math.prod(shape[1:]) if len(shape) > 1 else 1
+        elements = rows * columns
+        tile_rows = (rows + 63) // 64
+        tile_columns = (columns + 63) // 64
+        tiles = tile_rows * tile_columns
+        # Three gradient reads, one parameter read/write, and row/column/total
+        # energy reads in both the norm and output passes.
+        total += elements * (5 * element_size + 24)
+        # FP32 marginal/total/norm atomic read-modify-writes and initialization.
+        total += 8 * (rows * tile_columns + columns * tile_rows + 2 * tiles)
+        total += 4 * (rows + columns)
+    return total
+
+
 def state_summary(optimizer: torch.optim.Optimizer) -> dict[str, int]:
     tensors = [
         value
@@ -110,11 +129,29 @@ def measure_case(
     learning_rate = 1e-7
 
     if name == "cauchylift_hip":
+        for gradient in gradients:
+            if not bool(torch.isfinite(gradient).all()) or int(torch.count_nonzero(gradient)) < 2:
+                raise RuntimeError("fast HIP benchmark requires finite non-boundary gradients")
+            rows = gradient.shape[0] if gradient.ndim else 1
+            matrix = gradient.float().reshape(rows, -1)
+            squares = matrix.square()
+            active_squares = squares[matrix != 0]
+            if not bool(torch.isfinite(active_squares).all()) or bool((active_squares == 0).any()):
+                raise RuntimeError("fast HIP benchmark requires representable active FP32 squares")
+            total = squares.sum()
+            denominator_lower_bound = (
+                total - squares.sum(dim=1).max()
+                + total
+                - squares.sum(dim=0).max()
+            )
+            if not bool(torch.isfinite(total)) or not bool(denominator_lower_bound > 0):
+                raise RuntimeError("fast HIP benchmark requires positive finite FP32 denominators")
+        del active_squares, denominator_lower_bound, matrix, squares, total
         optimizer = CauchyLift(
             parameters, lr=learning_rate, backend="hip", strict=False
         )
         step = optimizer.step
-        logical_bytes = 68 * element_count + 4 * sum(sum(shape[:1]) + math.prod(shape[1:]) for shape in shapes)
+        logical_bytes = native_logical_bytes(shapes, parameters[0].element_size())
     elif name == "cauchylift_reference":
         optimizer = CauchyLift(parameters, lr=learning_rate, backend="reference")
         step = optimizer.step

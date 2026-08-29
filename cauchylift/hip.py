@@ -114,3 +114,47 @@ def cauchylift_hip_step_(
             direction = cauchylift_reference(gradient, accumulation_dtype=torch.float64)
             parameter.add_(direction.to(parameter.dtype), alpha=-learning_rate)
     return status
+
+
+@torch.no_grad()
+def cauchylift_hip_foreach_step_(
+    parameters: list[torch.Tensor],
+    gradients: list[torch.Tensor],
+    learning_rate: float,
+    *,
+    strict: bool = True,
+) -> torch.Tensor:
+    """Update a same-dtype tensor list with one native multi-tensor pipeline.
+
+    ``strict=False`` is a caller assertion that every gradient is finite, has
+    at least two active entries, and has representable nonzero FP32 squares.
+    It skips boundary/status analysis and is intended for prevalidated timing
+    or training pipelines. The default retains the complete frozen semantics.
+    """
+    if not parameters or len(parameters) != len(gradients):
+        raise ValueError("parameters and gradients must be nonempty equal-length lists")
+    prepared: list[torch.Tensor] = []
+    for parameter, gradient in zip(parameters, gradients, strict=True):
+        if not parameter.is_contiguous():
+            raise ValueError("foreach HIP parameters must be contiguous")
+        grad = _validate_native_input(gradient)
+        if parameter.dtype != grad.dtype:
+            grad = grad.to(parameter.dtype)
+        prepared.append(grad)
+    extension = load_extension()
+    status = extension.foreach_step_(
+        parameters, prepared, float(learning_rate), not strict
+    )
+    if strict:
+        values = status.cpu().tolist()
+        for parameter, gradient, item in zip(
+            parameters, gradients, values, strict=True
+        ):
+            if item[2]:
+                raise ValueError("CauchyLift rejects nonfinite gradients")
+            if item[3]:
+                direction = cauchylift_reference(
+                    gradient, accumulation_dtype=torch.float64
+                )
+                parameter.add_(direction.to(parameter.dtype), alpha=-learning_rate)
+    return status

@@ -14,6 +14,19 @@
 namespace {
 
 constexpr int kThreads = 256;
+constexpr int kElementThreads = 512;
+constexpr int kMetaFields = 8;
+
+enum MetaField : int {
+  kParameterPointer = 0,
+  kGradientPointer = 1,
+  kRows = 2,
+  kColumns = 3,
+  kRowOffset = 4,
+  kColumnOffset = 5,
+  kTileOffset = 6,
+  kTileCount = 7,
+};
 
 __device__ __forceinline__ int positive_float_bits(float value) {
   return __float_as_int(value);
@@ -21,6 +34,400 @@ __device__ __forceinline__ int positive_float_bits(float value) {
 
 __device__ __forceinline__ float bits_float(int value) {
   return __int_as_float(value);
+}
+
+__device__ __forceinline__ int locate_metadata(
+    const int64_t* metadata,
+    int tensor_count,
+    int64_t work_index,
+    int offset_field) {
+  int lower = 0;
+  int upper = tensor_count;
+  while (lower + 1 < upper) {
+    int middle = (lower + upper) / 2;
+    if (metadata[middle * kMetaFields + offset_field] <= work_index) {
+      lower = middle;
+    } else {
+      upper = middle;
+    }
+  }
+  return lower;
+}
+
+__global__ void foreach_initialize_kernel(
+    int* status,
+    float* norm_square,
+    float* scale,
+    float* total_energy,
+    float* row_energy,
+    int64_t total_rows,
+    float* column_energy,
+    int64_t total_columns,
+    int tensor_count,
+    bool prevalidated_dense) {
+  int64_t global_thread =
+      static_cast<int64_t>(blockIdx.x) * blockDim.x + threadIdx.x;
+  int64_t global_stride = static_cast<int64_t>(gridDim.x) * blockDim.x;
+  for (int index = global_thread; index < tensor_count; index += global_stride) {
+    status[index * 4] = 0;
+    status[index * 4 + 1] = prevalidated_dense ? 2 : 0;
+    status[index * 4 + 2] = 0;
+    status[index * 4 + 3] = 0;
+    norm_square[index] = 0.0f;
+    total_energy[index] = 0.0f;
+    if (prevalidated_dense) {
+      scale[index] = 1.0f;
+    }
+  }
+  for (int64_t index = global_thread; index < total_rows; index += global_stride) {
+    row_energy[index] = 0.0f;
+  }
+  for (int64_t index = global_thread; index < total_columns; index += global_stride) {
+    column_energy[index] = 0.0f;
+  }
+}
+
+__global__ void foreach_inverse_maximum_kernel(
+    const int* status, float* inverse_maximum, int tensor_count) {
+  for (int tensor = threadIdx.x; tensor < tensor_count; tensor += blockDim.x) {
+    float maximum = bits_float(status[tensor * 4]);
+    inverse_maximum[tensor] = maximum > 0.0f ? 1.0f / maximum : 0.0f;
+  }
+}
+
+__global__ void foreach_finalize_scale_kernel(
+    const int64_t* metadata,
+    int* status,
+    float* scale,
+    const float* norm_square,
+    int tensor_count) {
+  for (int tensor = threadIdx.x; tensor < tensor_count; tensor += blockDim.x) {
+    if (status[tensor * 4 + 1] <= 1 || status[tensor * 4 + 2] ||
+        status[tensor * 4 + 3]) {
+      continue;
+    }
+    float norm = sqrtf(norm_square[tensor]);
+    if (!(norm > 0.0f) || !isfinite(norm)) {
+      status[tensor * 4 + 3] = 1;
+      continue;
+    }
+    const int64_t* item = metadata + tensor * kMetaFields;
+    float radius = sqrtf(static_cast<float>(min(item[kRows], item[kColumns])));
+    scale[tensor] = __fdividef(scale[tensor] * radius, norm);
+  }
+}
+
+template <typename scalar_t, bool Analyze>
+__global__ void foreach_marginal_energy_kernel(
+    const int64_t* metadata,
+    int tensor_count,
+    int* analysis_partials,
+    float* total_energy,
+    float* row_energy,
+    float* column_energy) {
+  int tensor = locate_metadata(metadata, tensor_count, blockIdx.x, kTileOffset);
+  const int64_t* item = metadata + tensor * kMetaFields;
+  int64_t local_tile = blockIdx.x - item[kTileOffset];
+  int64_t rows = item[kRows];
+  int64_t columns = item[kColumns];
+  int64_t tile_columns = (columns + 63) / 64;
+  int64_t tile_row = local_tile / tile_columns;
+  int64_t tile_column = local_tile % tile_columns;
+  const scalar_t* gradient = reinterpret_cast<const scalar_t*>(
+      static_cast<uintptr_t>(item[kGradientPointer]));
+  __shared__ float tile[64][65];
+  constexpr int local_rows = Analyze ? 16 : 32;
+  constexpr int row_parts = 64 / local_rows;
+  constexpr int wave_count = Analyze ? 4 : 8;
+  int linear_thread = threadIdx.y * 16 + threadIdx.x;
+  int local_maximum = 0;
+  int local_count = 0;
+  int local_nonfinite = 0;
+  int local_invalid = 0;
+  float local_total = 0.0f;
+  for (int row_part = 0; row_part < row_parts; ++row_part) {
+    int local_row = threadIdx.y + local_rows * row_part;
+    int64_t row = tile_row * 64 + local_row;
+    for (int column_part = 0; column_part < 4; ++column_part) {
+      int local_column = threadIdx.x + 16 * column_part;
+      int64_t column = tile_column * 64 + local_column;
+      float square = 0.0f;
+      if (row < rows && column < columns) {
+        float value = static_cast<float>(gradient[row * columns + column]);
+        if constexpr (Analyze) {
+          if (!isfinite(value)) {
+            local_nonfinite = 1;
+          } else if (value != 0.0f) {
+            ++local_count;
+            local_maximum = max(local_maximum, positive_float_bits(fabsf(value)));
+            square = value * value;
+            if (!isfinite(square) || square == 0.0f) {
+              local_invalid = 1;
+              square = 0.0f;
+            }
+          }
+        } else {
+          square = value * value;
+        }
+      }
+      tile[local_row][local_column] = square;
+      local_total += square;
+    }
+  }
+  __syncthreads();
+  if (threadIdx.x == 0) {
+    for (int row_part = 0; row_part < row_parts; ++row_part) {
+      int local_row = threadIdx.y + local_rows * row_part;
+      int64_t row = tile_row * 64 + local_row;
+      if (row < rows) {
+        float sum = 0.0f;
+        for (int x = 0; x < 64; ++x) sum += tile[local_row][x];
+        atomicAdd(row_energy + item[kRowOffset] + row, sum);
+      }
+    }
+  }
+  if (threadIdx.y == 0) {
+    for (int column_part = 0; column_part < 4; ++column_part) {
+      int local_column = threadIdx.x + 16 * column_part;
+      int64_t column = tile_column * 64 + local_column;
+      if (column < columns) {
+        float sum = 0.0f;
+        for (int y = 0; y < 64; ++y) sum += tile[y][local_column];
+        atomicAdd(column_energy + item[kColumnOffset] + column, sum);
+      }
+    }
+  }
+  int lane = linear_thread & 63;
+  int wave = linear_thread >> 6;
+  for (int stride = 32; stride > 0; stride /= 2) {
+    local_total += __shfl_down(local_total, stride, 64);
+    if constexpr (Analyze) {
+      local_maximum = max(local_maximum, __shfl_down(local_maximum, stride, 64));
+      local_count += __shfl_down(local_count, stride, 64);
+      local_nonfinite |= __shfl_down(local_nonfinite, stride, 64);
+      local_invalid |= __shfl_down(local_invalid, stride, 64);
+    }
+  }
+  __shared__ float wave_totals[8];
+  __shared__ int wave_results[4][4];
+  if (lane == 0) wave_totals[wave] = local_total;
+  if constexpr (Analyze) {
+    if (lane == 0) {
+      wave_results[wave][0] = local_maximum;
+      wave_results[wave][1] = local_count;
+      wave_results[wave][2] = local_nonfinite;
+      wave_results[wave][3] = local_invalid;
+    }
+  }
+  __syncthreads();
+  if (linear_thread == 0) {
+    float tile_total = wave_totals[0];
+    for (int other = 1; other < wave_count; ++other) tile_total += wave_totals[other];
+    atomicAdd(total_energy + tensor, tile_total);
+    if constexpr (Analyze) {
+      for (int other = 1; other < 4; ++other) {
+        wave_results[0][0] = max(wave_results[0][0], wave_results[other][0]);
+        wave_results[0][1] += wave_results[other][1];
+        wave_results[0][2] |= wave_results[other][2];
+        wave_results[0][3] |= wave_results[other][3];
+      }
+      for (int field = 0; field < 4; ++field) {
+        analysis_partials[blockIdx.x * 4 + field] = wave_results[0][field];
+      }
+    }
+  }
+}
+
+__global__ void foreach_analysis_finalize_kernel(
+    const int64_t* metadata,
+    const int* analysis_partials,
+    int* status,
+    int tensor_count) {
+  int tensor = blockIdx.x;
+  const int64_t* item = metadata + tensor * kMetaFields;
+  int begin = static_cast<int>(item[kTileOffset]);
+  int end = begin + static_cast<int>(item[kTileCount]);
+  int local_maximum = 0;
+  int local_count = 0;
+  int local_nonfinite = 0;
+  int local_invalid = 0;
+  for (int tile = begin + threadIdx.x; tile < end; tile += blockDim.x) {
+    local_maximum = max(local_maximum, analysis_partials[tile * 4]);
+    local_count += analysis_partials[tile * 4 + 1];
+    local_nonfinite |= analysis_partials[tile * 4 + 2];
+    local_invalid |= analysis_partials[tile * 4 + 3];
+  }
+  __shared__ int maxima[kThreads];
+  __shared__ int counts[kThreads];
+  __shared__ int nonfinite[kThreads];
+  __shared__ int invalid[kThreads];
+  maxima[threadIdx.x] = local_maximum;
+  counts[threadIdx.x] = local_count;
+  nonfinite[threadIdx.x] = local_nonfinite;
+  invalid[threadIdx.x] = local_invalid;
+  __syncthreads();
+  for (int stride = blockDim.x / 2; stride > 0; stride /= 2) {
+    if (threadIdx.x < stride) {
+      maxima[threadIdx.x] = max(maxima[threadIdx.x], maxima[threadIdx.x + stride]);
+      counts[threadIdx.x] += counts[threadIdx.x + stride];
+      nonfinite[threadIdx.x] |= nonfinite[threadIdx.x + stride];
+      invalid[threadIdx.x] |= invalid[threadIdx.x + stride];
+    }
+    __syncthreads();
+  }
+  if (threadIdx.x == 0) {
+    status[tensor * 4] = maxima[0];
+    status[tensor * 4 + 1] = counts[0];
+    status[tensor * 4 + 2] = nonfinite[0];
+    status[tensor * 4 + 3] = invalid[0];
+  }
+}
+
+template <typename scalar_t, bool Fast>
+__global__ void foreach_raw_norm_kernel(
+    const int64_t* metadata,
+    int tensor_count,
+    int* status,
+    const float* inverse_maximum,
+    const float* total_energy,
+    const float* row_energy,
+    const float* column_energy,
+    float* norm_square) {
+  int tensor = locate_metadata(metadata, tensor_count, blockIdx.x, kTileOffset);
+  const int64_t* item = metadata + tensor * kMetaFields;
+  if constexpr (!Fast) {
+    if (status[tensor * 4 + 2] || status[tensor * 4 + 3] ||
+        status[tensor * 4 + 1] <= 1) return;
+  }
+  int columns = static_cast<int>(item[kColumns]);
+  int rows = static_cast<int>(item[kRows]);
+  int local_tile = static_cast<int>(blockIdx.x - item[kTileOffset]);
+  int tile_columns = (columns + 63) / 64;
+  int tile_row = local_tile / tile_columns;
+  int tile_column = local_tile % tile_columns;
+  const scalar_t* gradient = reinterpret_cast<const scalar_t*>(
+      static_cast<uintptr_t>(item[kGradientPointer]));
+  float scale = inverse_maximum[tensor];
+  float local_sum = 0.0f;
+  int local_invalid = 0;
+  int linear_thread = threadIdx.x;
+  int thread_row = linear_thread / 16;
+  int thread_column = linear_thread % 16;
+  for (int row_part = 0; row_part < 2; ++row_part) {
+    int row = tile_row * 64 + thread_row + 32 * row_part;
+    if (row >= rows) continue;
+    for (int column_part = 0; column_part < 4; ++column_part) {
+      int column = tile_column * 64 + thread_column + 16 * column_part;
+      if (column >= columns) continue;
+      int index = row * columns + column;
+      float value = static_cast<float>(gradient[index]);
+      if constexpr (!Fast) {
+        if (value == 0.0f) continue;
+      }
+      float denominator = 2.0f * total_energy[tensor] -
+          row_energy[item[kRowOffset] + row] -
+          column_energy[item[kColumnOffset] + column];
+      float raw = __fdividef(value * scale, denominator);
+      float square = raw * raw;
+      if constexpr (Fast) {
+        local_sum += square;
+      } else {
+        if (!(denominator > 0.0f) || !isfinite(denominator) ||
+            !isfinite(square) || square == 0.0f) {
+          local_invalid = 1;
+        } else {
+          local_sum += square;
+        }
+      }
+    }
+  }
+  for (int stride = 32; stride > 0; stride /= 2) {
+    local_sum += __shfl_down(local_sum, stride, 64);
+    local_invalid |= __shfl_down(local_invalid, stride, 64);
+  }
+  int lane = threadIdx.x & 63;
+  int wave = threadIdx.x >> 6;
+  __shared__ float wave_sums[8];
+  __shared__ int wave_invalid[8];
+  if (lane == 0) {
+    wave_sums[wave] = local_sum;
+    wave_invalid[wave] = local_invalid;
+  }
+  __syncthreads();
+  float block_sum = threadIdx.x < 8 ? wave_sums[threadIdx.x] : 0.0f;
+  int block_invalid = threadIdx.x < 8 ? wave_invalid[threadIdx.x] : 0;
+  for (int stride = 32; stride > 0; stride /= 2) {
+    block_sum += __shfl_down(block_sum, stride, 64);
+    block_invalid |= __shfl_down(block_invalid, stride, 64);
+  }
+  if (threadIdx.x == 0) {
+    atomicAdd(norm_square + tensor, block_sum);
+    if constexpr (!Fast) atomicOr(status + tensor * 4 + 3, block_invalid);
+  }
+}
+
+template <typename scalar_t, bool Fast>
+__global__ void foreach_output_kernel(
+    const int64_t* metadata,
+    int tensor_count,
+    int* status,
+    const float* inverse_maximum,
+    const float* total_energy,
+    const float* row_energy,
+    const float* column_energy,
+    float learning_rate) {
+  int tensor = locate_metadata(metadata, tensor_count, blockIdx.x, kTileOffset);
+  const int64_t* item = metadata + tensor * kMetaFields;
+  int columns = static_cast<int>(item[kColumns]);
+  int rows = static_cast<int>(item[kRows]);
+  int local_tile = static_cast<int>(blockIdx.x - item[kTileOffset]);
+  int tile_columns = (columns + 63) / 64;
+  int tile_row = local_tile / tile_columns;
+  int tile_column = local_tile % tile_columns;
+  scalar_t* parameter = reinterpret_cast<scalar_t*>(
+      static_cast<uintptr_t>(item[kParameterPointer]));
+  const scalar_t* gradient = reinterpret_cast<const scalar_t*>(
+      static_cast<uintptr_t>(item[kGradientPointer]));
+  float scale = inverse_maximum[tensor];
+  int linear_thread = threadIdx.x;
+  int thread_row = linear_thread / 32;
+  int thread_column = linear_thread % 32;
+  for (int row_part = 0; row_part < 4; ++row_part) {
+    int row = tile_row * 64 + thread_row + 16 * row_part;
+    if (row >= rows) continue;
+    for (int column_part = 0; column_part < 2; ++column_part) {
+      int column = tile_column * 64 + thread_column + 32 * column_part;
+      if (column >= columns) continue;
+      int index = row * columns + column;
+      float value = static_cast<float>(gradient[index]);
+      float direction = 0.0f;
+      if constexpr (Fast) {
+        float denominator = 2.0f * total_energy[tensor] -
+            row_energy[item[kRowOffset] + row] -
+            column_energy[item[kColumnOffset] + column];
+        direction = __fdividef(value * scale, denominator);
+      } else {
+        if (!status[tensor * 4 + 2] && !status[tensor * 4 + 3]) {
+          if (status[tensor * 4 + 1] == 1 && value != 0.0f) {
+            float radius = sqrtf(static_cast<float>(min(item[kRows], item[kColumns])));
+            direction = copysignf(radius, value);
+          } else if (status[tensor * 4 + 1] > 1 && value != 0.0f) {
+            float denominator = 2.0f * total_energy[tensor] -
+                row_energy[item[kRowOffset] + row] -
+                column_energy[item[kColumnOffset] + column];
+            direction = __fdividef(value * scale, denominator);
+          }
+        }
+      }
+      if constexpr (Fast) {
+        float current = static_cast<float>(parameter[index]);
+        parameter[index] = static_cast<scalar_t>(current - learning_rate * direction);
+      } else if (!status[tensor * 4 + 2] && !status[tensor * 4 + 3]) {
+        float current = static_cast<float>(parameter[index]);
+        parameter[index] = static_cast<scalar_t>(current - learning_rate * direction);
+      }
+    }
+  }
 }
 
 template <typename scalar_t>
@@ -540,12 +947,187 @@ at::Tensor cauchylift_step_hip(
   return workspace.status;
 }
 
+at::Tensor cauchylift_foreach_step_hip(
+    at::TensorList parameters,
+    at::TensorList gradients,
+    double learning_rate,
+    bool prevalidated_dense) {
+  TORCH_CHECK(!parameters.empty(), "CauchyLift foreach requires parameters");
+  TORCH_CHECK(parameters.size() == gradients.size(), "parameter and gradient list sizes differ");
+  const at::Tensor& first = gradients[0];
+  check_input(first);
+  c10::cuda::CUDAGuard guard(first.device());
+  int tensor_count = static_cast<int>(parameters.size());
+  int64_t total_rows = 0;
+  int64_t total_columns = 0;
+  int64_t total_tiles = 0;
+  auto metadata_cpu = at::empty(
+      {tensor_count, kMetaFields},
+      at::TensorOptions().dtype(at::kLong).device(at::kCPU));
+  int64_t* metadata_host = metadata_cpu.data_ptr<int64_t>();
+  for (int tensor = 0; tensor < tensor_count; ++tensor) {
+    const at::Tensor& parameter = parameters[tensor];
+    const at::Tensor& gradient = gradients[tensor];
+    check_input(parameter);
+    check_input(gradient);
+    TORCH_CHECK(parameter.sizes() == gradient.sizes(), "parameter and gradient shapes differ");
+    TORCH_CHECK(parameter.scalar_type() == gradient.scalar_type(), "parameter and gradient dtypes differ");
+    TORCH_CHECK(parameter.scalar_type() == first.scalar_type(), "foreach tensors must share a dtype");
+    TORCH_CHECK(parameter.device() == first.device(), "foreach tensors must share a device");
+    auto [rows, columns] = matrix_shape(gradient);
+    int64_t tiles = ((rows + 63) / 64) * ((columns + 63) / 64);
+    int64_t* item = metadata_host + tensor * kMetaFields;
+    item[kParameterPointer] = reinterpret_cast<int64_t>(parameter.data_ptr());
+    item[kGradientPointer] = reinterpret_cast<int64_t>(gradient.data_ptr());
+    item[kRows] = rows;
+    item[kColumns] = columns;
+    item[kRowOffset] = total_rows;
+    item[kColumnOffset] = total_columns;
+    item[kTileOffset] = total_tiles;
+    item[kTileCount] = tiles;
+    total_rows += rows;
+    total_columns += columns;
+    total_tiles += tiles;
+  }
+  auto metadata = metadata_cpu.to(first.device(), at::kLong, true, true);
+  auto float_options = first.options().dtype(at::kFloat);
+  auto int_options = first.options().dtype(at::kInt);
+  auto status = at::empty({tensor_count, 4}, int_options);
+  auto norm_square = at::empty({tensor_count}, float_options);
+  auto inverse_maximum = at::empty({tensor_count}, float_options);
+  auto total_energy = at::empty({tensor_count}, float_options);
+  auto row_energy = at::empty({total_rows}, float_options);
+  auto column_energy = at::empty({total_columns}, float_options);
+  at::Tensor analysis_partials;
+  if (!prevalidated_dense) {
+    analysis_partials = at::empty({total_tiles, 4}, int_options);
+  }
+  cudaStream_t stream = at::cuda::getCurrentCUDAStream();
+  int initialize_blocks = static_cast<int>(std::min<int64_t>(
+      1024,
+      (std::max(
+           total_rows,
+           std::max(total_columns, static_cast<int64_t>(tensor_count))) +
+       kThreads - 1) /
+          kThreads));
+  foreach_initialize_kernel<<<initialize_blocks, kThreads, 0, stream>>>(
+      status.data_ptr<int>(),
+      norm_square.data_ptr<float>(),
+      inverse_maximum.data_ptr<float>(),
+      total_energy.data_ptr<float>(),
+      row_energy.data_ptr<float>(),
+      total_rows,
+      column_energy.data_ptr<float>(),
+      total_columns,
+      tensor_count,
+      prevalidated_dense);
+  dim3 fast_marginal_threads(16, 32);
+  dim3 safe_marginal_threads(16, 16);
+  if (first.scalar_type() == at::kFloat) {
+    if (prevalidated_dense) {
+      foreach_marginal_energy_kernel<float, false><<<total_tiles, fast_marginal_threads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, nullptr,
+          total_energy.data_ptr<float>(), row_energy.data_ptr<float>(),
+          column_energy.data_ptr<float>());
+    } else {
+      foreach_marginal_energy_kernel<float, true><<<total_tiles, safe_marginal_threads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, analysis_partials.data_ptr<int>(),
+          total_energy.data_ptr<float>(), row_energy.data_ptr<float>(),
+          column_energy.data_ptr<float>());
+    }
+  } else {
+    if (prevalidated_dense) {
+      foreach_marginal_energy_kernel<at::BFloat16, false><<<total_tiles, fast_marginal_threads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, nullptr,
+          total_energy.data_ptr<float>(), row_energy.data_ptr<float>(),
+          column_energy.data_ptr<float>());
+    } else {
+      foreach_marginal_energy_kernel<at::BFloat16, true><<<total_tiles, safe_marginal_threads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, analysis_partials.data_ptr<int>(),
+          total_energy.data_ptr<float>(), row_energy.data_ptr<float>(),
+          column_energy.data_ptr<float>());
+    }
+  }
+  if (!prevalidated_dense) {
+    foreach_analysis_finalize_kernel<<<tensor_count, kThreads, 0, stream>>>(
+        metadata.data_ptr<int64_t>(), analysis_partials.data_ptr<int>(),
+        status.data_ptr<int>(), tensor_count);
+    foreach_inverse_maximum_kernel<<<1, kThreads, 0, stream>>>(
+        status.data_ptr<int>(), inverse_maximum.data_ptr<float>(), tensor_count);
+  }
+  if (first.scalar_type() == at::kFloat) {
+    if (prevalidated_dense) {
+      foreach_raw_norm_kernel<float, true><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          norm_square.data_ptr<float>());
+    } else {
+      foreach_raw_norm_kernel<float, false><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          norm_square.data_ptr<float>());
+    }
+    foreach_finalize_scale_kernel<<<1, kThreads, 0, stream>>>(
+        metadata.data_ptr<int64_t>(), status.data_ptr<int>(),
+        inverse_maximum.data_ptr<float>(), norm_square.data_ptr<float>(), tensor_count);
+    if (prevalidated_dense) {
+      foreach_output_kernel<float, true><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          static_cast<float>(learning_rate));
+    } else {
+      foreach_output_kernel<float, false><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          static_cast<float>(learning_rate));
+    }
+  } else {
+    if (prevalidated_dense) {
+      foreach_raw_norm_kernel<at::BFloat16, true><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          norm_square.data_ptr<float>());
+    } else {
+      foreach_raw_norm_kernel<at::BFloat16, false><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          norm_square.data_ptr<float>());
+    }
+    foreach_finalize_scale_kernel<<<1, kThreads, 0, stream>>>(
+        metadata.data_ptr<int64_t>(), status.data_ptr<int>(),
+        inverse_maximum.data_ptr<float>(), norm_square.data_ptr<float>(), tensor_count);
+    if (prevalidated_dense) {
+      foreach_output_kernel<at::BFloat16, true><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          static_cast<float>(learning_rate));
+    } else {
+      foreach_output_kernel<at::BFloat16, false><<<total_tiles, kElementThreads, 0, stream>>>(
+          metadata.data_ptr<int64_t>(), tensor_count, status.data_ptr<int>(),
+          inverse_maximum.data_ptr<float>(), total_energy.data_ptr<float>(),
+          row_energy.data_ptr<float>(), column_energy.data_ptr<float>(),
+          static_cast<float>(learning_rate));
+    }
+  }
+  C10_CUDA_KERNEL_LAUNCH_CHECK();
+  return status;
+}
+
 TORCH_LIBRARY(cauchylift_native, module) {
   module.def("direction(Tensor gradient) -> (Tensor, Tensor)");
   module.def("step_(Tensor(a!) parameter, Tensor gradient, float learning_rate) -> Tensor");
+  module.def("foreach_step_(Tensor(a!)[] parameters, Tensor[] gradients, float learning_rate, bool prevalidated_dense) -> Tensor");
 }
 
 TORCH_LIBRARY_IMPL(cauchylift_native, CUDA, module) {
   module.impl("direction", &cauchylift_direction_hip);
   module.impl("step_", &cauchylift_step_hip);
+  module.impl("foreach_step_", &cauchylift_foreach_step_hip);
 }

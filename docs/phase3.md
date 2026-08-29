@@ -57,12 +57,15 @@ optimizer = CauchyLift(model.parameters(), lr=1e-3, backend="auto")
 ```
 
 `optimizer.state` remains empty. Exactly zero tensors and zero bytes persist
-between steps. Native transient storage is FP32 row/column energies and
-exclusions plus bounded reduction partials; it is allocated per invocation.
-The `strict=True` default checks native status on the host and raises on a
-nonfinite input or invokes the declared FP64 rare path. Benchmarking uses
-`strict=False` only for an explicitly prevalidated finite input suite so that
-the host status synchronization is not mixed into kernel timing.
+between steps. Native transient storage is batched metadata, FP32 row/column
+and total energies, per-tensor norm/scale/status values, and bounded analysis
+partials; it is allocated per invocation. The `strict=True` default checks
+native status on the host and raises on a nonfinite input or invokes the
+declared FP64 rare path. `strict=False` is a caller assertion that every input
+is finite, has at least two active entries, has representable nonzero FP32
+squares, and yields finite positive FP32 denominators. The benchmark checks
+those conditions before timing so host status synchronization is not mixed
+into kernel timing.
 
 ## Declared comparison tolerances
 
@@ -84,7 +87,7 @@ Repeated results are required to remain within the declared HIP tolerance.
 ```bash
 PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build \
   .venv/bin/python benchmarks/benchmark_phase3.py \
-  --warmup 5 --iterations 15 \
+  --warmup 10 --iterations 30 \
   --output analysis/results/phase3_benchmark.json
 
 .venv/bin/rocprofv3 \
@@ -100,16 +103,20 @@ The benchmark uses warmed ROCm events and synchronizes every sample. It reports
 raw samples, median, MAD, p25/p75, optimizer-only and complete-update times,
 logical bytes/bandwidth estimates, allocator peak transient memory, and actual
 persistent state. The checked-in profiler CSV files are the raw kernel traces.
-They prove that the custom HIP kernels executed; four profiled steps launch each
-of the nine named CauchyLift kernels four times. Including two FP32 workspace
-fills, the native path uses 11 launches per tensor step versus two steady-state
-launches for fused AdamW in this profile.
+They prove that the custom HIP path executed: four profiled steps invoke the
+batched initialization, tiled marginal-energy, raw-norm, scale-finalization,
+and fused parameter-update kernels four times each. An asynchronous metadata
+copy makes six device dispatches per optimizer step in this profile. The direct
+`2S-r_i-c_j` form removes the former exclusion scans; the strict path detects a
+rounded invalid denominator and retains the declared FP64 rare path.
 
-The optimized native result does not pass the speed gate. The representative
-BF16 Transformer-shaped suite takes 5.3505 ms versus 0.9076 ms for fused AdamW,
-a ratio of 5.8953 rather than the required maximum 1.15. The initial contended
-atomic reduction took 141.0779 ms; that failed run is preserved alongside the
-optimized result. Phase 3 is therefore `REVISE`, not `PASS`.
+The final native result passes the speed gate. On the representative
+123,586,560-element BF16 Transformer-shaped suite, CauchyLift takes a 1.0625 ms
+optimizer-only median (0.0047 ms MAD) versus 0.9602 ms (0.0166 ms MAD) for
+fused AdamW. The ratio is 1.1065, below the required maximum 1.15. The initial
+contended 141.0779 ms result and the prior 5.3505 ms `REVISE` result remain in
+Git history; the final raw benchmark and profiler artifacts describe the
+passing implementation.
 
 The original research contract requires the timing criterion on two modern GPU
 families. This single MI300X result does not satisfy independent external

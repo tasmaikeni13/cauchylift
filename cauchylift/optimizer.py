@@ -5,7 +5,7 @@ from typing import Any
 
 import torch
 
-from .hip import cauchylift_hip_step_, is_rocm_available
+from .hip import cauchylift_hip_foreach_step_, cauchylift_hip_step_, is_rocm_available
 from .reference import cauchylift_reference
 
 
@@ -47,6 +47,8 @@ class CauchyLift(torch.optim.Optimizer):
 
     No momentum, moments, weight decay, clipping, epsilon, or fallback optimizer
     is accepted. ``backend='auto'`` selects native HIP only on ROCm tensors.
+    ``strict=False`` enables the native fast path and asserts that gradients
+    satisfy its documented finite, non-boundary FP32-representability contract.
     """
 
     def __init__(
@@ -74,6 +76,7 @@ class CauchyLift(torch.optim.Optimizer):
                 loss = closure()
         for group in self.param_groups:
             learning_rate = float(group["lr"])
+            native: dict[torch.dtype, tuple[list[torch.Tensor], list[torch.Tensor]]] = {}
             for parameter in group["params"]:
                 if parameter.grad is None:
                     continue
@@ -87,15 +90,33 @@ class CauchyLift(torch.optim.Optimizer):
                     and parameter.dtype in (torch.float32, torch.bfloat16)
                 )
                 if use_hip:
-                    cauchylift_hip_step_(
-                        parameter,
-                        gradient,
-                        learning_rate,
-                        strict=self.strict,
-                    )
+                    if (
+                        parameter.dtype in (torch.float32, torch.bfloat16)
+                        and parameter.is_contiguous()
+                        and gradient.layout == torch.strided
+                    ):
+                        parameters, gradients = native.setdefault(
+                            parameter.dtype, ([], [])
+                        )
+                        parameters.append(parameter)
+                        gradients.append(gradient)
+                    else:
+                        cauchylift_hip_step_(
+                            parameter,
+                            gradient,
+                            learning_rate,
+                            strict=self.strict,
+                        )
                 else:
                     direction = cauchylift_reference(gradient)
                     parameter.add_(direction.to(parameter.dtype), alpha=-learning_rate)
+            for parameters, gradients in native.values():
+                cauchylift_hip_foreach_step_(
+                    parameters,
+                    gradients,
+                    learning_rate,
+                    strict=self.strict,
+                )
         return loss
 
     def persistent_tensor_summary(self) -> dict[str, int]:

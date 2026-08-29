@@ -56,3 +56,20 @@ python3 -m json.tool phases/status/phase3.json
 python3 -m compileall -q analysis benchmarks cauchylift tests
 sha256sum analysis/results/phase3_benchmark*.json artifacts/phase3/profiler/* cauchylift/*.py csrc/*.cu tests/*.py requirements/*.txt
 git diff --check
+
+# Phase 3 performance-repair run (UTC 2026-08-29).
+# Reproduce the final correctness/stress suite and official benchmark.
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python -m pytest -q
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/benchmark_phase3.py --warmup 10 --iterations 30 --output analysis/results/phase3_benchmark.json
+
+# Generate fresh native-execution evidence for the final five-kernel path.
+.venv/bin/rocprofv3 --rocm-root /root/cauchylift/.venv/lib/python3.12/site-packages/_rocm_sdk_devel --disable-signal-handlers true --kernel-trace --stats --summary -f csv json -d /tmp/cauchylift-profiler-hip-final -- env PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/profile_phase3.py --backend cauchylift_hip --iterations 3
+.venv/bin/rocprofv3 --rocm-root /root/cauchylift/.venv/lib/python3.12/site-packages/_rocm_sdk_devel --disable-signal-handlers true --kernel-trace --stats --summary -f csv json -d /tmp/cauchylift-profiler-adamw-final -- env PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/profile_phase3.py --backend adamw_fused --iterations 3
+
+# Final artifact and repository checks.
+python3 -m json.tool analysis/results/phase3_benchmark.json
+python3 -m json.tool artifacts/phase3/manifest.json
+python3 -m json.tool phases/status/phase3.json
+python3 -m compileall -q analysis benchmarks cauchylift tests
+sha256sum analysis/results/phase3_benchmark.json artifacts/phase3/profiler/* csrc/cauchylift_kernel.cu tests/test_rocm.py
+git diff --check

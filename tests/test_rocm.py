@@ -7,7 +7,7 @@ import pytest
 import torch
 
 from cauchylift import CauchyLift, cauchylift_oracle, cauchylift_reference
-from cauchylift.hip import cauchylift_hip, load_extension
+from cauchylift.hip import cauchylift_hip, cauchylift_hip_foreach_step_, load_extension
 from conftest import BF16_UPDATE, HIP_BF16, HIP_FP32
 
 
@@ -81,6 +81,86 @@ def test_native_optimizer_forward_fp32_and_bf16():
         assert optimizer.persistent_tensor_summary() == {"tensors": 0, "bytes": 0}
 
 
+@pytest.mark.parametrize("dtype,tolerance", [(torch.float32, HIP_FP32), (torch.bfloat16, BF16_UPDATE)])
+def test_foreach_native_update_matches_independent_reference(dtype, tolerance):
+    generator = torch.Generator(device="cuda").manual_seed(20260829)
+    parameters = [
+        torch.nn.Parameter(torch.randn(shape, generator=generator, device="cuda", dtype=dtype))
+        for shape in [(1,), (7,), (2, 3), (17, 5), (2, 3, 4), (257, 64)]
+    ]
+    expected = []
+    gradients = []
+    for parameter in parameters:
+        gradient = torch.randn(
+            parameter.shape, generator=generator, device="cuda", dtype=dtype
+        )
+        gradients.append(gradient)
+        expected.append(
+            parameter.detach().float() - 0.03 * cauchylift_reference(gradient).float()
+        )
+    status = cauchylift_hip_foreach_step_(parameters, gradients, 0.03)
+    assert status.shape == (len(parameters), 4)
+    for parameter, target in zip(parameters, expected, strict=True):
+        torch.testing.assert_close(parameter.float(), target, **tolerance)
+
+
+@pytest.mark.parametrize(
+    "dtype,tolerance", [(torch.float32, HIP_FP32), (torch.bfloat16, BF16_UPDATE)]
+)
+def test_prevalidated_foreach_fast_path_matches_reference(dtype, tolerance):
+    generator = torch.Generator(device="cuda").manual_seed(20260830)
+    parameters = []
+    gradients = []
+    expected = []
+    for shape in [(17, 5), (257, 64), (503, 129)]:
+        parameter = torch.nn.Parameter(
+            torch.randn(shape, generator=generator, device="cuda", dtype=dtype)
+        )
+        gradient = torch.randn(
+            shape, generator=generator, device="cuda", dtype=dtype
+        )
+        parameters.append(parameter)
+        gradients.append(gradient)
+        expected.append(
+            parameter.detach().float()
+            - 0.01 * cauchylift_reference(gradient).float()
+        )
+    status = cauchylift_hip_foreach_step_(
+        parameters, gradients, 0.01, strict=False
+    )
+    assert status.cpu().tolist() == [[0, 2, 0, 0]] * len(parameters)
+    for parameter, target in zip(parameters, expected, strict=True):
+        torch.testing.assert_close(parameter.float(), target, **tolerance)
+
+
+def test_optimizer_batches_native_tensors_and_preserves_boundary_semantics():
+    parameters = [
+        torch.nn.Parameter(torch.ones(3, 4, device="cuda")),
+        torch.nn.Parameter(torch.ones(9, device="cuda")),
+        torch.nn.Parameter(torch.ones(2, 3, 4, device="cuda")),
+    ]
+    for index, parameter in enumerate(parameters):
+        parameter.grad = torch.zeros_like(parameter)
+        if index:
+            parameter.grad.reshape(-1)[index] = -2.0
+    expected = [
+        parameter.detach() - 0.1 * cauchylift_reference(parameter.grad)
+        for parameter in parameters
+    ]
+    optimizer = CauchyLift(parameters, lr=0.1, backend="hip")
+    optimizer.step()
+    for parameter, target in zip(parameters, expected, strict=True):
+        torch.testing.assert_close(parameter, target, **HIP_FP32)
+    assert optimizer.state == {}
+
+    nearly = torch.tensor([[1.0, 1e-10], [0.0, 0.0]], device="cuda")
+    parameter = torch.nn.Parameter(torch.zeros_like(nearly))
+    target = -cauchylift_reference(nearly)
+    status = cauchylift_hip_foreach_step_([parameter], [nearly], 1.0)
+    assert status.cpu().tolist()[0][3] == 1
+    torch.testing.assert_close(parameter, target, **HIP_FP32)
+
+
 def test_noncontiguous_hip_direction_and_parameter():
     gradient = torch.arange(1, 49, device="cuda", dtype=torch.float32).reshape(6, 8).t()
     assert not gradient.is_contiguous()
@@ -94,6 +174,16 @@ def test_noncontiguous_hip_direction_and_parameter():
     expected = parameter.detach() - 0.1 * cauchylift_reference(gradient)
     CauchyLift([parameter], lr=0.1, backend="hip").step()
     torch.testing.assert_close(parameter, expected, **HIP_FP32)
+
+    fp64_parameter = torch.nn.Parameter(torch.ones(5, 3, device="cuda", dtype=torch.float64))
+    fp64_parameter.grad = torch.linspace(
+        -1, 1, fp64_parameter.numel(), device="cuda", dtype=torch.float64
+    ).reshape_as(fp64_parameter)
+    fp64_expected = fp64_parameter.detach() - 0.1 * cauchylift_reference(
+        fp64_parameter.grad
+    )
+    CauchyLift([fp64_parameter], lr=0.1, backend="hip").step()
+    torch.testing.assert_close(fp64_parameter, fp64_expected)
 
 
 def test_deterministic_repeatability():

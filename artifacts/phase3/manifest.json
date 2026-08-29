@@ -1,32 +1,44 @@
 {
   "artifact": "CauchyLift Phase 3 manifest",
   "benchmark": {
-    "best_adamw_median_ms": 0.90761798620224,
+    "best_adamw_mad_ms": 0.016637533903121948,
+    "best_adamw_median_ms": 0.960179477930069,
     "best_adamw_path": "adamw_fused",
-    "cauchylift_hip_median_ms": 5.350458145141602,
-    "cauchylift_to_best_adamw_ratio": 5.895277718488844,
+    "cauchylift_hip_mad_ms": 0.00473099946975708,
+    "cauchylift_hip_median_ms": 1.0624719858169556,
+    "cauchylift_to_best_adamw_ratio": 1.1065347783806068,
     "criterion_ratio_maximum": 1.15,
     "initial_cauchylift_hip_median_ms": 141.07794189453125,
-    "iterations": 15,
+    "iterations": 30,
+    "prior_revise_cauchylift_hip_median_ms": 5.350458145141602,
     "representative_dtype": "bfloat16",
     "representative_elements": 123586560,
     "seed": 20260828,
-    "warmup": 5
+    "warmup": 10
   },
   "commands": "artifacts/phase3/commands.log",
   "decisive_artifact_hashes": {
-    "analysis/results/phase3_benchmark.json": "7e798d9916ec0d18021b33443527109ff993b52986440547128aa60ae2cfa54a",
+    "README.md": "7dd56c1ac2b007e51f33a8f9d2d3510c3ef8ec19febe6e3e8a53a7b599d6ef93",
+    "analysis/results/phase3_benchmark.json": "cea873d2fe72b9959c640a159f97cdb7a85a300ef23274acf017d68350e1c777",
     "analysis/results/phase3_benchmark_initial.json": "74a021914375ad65ef011af00b1b540f687626d36915a4f43b6b03607685b329",
     "artifacts/phase3/environment.txt": "49d7c554a5e3d26e7ac0512349889bbf35f48243d55b9187fa838bd2f5d4b33e",
-    "artifacts/phase3/profiler/adamw_kernel_trace.csv": "e8d59a72c1f170fec0f7a12cbed0751a83de22ffdf8c37b5375ae907b7f770fa",
-    "artifacts/phase3/profiler/cauchylift_kernel_stats.csv": "c652048179dd512daf48a706d029a146c020774a1f3ab9edf9148989ee121d2f",
-    "artifacts/phase3/profiler/cauchylift_kernel_trace.csv": "cdf004dcd75bb3e4967575b1313fe30d1db685ebda72dd052e2125e3e57f7b66",
-    "artifacts/phase3/report.md": "920c7bc17edbf7e1c8543b2c42578a024f44e476f9ee1f167c908ea4ee7c853d",
-    "csrc/cauchylift_kernel.cu": "8a55a410f8a6ad391a3460462a01c518eb0d8bd5936d8b5948bf233946816075",
+    "artifacts/phase3/profiler/adamw_kernel_trace.csv": "b5875a3de8b37af20f20f566d7210c3577f3f1539de02f23676815c10773f547",
+    "artifacts/phase3/profiler/cauchylift_kernel_stats.csv": "bfe1fc880dba16d8b86c8e4272d36655a38736b02a999a4bf06e2bf1ab789395",
+    "artifacts/phase3/profiler/cauchylift_kernel_trace.csv": "c74125b0bcf976af61861f431051333b0268a718e57ed1c1fb1901253bcbfb03",
+    "artifacts/phase3/report.md": "2dc20c84b1cf515381955ad07ddb5339c7b9bd3c19b6f3c1ef2d60ad972bd7ee",
+    "benchmarks/benchmark_phase3.py": "d4fd55870dbcd8b86bfc300eb0e17939455f40460c93271fb4cbf319a0a0f3cd",
+    "cauchylift/hip.py": "257b9d1903cc7cbd963a4b9711e742038530c581de40212d0bc5098870933670",
+    "cauchylift/optimizer.py": "6fb6332fee39743a5181b0316353f94248dfa0c70435c86ab60965a51479567c",
+    "csrc/cauchylift_kernel.cu": "70ee0c09087d13b5129fb00ad94c322050475ac546a95b58ef230a5960bec621",
+    "docs/phase3.md": "295f5ec6dea625feb0c6d1047e29901bc69d618e3dc70d444d6230d9d65f9832",
+    "paper/paper.md": "5bb132392561cac8a1e1ea8c6bc0ee3cdcc58afc4151e0667128fed68a0c3a2a",
+    "phases/status/phase3.json": "ffcaa1a9b5dfd2a9cf5e9ed30891e78078b9d2bced571bacf259afa6efffd60a",
     "requirements/phase3-lock.txt": "b30bf9fdb5354e8185d0a83be60d63c591e1a2dda6fbcd8d141babeea3d4644a",
     "requirements/rocm10-mi300x.txt": "bdf5b8d2e34faceb19ae0afd5287b3d450d3b48efdf636218bed5f50da9c7d66",
+    "research/evidence_ledger.md": "bcdd93d82219ed982174e8ee09345a00e75ec97c0fd48b23838467a664e14957",
+    "research/risk_register.md": "4ec6d2ac4d110320a3762fa58da29638c96e432ab1a32c34cca0ff83d47081a7",
     "tests/test_reference.py": "9197f6dd6f97c447dd66f3d09a5780e13d89f3e6ca447eac4dd62b0ab6693ec1",
-    "tests/test_rocm.py": "1d090402f9101944ab51eea2b5c7616b7c9321712a0edfbcbd5c844559ec7f6d"
+    "tests/test_rocm.py": "7590e8b491cc5c158db0acea91d561244ad7239f7a49a681b0ee826b25b4e413"
   },
   "environment": {
     "bf16_supported": true,
@@ -49,7 +61,7 @@
       "AMD Instinct MI300X"
     ]
   },
-  "gate": "REVISE",
+  "gate": "PASS",
   "inputs": [
     "README.md",
     "phases/README.md",
@@ -64,13 +76,6 @@
     "research/risk_register.md",
     "paper/paper.md",
     "spec/optimizer_v0.2.json"
-  ],
-  "official_guidance": [
-    "https://rocm.docs.amd.com/projects/ai-ecosystem/en/latest/frameworks/pytorch/install.html",
-    "https://docs.pytorch.org/tutorials/advanced/cpp_custom_ops.html",
-    "https://docs.pytorch.org/docs/stable/notes/hip.html",
-    "https://rocm.docs.amd.com/projects/HIP/en/latest/tutorial/reduction.html",
-    "https://rocm.docs.amd.com/projects/rocprofiler-sdk/en/latest/quick-reference/quick_guide.html"
   ],
   "outputs": [
     "cauchylift/",
@@ -90,12 +95,22 @@
   },
   "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
   "phase2_handoff_commit": "ef6c726b62cf693216aedcf42afe8669c0a2719e",
-  "repository_commit_at_start": "ef6c726b62cf693216aedcf42afe8669c0a2719e",
-  "run_id": "phase3-20260828T180051Z",
+  "profiler": {
+    "custom_kernel_dispatches_per_step": 5,
+    "metadata_copy_dispatches_per_step": 1,
+    "profile_dtype": "float32",
+    "profile_shape": [
+      4096,
+      4096
+    ],
+    "profiled_steps": 4
+  },
+  "repository_commit_at_start": "29708633a38a286457e2aa4e86e716f53ffabdd4",
+  "run_id": "phase3-20260829T042638Z",
   "tests": {
     "cpu_passed": 27,
-    "rocm_passed": 36,
-    "total_passed": 63
+    "rocm_passed": 41,
+    "total_passed": 68
   },
-  "timestamp_utc": "2026-08-28T18:00:51Z"
+  "timestamp_utc": "2026-08-29T04:26:38Z"
 }
