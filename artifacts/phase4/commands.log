@@ -1,0 +1,40 @@
+# CauchyLift Phase 4 reconstruction commands (UTC 2026-09-04)
+# Commands do not contain credentials.
+
+# 1. Verify Phase 3 handoff and starting git state
+git status --short --branch
+git log -5 --oneline
+python3 -m json.tool phases/status/phase3.json
+
+# 2. Inspect machine inventory and GPU status
+uname -a
+cat /etc/os-release
+rocminfo
+rocm-smi --showproductname --showuniqueid --showdriverversion --showvbios --showmeminfo vram --showuse --showtemp
+hipconfig --full
+python3 --version
+
+# 3. Environment bootstrap and dependencies installation
+python3 -m venv --without-pip .venv
+curl -fsSL https://bootstrap.pypa.io/get-pip.py -o /tmp/cauchylift-get-pip.py
+.venv/bin/python /tmp/cauchylift-get-pip.py
+PIP_CACHE_DIR=/tmp/cauchylift-pip-cache .venv/bin/python -m pip install -r requirements/rocm10-mi300x.txt
+PIP_CACHE_DIR=/tmp/cauchylift-pip-cache .venv/bin/python -m pip install numpy tiktoken pyarrow
+.venv/bin/python -m pip freeze --all > requirements/phase4-lock.txt
+
+# 4. Compile and verify native HIP extension
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python -c 'from cauchylift.hip import load_extension; load_extension(verbose=True)'
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python -m pytest -q
+
+# 5. Inventory environment
+bash scripts/inventory_phase4.sh > artifacts/phase4/environment.txt 2>&1
+
+# 6. Profiler trace on MI300X confirming flash attention and native HIP kernels
+mkdir -p artifacts/phase4/profiler
+.venv/bin/rocprofv3 --rocm-root /root/cauchylift/.venv/lib/python3.12/site-packages/_rocm_sdk_devel --disable-signal-handlers true --kernel-trace --stats --summary -f csv json -d artifacts/phase4/profiler -- env PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python benchmarks/profile_phase4.py --optimizer cauchylift --iterations 3
+
+# 7. Comprehensive test suite execution (90 tests)
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python -m pytest -v tests/
+
+# 8. End-to-end smoke test suite (preflight, parity, overfit screen, resumption determinism)
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python scripts/run_phase4_smoke.py

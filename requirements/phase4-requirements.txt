@@ -1,0 +1,13 @@
+--index-url https://stable.repo.amd.com/rocm/whl-next/
+--extra-index-url https://pypi.org/simple
+
+# Official ROCm 10.0 / gfx942 PyTorch wheel
+torch[device-gfx942]==2.13.0+rocm10.0.0
+rocm[devel]==10.0.0
+ninja==1.13.0
+pytest==8.4.2
+
+# Phase 4 data and architecture dependencies
+numpy==2.5.2
+tiktoken==0.14.0
+pyarrow==25.0.1

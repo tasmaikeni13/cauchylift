@@ -1,0 +1,123 @@
+{
+  "artifact": "CauchyLift Phase 4 manifest",
+  "commands": "artifacts/phase4/commands.log",
+  "dataset": {
+    "configuration": "sample-10BT",
+    "license": "ODC-By 1.0",
+    "partitions": {
+      "final_held_out_shards": 2,
+      "train_shards": 10,
+      "tuning_shards": 1,
+      "validation_shards": 1
+    },
+    "repository": "HuggingFaceFW/fineweb-edu",
+    "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+    "tokenizer": "tiktoken gpt2",
+    "tokenizer_license": "MIT License",
+    "tokenizer_vocab_size": 50257
+  },
+  "decisive_artifact_hashes": {
+    "analysis/results/phase4_smoke_results.json": "33aa3440a437716c0f4c38789902b0bf22c5732b1b20597d16d1da6ed4a3a04a",
+    "artifacts/phase4/commands.log": "b2c76123a7b8b76fc1b71f4d19ce0f08824915a3ccbd86bbcffb276ee285fd5e",
+    "artifacts/phase4/environment.txt": "52ab83bb3f457a4c864791dddc97bb34c469cd4d696ee1bf30e640ea264d7da8",
+    "artifacts/phase4/profiler/agent_info.csv": "08f3f7dbcfa00ded036929235ef6f85e3e84195a604533113ea7ca85a345ffb3",
+    "artifacts/phase4/profiler/kernel_stats.csv": "491a55d8cf9d1556e7d637d903c13a0e3ea4ce03e78ee5e8eaf29380b248c0d4",
+    "artifacts/phase4/profiler/kernel_trace.csv": "b45bcd57aa215e949ff7285cca7ea654b80e6e102a77012115b04038409a9fca",
+    "artifacts/phase4/report.md": "311ac757fda00472661547b2dd0b89496a81450eef4276a44cf420b3b15ea367",
+    "benchmarks/profile_phase4.py": "7cfe7018f16782ad1fa6f667cc4a27c557b6a4a846b3439aaca0cc3a354542d0",
+    "cauchylift/baselines/controls.py": "b2f6725cccd723364f95e3b76fd0be2cfa7cd1ce43bed9ecbd6670b7d78efdf7",
+    "cauchylift/baselines/factory.py": "d1a4b14be15a6bbd995fc2f7b366335d629f53f5820c72c8300efa6aba29e4cf",
+    "cauchylift/baselines/muon.py": "043122eaae2293f1ebb90fb4cdd49b764a177562c4f173e18a5f73f28b5be38f",
+    "cauchylift/baselines/sinkgd.py": "37676070d2234d0c0dfc931564e5b03ead77fa63f93bb62e48033e66326bee5c",
+    "cauchylift/baselines/soap.py": "0e2de34f8c6c80a7fa2857357333f2f34f6a8588c64dc5e04c0262da48ac403f",
+    "cauchylift/data/dataset.py": "efa949ec01ae59fd495f9ba8023a60b6d02bd38d5ac93fbafc1e10a504e03d63",
+    "cauchylift/models/attention.py": "d3b446a305eca5fbb506c95098144579cce55b7d60cd6abbc43ae7b1b2f49239",
+    "cauchylift/models/transformer.py": "933748e3b54c2a1177ab48840d70ea0d73caa6f869a64bef02978bfaa789c83e",
+    "cauchylift/train/checkpoint.py": "356f7179fcbbe8be3ff32de8ee46b8d314071b035ff0035d807ee70dd7f6a25c",
+    "cauchylift/train/metrics.py": "2b5de7244568a420e592794ae68bc7d1b8a6fb43b00e4b1cebc739c859af2d06",
+    "cauchylift/train/trainer.py": "35775277b65698117326dbd11a37bfe02e6650959b10fcecf55692e9a95e00d0",
+    "phases/status/phase4.json": "d2b4ee142833458da41a4769fe0b665e60bf1fc5fd08452b15712764a569dc7f",
+    "requirements/phase4-lock.txt": "ebe4aaca91b84d064214f11e36aa8f10ce647aaebb1675a2f4527d279043d7c8",
+    "requirements/phase4-requirements.txt": "f9c74f26db805bd3f8e72e6a9377e6508a8ee5355cf30a4666bba9c07889df57",
+    "scripts/run_phase4_smoke.py": "e2f45c3e505a4d8b282bec6b5d3422c6653b80e1ea24b952a127c4b7586ecd37"
+  },
+  "environment": {
+    "bf16_supported": true,
+    "compiler": "AMD clang 23.0.0git",
+    "device": "AMD Instinct MI300X VF",
+    "device_arch": "gfx942",
+    "driver": "6.19.14.31400000",
+    "hip_runtime": "7.15.26333",
+    "operating_system": "Ubuntu 24.04.4 LTS; Linux 6.8.0-138-generic x86_64",
+    "profiler": "rocprofv3 1.3.5",
+    "python": "3.12.3",
+    "rocm": "10.0.0",
+    "torch": "2.13.0+rocm10.0.0",
+    "vram_bytes": 205822885888
+  },
+  "gate": "PASS",
+  "inputs": [
+    "README.md",
+    "phases/README.md",
+    "phases/phase4.md",
+    "phases/status/phase1.json",
+    "phases/status/phase2.json",
+    "phases/status/phase3.json",
+    "research/research_contract.md",
+    "research/future_experiment_protocol.md",
+    "research/evidence_ledger.md",
+    "research/risk_register.md",
+    "spec/optimizer_v0.2.json"
+  ],
+  "outputs": [
+    "cauchylift/models/",
+    "cauchylift/baselines/",
+    "cauchylift/data/",
+    "cauchylift/train/",
+    "tests/",
+    "benchmarks/profile_phase4.py",
+    "scripts/run_phase4_smoke.py",
+    "scripts/inventory_phase4.sh",
+    "analysis/results/phase4_smoke_results.json",
+    "artifacts/phase4/",
+    "phases/status/phase4.json"
+  ],
+  "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
+  "phase2_handoff_commit": "ef6c726b62cf693216aedcf42afe8669c0a2719e",
+  "phase3_handoff_commit": "28e9285517c9d56971afcd4895c21595add517f1",
+  "profiler": {
+    "flash_attention_kernels": [
+      "attn_fwd",
+      "bwd_kernel_fuse"
+    ],
+    "multi_tensor_hip_kernels": [
+      "foreach_marginal_energy_kernel",
+      "foreach_output_kernel",
+      "foreach_raw_norm_kernel",
+      "foreach_analysis_finalize_kernel",
+      "foreach_finalize_scale_kernel",
+      "foreach_initialize_kernel",
+      "foreach_inverse_maximum_kernel"
+    ],
+    "profiled_iterations": 4
+  },
+  "run_id": "phase4-20260904T110800Z",
+  "smoke_suite": {
+    "checkpoint_resumption_tokens_matched": true,
+    "checkpoint_resumption_max_loss_diff": 0.0,
+    "overfit_optimizers_screened": [
+      "cauchylift",
+      "adamw",
+      "muon",
+      "soap",
+      "sinkgd",
+      "normalized_gd",
+      "sign_descent"
+    ],
+    "overfit_passed_count": 7
+  },
+  "tests": {
+    "total_passed": 90
+  },
+  "timestamp_utc": "2026-09-04T11:08:00Z"
+}

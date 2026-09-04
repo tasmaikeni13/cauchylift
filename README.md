@@ -65,7 +65,8 @@ The update is \(W_{t+1}=W_t-\eta_t\operatorname{CL}(\nabla f(W_t))\). Momentum, 
 - [`analysis/`](analysis/) — standard-library-only mathematical and numerical probes; no training code.
 - [`formal/`](formal/) — Lean project and proof audit.
 - [`cauchylift/`](cauchylift/) and [`csrc/`](csrc/) — reference optimizer and native HIP kernels.
-- [`docs/phase3.md`](docs/phase3.md) — isolated environment, build, tests, benchmark, profiler, and declared tolerances.
+- [`docs/phase3.md`](docs/phase3.md) — isolated environment, build, tests, benchmark, profiler, and declared tolerances for Phase 3.
+- [`docs/phase4.md`](docs/phase4.md) — neutral training system, decoder-only Transformer, verified ROCm FlashAttention, baseline suite, and data pipeline for Phase 4.
 
 ## Reproduce the mathematical analyses
 
@@ -102,9 +103,20 @@ The ROCm environment, CPU/GPU tests, benchmark, and profiler commands are in
 [`docs/phase3.md`](docs/phase3.md). CPU-only continuous tests skip ROCm cases
 honestly; no model or dataset is built.
 
+## Reproduce Phase 4
+
+The neutral training system, test suite (90 tests), overfit smoke tests across all 7 optimizers, deterministic checkpoint resumption, and profiler traces are documented in
+[`docs/phase4.md`](docs/phase4.md). Run:
+
+```bash
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python -m pytest -q
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python scripts/run_phase4_smoke.py
+```
+
 ## Status
 
-**Theory-stage research hypothesis, version 0.2.0.** Phases 1 and 2 passed on
-2026-08-28, and Phase 3 passed on 2026-08-29. The original two-GPU-family
-criterion remains unreplicated; the Phase 3 result is a single-MI300X result.
-Phase 4 has not been started. No neural-network training has been run.
+**Research prototype, version 0.3.0.** Phases 1 and 2 passed on
+2026-08-28, Phase 3 passed on 2026-08-29, and Phase 4 passed on 2026-09-04.
+The original two-GPU-family criterion remains unreplicated; results are on the single MI300X.
+The neutral training system, verified ROCm FlashAttention, baseline suite, deterministic data pipeline, and atomic checkpoint resumption are established.
+Phase 5 (small-scale falsification and baseline screen) has not been started.

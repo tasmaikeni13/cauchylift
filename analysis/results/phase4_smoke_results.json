@@ -1,0 +1,81 @@
+{
+  "gate": "PASS",
+  "timestamp_utc": "2026-09-04T11:07:20Z",
+  "total_elapsed_seconds": 17.892888019999873,
+  "preflight": {
+    "is_cuda": true,
+    "hip_version": "7.15.26333",
+    "device_name": "AMD Instinct MI300X VF",
+    "bf16_supported": true,
+    "partitions_disjoint": true,
+    "dataset_repo": "HuggingFaceFW/fineweb-edu",
+    "dataset_revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+    "dataset_config": "sample-10BT",
+    "dataset_license": "ODC-By 1.0 (Open Data Commons Attribution License)",
+    "tokenizer_name": "gpt2",
+    "tokenizer_license": "MIT License"
+  },
+  "flash_attention_parity": {
+    "out_diff": 0.01122140884399414,
+    "grad_q_diff": 0.016185104846954346,
+    "grad_k_diff": 0.018088340759277344,
+    "grad_v_diff": 0.015448570251464844
+  },
+  "overfit_screen": {
+    "cauchylift": {
+      "initial_loss": 5.57629919052124,
+      "final_loss": 0.27652403712272644,
+      "loss_reduction_pct": 95.0410832045603,
+      "elapsed_seconds": 4.204410812000106,
+      "passed": true
+    },
+    "adamw": {
+      "initial_loss": 5.57629919052124,
+      "final_loss": 0.0010930787539109588,
+      "loss_reduction_pct": 99.98039777428426,
+      "elapsed_seconds": 0.2707395090001228,
+      "passed": true
+    },
+    "muon": {
+      "initial_loss": 5.57629919052124,
+      "final_loss": 0.00019543453527148813,
+      "loss_reduction_pct": 99.99649526453668,
+      "elapsed_seconds": 0.7325528989999839,
+      "passed": true
+    },
+    "soap": {
+      "initial_loss": 5.57629919052124,
+      "final_loss": 0.0058484552428126335,
+      "loss_reduction_pct": 99.89511941445406,
+      "elapsed_seconds": 1.2624872750000122,
+      "passed": true
+    },
+    "sinkgd": {
+      "initial_loss": 5.57629919052124,
+      "final_loss": 0.0010121859377250075,
+      "loss_reduction_pct": 99.98184842844434,
+      "elapsed_seconds": 0.4632731889998922,
+      "passed": true
+    },
+    "normalized_gd": {
+      "initial_loss": 5.57629919052124,
+      "final_loss": 0.38800179958343506,
+      "loss_reduction_pct": 93.04194795998443,
+      "elapsed_seconds": 0.31179965299998,
+      "passed": true
+    },
+    "sign_descent": {
+      "initial_loss": 5.57629919052124,
+      "final_loss": 2.316789150238037,
+      "loss_reduction_pct": 58.45292601630514,
+      "elapsed_seconds": 0.29274134700017385,
+      "passed": true
+    }
+  },
+  "checkpoint_resumption": {
+    "tokens_match": true,
+    "max_loss_diff": 0.0,
+    "declared_tolerance": 0.01,
+    "passed": true
+  }
+}

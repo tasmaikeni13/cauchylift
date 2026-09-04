@@ -8,3 +8,12 @@ dist/
 *.egg-info/
 *.so
 .pytest_cache/
+checkpoints/
+data_cache/
+runs/
+*.tmp
+*.pt
+*.parquet
+*.bin
+*.jsonl
+artifacts/*/profiler/*.json
