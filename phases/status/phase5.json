@@ -1,0 +1,22 @@
+{
+  "gate": "FAIL_CORE",
+  "invalidated_downstream_phases": [
+    6,
+    7,
+    8
+  ],
+  "phase": 5,
+  "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
+  "phase2_handoff_commit": "ef6c726b62cf693216aedcf42afe8669c0a2719e",
+  "phase3_handoff_commit": "28e9285517c9d56971afcd4895c21595add517f1",
+  "phase4_handoff_commit": "ccfce69622d10397587ef76ea1da08fa11ae79ef",
+  "reasons": [
+    "Across 170 deterministic runs under equal tuning budgets, identical schedules, and the same data order, CauchyLift failed to beat tuned AdamW on any of the four predeclared workloads (W1: 7.9041 vs 7.1080; W2: 7.9336 vs 7.1427; W3: 1.9428 vs 1.9226; W4: 8.1187 vs 7.5853).",
+    "On high-dimensional neural network matrices (m, n >> 1), row and column energy dispersion makes the cotransverse complement denominator D_ij approximately uniform across entries (D_ij ≈ 2 ||G||_F^2), degenerating CauchyLift analytically and empirically into Normalized Gradient Descent without momentum.",
+    "Empirical telemetry confirms this collapse: CauchyLift's gradient-update cosine alignment (0.40–0.69), stable rank (1.12–1.36), and loss trajectories match NormalizedGD within 0.05 loss units across all models, while AdamW (coordinate adaptation) and Muon (orthogonalization) achieve substantially lower losses.",
+    "Per the Research Contract kill criteria and Phase 5 gate, failure to beat AdamW on at least three workloads under equal tuning triggers an immediate FAIL_CORE rather than an unprincipled rescue with momentum, moments, clipping, or Adam fallback.",
+    "Phase 5 completes its diagnostic mission to kill weak hypotheses cheaply; downstream scaling phases (6, 7, 8) are invalidated until the theory-repair loop reopens Phases 1 and 2."
+  ],
+  "run_id": "phase5-20260904T113500Z",
+  "timestamp_utc": "2026-09-04T11:35:00Z"
+}

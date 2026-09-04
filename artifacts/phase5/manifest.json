@@ -1,0 +1,54 @@
+{
+  "artifact": "CauchyLift Phase 5 manifest",
+  "commands": "artifacts/phase5/commands.log",
+  "datasets": {
+    "wikitext103": {
+      "repository": "mattdangerw/wikitext-103-raw",
+      "source": "https://huggingface.co/datasets/mattdangerw/wikitext-103-raw",
+      "format": "raw text tokenized with gpt2 tokenizer",
+      "splits": ["train", "valid", "test"]
+    },
+    "cifar10": {
+      "repository": "uoft-cs/cifar10",
+      "source": "https://huggingface.co/datasets/uoft-cs/cifar10",
+      "format": "parquet plain_text converted to tensors",
+      "splits": ["train", "test"]
+    }
+  },
+  "decisive_artifact_hashes": {
+    "artifacts/phase5/commands.log": "e597905d750cd9e00c0c3601ac118f05814ffa54ebc9bc455e4c5e25635034d2",
+    "artifacts/phase5/plots/mechanism_diagnostics.png": "3f9c74bb1816233c8cb93491578e10790ac0f320cbdec0b7d9ee9f548df70525",
+    "artifacts/phase5/plots/paired_loss_curves.png": "8a41d076ebcd5d843a6151c562325d169c382d97736372bda34a713671b21f79",
+    "artifacts/phase5/plots/sensitivity_curves.png": "0fef045365207407cc422147677c3c41529efda7d3833b37193e97d7627ad418",
+    "artifacts/phase5/plots/step_time_comparison.png": "79f19aa042db71d8fff43afeb411a898e68f9dce54937b7cd2ae291f80c21e9d",
+    "artifacts/phase5/report.md": "a6b3da05fba4c9e74f87606771efad52cfe1cd5c0915d917c6f913e6297e8b12",
+    "artifacts/phase5/screen_summary.json": "0d549db8b0546a2642ff6c9da3615444737544a77c456ed5a2a51ad30ed73432",
+    "cauchylift/data/vision.py": "fd2efd9c54d158c68f66116cf7c7c96f048af2d330ef4535758b1f52c41833f9",
+    "cauchylift/data/wikitext.py": "a8638b462017a823d43a161177cbe31dd5a8a4423cf0327c8b67a6d97b2a7232",
+    "cauchylift/models/conv_ssm.py": "6a7bb9bbb67612c72111da6a38b575f44a825c5caf3e8dab1e4f0423cec92493",
+    "cauchylift/models/vit.py": "2a25ad5e75e0d9ce6ec16055b1ed2944ab32875515e2b9f6676d2393af6b76e7",
+    "experiments/protocols/phase5_protocol.json": "d2228adaee66bdeadffc841aedf989a5edf6084c82d44799990bb5ebf41622ef",
+    "phases/status/phase5.json": "d54543bc23e20d86886e1f8ee295a65553160957a254866235e6a5e66fe44443",
+    "scripts/plot_phase5_results.py": "c7d52bd411a0928d6c0046e03f8b8893e458d21ae4797e0afe69ec59ef314177",
+    "scripts/run_phase5_screen.py": "3d692d8b595e6d6df04b68805e418f67e10410aecb021f4f8e6638e96ecba895"
+  },
+  "environment": {
+    "compiler": "AMD clang 23.0.0git",
+    "device": "AMD Instinct MI300X VF",
+    "device_arch": "gfx942",
+    "driver": "6.19.14.31400000",
+    "hip_runtime": "7.15.26333",
+    "operating_system": "Ubuntu 24.04.4 LTS; Linux 6.8.0-138-generic x86_64",
+    "python": "3.12.3",
+    "rocm": "10.0.0",
+    "torch": "2.13.0+rocm10.0.0",
+    "vram_bytes": 206158430208
+  },
+  "gate": "FAIL_CORE",
+  "protocol_hash": "d2228adaee66bdeadffc841aedf989a5edf6084c82d44799990bb5ebf41622ef",
+  "seeds": {
+    "confirmation_seeds": [42, 43, 44],
+    "tuning_seed": 42
+  },
+  "timestamp_utc": "2026-09-04T11:35:00Z"
+}

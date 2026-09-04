@@ -118,5 +118,7 @@ PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python scr
 **Research prototype, version 0.3.0.** Phases 1 and 2 passed on
 2026-08-28, Phase 3 passed on 2026-08-29, and Phase 4 passed on 2026-09-04.
 The original two-GPU-family criterion remains unreplicated; results are on the single MI300X.
-The neutral training system, verified ROCm FlashAttention, baseline suite, deterministic data pipeline, and atomic checkpoint resumption are established.
-Phase 5 (small-scale falsification and baseline screen) has not been started.
+Phase 5 (small-scale falsification and baseline screen) completed on 2026-09-04 with gate `FAIL_CORE`.
+Under a strict 170-run equal-budget screen across 4 workloads (Small LM, Medium LM, Small ViT, Held-Out ConvSSM), CauchyLift did not beat tuned AdamW on any workload (W1: 7.9041 vs 7.1080; W2: 7.9336 vs 7.1427; W3: 1.9428 vs 1.9226; W4: 8.1187 vs 7.5853).
+Energy dispersion across rows and columns causes the cotransverse complement denominator to be approximately uniform ($D_{ij} \approx 2\|G\|_F^2$), collapsing CauchyLift analytically and empirically into Normalized Gradient Descent without momentum.
+Per the research contract, the hypothesis is killed rather than rescued with forbidden auxiliary modules; downstream phases 6, 7, and 8 are invalidated pending theory repair. Full details in [`artifacts/phase5/report.md`](artifacts/phase5/report.md) and [`docs/phase5.md`](docs/phase5.md).

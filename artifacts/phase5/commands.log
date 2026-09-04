@@ -1,0 +1,58 @@
+# Phase 5 Reproduction Commands (UTC)
+# Environment: AMD Instinct MI300X VF (gfx942), ROCm 10.0, PyTorch 2.13.0+rocm10.0.0
+
+# 1. Download and prepare datasets
+mkdir -p data_cache/wikitext-103-raw data_cache/cifar10
+curl -L -o data_cache/wikitext-103-raw-v1.zip "https://huggingface.co/datasets/mattdangerw/wikitext-103-raw/resolve/main/wikitext-103-raw-v1.zip?download=true"
+python -c "import zipfile; zipfile.ZipFile('data_cache/wikitext-103-raw-v1.zip').extractall('data_cache')"
+curl -L -o data_cache/cifar10/train.parquet "https://huggingface.co/datasets/uoft-cs/cifar10/resolve/main/plain_text/train-00000-of-00001.parquet"
+curl -L -o data_cache/cifar10/test.parquet "https://huggingface.co/datasets/uoft-cs/cifar10/resolve/main/plain_text/test-00000-of-00001.parquet"
+
+# Pre-tokenize WikiText-103 and decode CIFAR-10 tensors to cache
+PYTHONPATH=. .venv/bin/python -c "
+import tiktoken, torch, io, numpy as np, pyarrow.parquet as pq
+from PIL import Image
+
+# Tokenize WikiText
+enc = tiktoken.get_encoding('gpt2')
+with open('data_cache/wikitext-103-raw/wiki.valid.raw') as f:
+    valid_tokens = torch.tensor(enc.encode(f.read()), dtype=torch.int32)
+with open('data_cache/wikitext-103-raw/wiki.test.raw') as f:
+    test_tokens = torch.tensor(enc.encode(f.read()), dtype=torch.int32)
+with open('data_cache/wikitext-103-raw/wiki.train.raw') as f:
+    train_tokens = torch.tensor(enc.encode(f.read(50000000)), dtype=torch.int32)
+torch.save({'train': train_tokens, 'valid': valid_tokens, 'test': test_tokens}, 'data_cache/wikitext103_tokens.pt')
+
+# Decode CIFAR-10
+table_tr = pq.read_table('data_cache/cifar10/train.parquet')
+bytes_tr = table_tr['img'].combine_chunks().field('bytes')
+labels_tr = torch.tensor(table_tr['label'].to_pylist(), dtype=torch.long)
+imgs_tr = [torch.from_numpy(np.array(Image.open(io.BytesIO(b.as_py())), dtype=np.uint8)).permute(2, 0, 1) for b in bytes_tr]
+train_imgs = torch.stack(imgs_tr)
+
+table_te = pq.read_table('data_cache/cifar10/test.parquet')
+bytes_te = table_te['img'].combine_chunks().field('bytes')
+labels_te = torch.tensor(table_te['label'].to_pylist(), dtype=torch.long)
+imgs_te = [torch.from_numpy(np.array(Image.open(io.BytesIO(b.as_py())), dtype=np.uint8)).permute(2, 0, 1) for b in bytes_te]
+test_imgs = torch.stack(imgs_te)
+
+torch.save({'train_imgs': train_imgs, 'train_labels': labels_tr, 'test_imgs': test_imgs, 'test_labels': labels_te}, 'data_cache/cifar10_tensors.pt')
+"
+
+# 2. Write and commit immutable Phase 5 protocol
+# Protocol saved at experiments/protocols/phase5_protocol.json
+# SHA256: d2228adaee66bdeadffc841aedf989a5edf6084c82d44799990bb5ebf41622ef
+git add cauchylift/ experiments/ tests/test_phase5_models.py
+git commit -m "Commit Phase 5 small-scale protocol and workload definitions"
+
+# 3. Verify models and optimizers via test suite
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/pytest tests/test_phase5_models.py
+
+# 4. Execute the full Phase 5 screen across 4 workloads and 7 optimizers
+PYTHONPATH=. CAUCHYLIFT_BUILD_DIR=/tmp/cauchylift-hip-build .venv/bin/python scripts/run_phase5_screen.py --device cuda
+
+# 5. Generate plots and diagnostic figures
+PYTHONPATH=. .venv/bin/python scripts/plot_phase5_results.py
+
+# 6. Verify Gate and emit status artifacts
+# Gate Result: FAIL_CORE
