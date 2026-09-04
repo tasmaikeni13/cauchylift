@@ -14,6 +14,8 @@ from .dataset import (
     SyntheticFineWebEduStream,
     verify_partition_disjointness,
 )
+from .vision import VisionDataset
+from .wikitext import WikiTextDataset
 
 __all__ = [
     "EOS_TOKEN_ID",
@@ -29,5 +31,7 @@ __all__ = [
     "TOKENIZER_LICENSE",
     "TOKENIZER_NAME",
     "TOKENIZER_VOCAB_SIZE",
+    "VisionDataset",
+    "WikiTextDataset",
     "verify_partition_disjointness",
 ]

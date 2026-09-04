@@ -68,10 +68,10 @@ class Trainer:
 
     def __init__(
         self,
-        model: Transformer,
+        model: nn.Module,
         optimizer: Optimizer,
-        train_dataset: PackedTokenDataset,
-        val_dataset: PackedTokenDataset | None = None,
+        train_dataset: Any,
+        val_dataset: Any | None = None,
         config: TrainingConfig | None = None,
     ) -> None:
         self.config = config or TrainingConfig()
@@ -173,7 +173,12 @@ class Trainer:
         peak_mem = torch.cuda.max_memory_allocated() if is_cuda else 0
 
         # FLOPs and MFU estimate
-        flops_per_token = self.model.flops_per_token()
+        if hasattr(self.model, "flops_per_token"):
+            flops_per_token = self.model.flops_per_token()
+        elif hasattr(self.model, "flops_per_example"):
+            flops_per_token = self.model.flops_per_example()
+        else:
+            flops_per_token = 1e6
         achieved_tflops = (throughput * flops_per_token) / 1e12
         mfu_estimate = achieved_tflops / MI300X_BF16_PEAK_TFLOPS
 

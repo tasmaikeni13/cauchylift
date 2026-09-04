@@ -1,0 +1,198 @@
+{
+  "protocol_version": "1.0",
+  "created_at_utc": "2026-09-04T11:22:00Z",
+  "phase": 5,
+  "hardware": {
+    "device_name": "AMD Instinct MI300X VF",
+    "architecture": "gfx942",
+    "hbm_bytes": 206158430208,
+    "rocm_version": "10.0.0",
+    "pytorch_version": "2.13.0+rocm10.0.0"
+  },
+  "workloads": {
+    "small_decoder_lm": {
+      "workload_id": "W1_small_decoder_lm",
+      "model_type": "Transformer",
+      "config": {
+        "vocab_size": 50257,
+        "hidden_dim": 128,
+        "num_layers": 4,
+        "num_heads": 4,
+        "intermediate_dim": 512,
+        "max_seq_len": 256,
+        "tied_embeddings": true,
+        "activation": "swiglu",
+        "norm_eps": 1e-5
+      },
+      "dataset": {
+        "name": "WikiText-103",
+        "source": "https://huggingface.co/datasets/mattdangerw/wikitext-103-raw",
+        "train_split": "train",
+        "val_split": "valid"
+      },
+      "batch_size": 8,
+      "seq_len": 256,
+      "tokens_per_step": 2048,
+      "max_steps": 100,
+      "total_token_budget": 204800,
+      "eval_interval": 10,
+      "eval_steps": 5,
+      "target_losses": [5.50, 5.00, 4.50, 4.00],
+      "held_out": false
+    },
+    "medium_decoder_lm": {
+      "workload_id": "W2_medium_decoder_lm",
+      "model_type": "Transformer",
+      "config": {
+        "vocab_size": 50257,
+        "hidden_dim": 256,
+        "num_layers": 6,
+        "num_heads": 8,
+        "intermediate_dim": 1024,
+        "max_seq_len": 256,
+        "tied_embeddings": true,
+        "activation": "swiglu",
+        "norm_eps": 1e-5
+      },
+      "dataset": {
+        "name": "WikiText-103",
+        "source": "https://huggingface.co/datasets/mattdangerw/wikitext-103-raw",
+        "train_split": "train",
+        "val_split": "valid"
+      },
+      "batch_size": 8,
+      "seq_len": 256,
+      "tokens_per_step": 2048,
+      "max_steps": 100,
+      "total_token_budget": 204800,
+      "eval_interval": 10,
+      "eval_steps": 5,
+      "target_losses": [5.00, 4.50, 4.00, 3.80],
+      "held_out": false
+    },
+    "small_vit": {
+      "workload_id": "W3_small_vit",
+      "model_type": "VisionTransformer",
+      "config": {
+        "img_size": 32,
+        "patch_size": 4,
+        "in_channels": 3,
+        "num_classes": 10,
+        "hidden_dim": 128,
+        "num_layers": 4,
+        "num_heads": 4,
+        "intermediate_dim": 512,
+        "dropout": 0.0,
+        "norm_eps": 1e-5
+      },
+      "dataset": {
+        "name": "CIFAR-10",
+        "source": "https://huggingface.co/datasets/uoft-cs/cifar10",
+        "train_split": "train",
+        "val_split": "test"
+      },
+      "batch_size": 64,
+      "examples_per_step": 64,
+      "max_steps": 100,
+      "total_example_budget": 6400,
+      "eval_interval": 10,
+      "eval_steps": 5,
+      "target_losses": [2.20, 2.00, 1.80, 1.60],
+      "held_out": false
+    },
+    "conv_ssm_heldout": {
+      "workload_id": "W4_conv_ssm_heldout",
+      "model_type": "ConvSSM",
+      "config": {
+        "vocab_size": 50257,
+        "hidden_dim": 128,
+        "intermediate_dim": 256,
+        "num_layers": 4,
+        "conv_kernel": 7,
+        "state_dim": 16,
+        "max_seq_len": 256,
+        "tied_embeddings": true,
+        "norm_eps": 1e-5
+      },
+      "dataset": {
+        "name": "WikiText-103",
+        "source": "https://huggingface.co/datasets/mattdangerw/wikitext-103-raw",
+        "train_split": "test",
+        "val_split": "valid"
+      },
+      "batch_size": 8,
+      "seq_len": 256,
+      "tokens_per_step": 2048,
+      "max_steps": 100,
+      "total_token_budget": 204800,
+      "eval_interval": 10,
+      "eval_steps": 5,
+      "target_losses": [5.50, 5.00, 4.50, 4.00],
+      "held_out": true,
+      "held_out_policy": "Frozen best hyperparameter per optimizer selected on W1-W3 tuning; strictly zero tuning trials on W4."
+    }
+  },
+  "optimizers": [
+    "cauchylift",
+    "adamw",
+    "muon",
+    "soap",
+    "sinkgd",
+    "normalized_gd",
+    "sign_descent"
+  ],
+  "hyperparameter_grid": {
+    "lr_grid": [0.0003, 0.001, 0.003, 0.01, 0.03],
+    "schedule": {
+      "family": "cosine_with_warmup",
+      "warmup_fraction": 0.1,
+      "min_lr_fraction": 0.1
+    }
+  },
+  "seeds": {
+    "tuning_seed": 42,
+    "confirmation_seeds": [42, 43, 44]
+  },
+  "precision": {
+    "forward_backward": "bfloat16",
+    "reductions": "float32",
+    "optimizer_arithmetic": "float32"
+  },
+  "ablations": {
+    "workload": "small_decoder_lm",
+    "configurations": [
+      {
+        "name": "precision_fp64_denom",
+        "description": "Evaluate FP64 diagnostic recomputation path versus native FP32"
+      },
+      {
+        "name": "backend_reference_vs_fused",
+        "description": "Compare PyTorch eager reference implementation against native multi-tensor HIP kernel"
+      },
+      {
+        "name": "radius_scaling_ablation",
+        "scales": {
+          "frozen_phase2": "sqrt(min(m, n))",
+          "unit_frobenius": "1.0",
+          "full_spectral": "sqrt(m * n)"
+        }
+      },
+      {
+        "name": "projective_boundary_diagnostic",
+        "description": "Trace exactly 1-sparse representation projective boundary activations"
+      }
+    ]
+  },
+  "stopping_rules": [
+    "Reach max_steps (100 steps)",
+    "Non-finite loss (NaN / Inf) triggers immediate abort and failure record",
+    "Loss spike > 4x running mean triggers failure diagnostic record"
+  ],
+  "gate_criteria": {
+    "min_workloads_beating_adamw": 3,
+    "max_optimizer_wall_time_overhead": 0.15,
+    "held_out_workload_consistency": "must confirm rather than reverse mechanism prediction",
+    "zero_unresolved_nans": true,
+    "zero_forbidden_rescues": true
+  }
+}

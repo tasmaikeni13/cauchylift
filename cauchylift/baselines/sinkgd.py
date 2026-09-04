@@ -8,6 +8,9 @@ import torch
 from torch.optim import Optimizer
 
 
+from cauchylift.common import matrixize
+
+
 def sinkhorn_normalize(G: torch.Tensor, rounds: int = 5, eps: float = 1e-8) -> torch.Tensor:
     """Sinkhorn alternating L2 row and column normalization for 5 rounds."""
     assert G.ndim == 2, f"Expected 2D matrix, got {G.ndim}D"
@@ -71,11 +74,10 @@ class SinkGD(Optimizer):
                     continue
                 grad = p.grad
 
-                if p.ndim == 2 and min(p.shape) > 1:
-                    # 2D matrix Sinkhorn update
-                    update = sinkhorn_normalize(grad, rounds=rounds, eps=eps)
+                grad_mat = matrixize(grad)
+                if min(grad_mat.shape) > 1:
+                    update = sinkhorn_normalize(grad_mat, rounds=rounds, eps=eps).reshape(grad.shape)
                 else:
-                    # 1D or vector parameter: normalized gradient update
                     g_fp32 = grad.to(torch.float32)
                     norm = torch.linalg.vector_norm(g_fp32) + eps
                     update = (g_fp32 / norm).to(p.dtype)
