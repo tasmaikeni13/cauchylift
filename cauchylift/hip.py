@@ -50,7 +50,7 @@ def load_extension(*, verbose: bool = False) -> Any:
         cpp_extension.HIP_HOME = sdk_root
         os.environ.setdefault("PYTORCH_ROCM_ARCH", "gfx942")
         cpp_extension.load(
-            name="cauchylift_hip_v02",
+            name="cauchylift_hip_v03",
             sources=[str(kernel_source)],
             extra_cflags=["-O3"],
             extra_cuda_cflags=["-O3"],

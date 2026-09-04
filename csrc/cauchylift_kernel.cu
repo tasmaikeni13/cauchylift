@@ -112,7 +112,7 @@ __global__ void foreach_finalize_scale_kernel(
       continue;
     }
     const int64_t* item = metadata + tensor * kMetaFields;
-    float radius = sqrtf(static_cast<float>(min(item[kRows], item[kColumns])));
+    float radius = sqrtf(static_cast<float>(max(item[kRows], item[kColumns])));
     scale[tensor] = __fdividef(scale[tensor] * radius, norm);
   }
 }
@@ -324,9 +324,8 @@ __global__ void foreach_raw_norm_kernel(
       if constexpr (!Fast) {
         if (value == 0.0f) continue;
       }
-      float denominator = 2.0f * total_energy[tensor] -
-          row_energy[item[kRowOffset] + row] -
-          column_energy[item[kColumnOffset] + column];
+      float denominator = sqrtf(row_energy[item[kRowOffset] + row] / static_cast<float>(columns)) +
+          sqrtf(column_energy[item[kColumnOffset] + column] / static_cast<float>(rows));
       float raw = __fdividef(value * scale, denominator);
       float square = raw * raw;
       if constexpr (Fast) {
@@ -402,19 +401,17 @@ __global__ void foreach_output_kernel(
       float value = static_cast<float>(gradient[index]);
       float direction = 0.0f;
       if constexpr (Fast) {
-        float denominator = 2.0f * total_energy[tensor] -
-            row_energy[item[kRowOffset] + row] -
-            column_energy[item[kColumnOffset] + column];
+        float denominator = sqrtf(row_energy[item[kRowOffset] + row] / static_cast<float>(columns)) +
+            sqrtf(column_energy[item[kColumnOffset] + column] / static_cast<float>(rows));
         direction = __fdividef(value * scale, denominator);
       } else {
         if (!status[tensor * 4 + 2] && !status[tensor * 4 + 3]) {
           if (status[tensor * 4 + 1] == 1 && value != 0.0f) {
-            float radius = sqrtf(static_cast<float>(min(item[kRows], item[kColumns])));
+            float radius = sqrtf(static_cast<float>(max(item[kRows], item[kColumns])));
             direction = copysignf(radius, value);
           } else if (status[tensor * 4 + 1] > 1 && value != 0.0f) {
-            float denominator = 2.0f * total_energy[tensor] -
-                row_energy[item[kRowOffset] + row] -
-                column_energy[item[kColumnOffset] + column];
+            float denominator = sqrtf(row_energy[item[kRowOffset] + row] / static_cast<float>(columns)) +
+                sqrtf(column_energy[item[kColumnOffset] + column] / static_cast<float>(rows));
             direction = __fdividef(value * scale, denominator);
           }
         }
@@ -544,29 +541,14 @@ __global__ void exclusion_scan_kernel(
     const float* column_energy,
     int64_t columns,
     float* outside_columns) {
-  const float* input = blockIdx.x == 0 ? row_energy : column_energy;
-  float* output = blockIdx.x == 0 ? outside_rows : outside_columns;
-  int64_t size = blockIdx.x == 0 ? rows : columns;
-  __shared__ float segment_sums[kThreads];
-  int64_t segment = (size + blockDim.x - 1) / blockDim.x;
-  int64_t begin = min<int64_t>(size, threadIdx.x * segment);
-  int64_t end = min<int64_t>(size, begin + segment);
-  float local_total = 0.0f;
-  for (int64_t index = begin; index < end; ++index) local_total += input[index];
-  segment_sums[threadIdx.x] = local_total;
-  __syncthreads();
-  float prefix = 0.0f;
-  float suffix = 0.0f;
-  for (int thread = 0; thread < threadIdx.x; ++thread) prefix += segment_sums[thread];
-  for (int thread = threadIdx.x + 1; thread < blockDim.x; ++thread)
-    suffix += segment_sums[thread];
-  for (int64_t index = begin; index < end; ++index) {
-    output[index] = prefix;
-    prefix += input[index];
-  }
-  for (int64_t index = end; index-- > begin;) {
-    output[index] += suffix;
-    suffix += input[index];
+  if (blockIdx.x == 0) {
+    for (int64_t index = threadIdx.x; index < rows; index += blockDim.x) {
+      outside_rows[index] = sqrtf(row_energy[index] / static_cast<float>(columns));
+    }
+  } else {
+    for (int64_t index = threadIdx.x; index < columns; index += blockDim.x) {
+      outside_columns[index] = sqrtf(column_energy[index] / static_cast<float>(rows));
+    }
   }
 }
 
@@ -708,7 +690,7 @@ __global__ void output_kernel(
     float* output,
     int64_t size,
     int64_t columns,
-    int64_t minimum_dimension,
+    int64_t maximum_dimension,
     const int* status,
     const float* outside_rows,
     const float* outside_columns,
@@ -717,7 +699,7 @@ __global__ void output_kernel(
     float learning_rate) {
   float maximum = bits_float(status[0]);
   float minimum = bits_float(minimum_bits[0]);
-  float radius = sqrtf(static_cast<float>(minimum_dimension));
+  float radius = sqrtf(static_cast<float>(maximum_dimension));
   float norm = sqrtf(norm_square[0]);
   for (int64_t index = blockIdx.x * blockDim.x + threadIdx.x;
        index < size;
@@ -872,7 +854,7 @@ std::tuple<at::Tensor, at::Tensor> cauchylift_direction_hip(at::Tensor gradient)
         output.data_ptr<float>(),
         size,
         columns,
-        std::min(rows, columns),
+        std::max(rows, columns),
         workspace.status.data_ptr<int>(),
         workspace.outside_rows.data_ptr<float>(),
         workspace.outside_columns.data_ptr<float>(),
@@ -887,7 +869,7 @@ std::tuple<at::Tensor, at::Tensor> cauchylift_direction_hip(at::Tensor gradient)
         output.data_ptr<float>(),
         size,
         columns,
-        std::min(rows, columns),
+        std::max(rows, columns),
         workspace.status.data_ptr<int>(),
         workspace.outside_rows.data_ptr<float>(),
         workspace.outside_columns.data_ptr<float>(),
@@ -920,7 +902,7 @@ at::Tensor cauchylift_step_hip(
         nullptr,
         size,
         columns,
-        std::min(rows, columns),
+        std::max(rows, columns),
         workspace.status.data_ptr<int>(),
         workspace.outside_rows.data_ptr<float>(),
         workspace.outside_columns.data_ptr<float>(),
@@ -935,7 +917,7 @@ at::Tensor cauchylift_step_hip(
         nullptr,
         size,
         columns,
-        std::min(rows, columns),
+        std::max(rows, columns),
         workspace.status.data_ptr<int>(),
         workspace.outside_rows.data_ptr<float>(),
         workspace.outside_columns.data_ptr<float>(),

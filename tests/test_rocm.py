@@ -48,7 +48,7 @@ def test_hip_boundary_zero_nonfinite_and_rare_path():
     one = zero.clone()
     one[4, 2] = -9
     output = cauchylift_hip(one)
-    assert output[4, 2] == -math.sqrt(5)
+    assert output[4, 2] == -math.sqrt(7)
     assert torch.count_nonzero(output) == 1
 
     nearly = torch.tensor([[1.0, 1e-30], [0.0, 0.0]], device="cuda")
@@ -153,7 +153,7 @@ def test_optimizer_batches_native_tensors_and_preserves_boundary_semantics():
         torch.testing.assert_close(parameter, target, **HIP_FP32)
     assert optimizer.state == {}
 
-    nearly = torch.tensor([[1.0, 1e-10], [0.0, 0.0]], device="cuda")
+    nearly = torch.tensor([[1.0, 1e-30], [0.0, 0.0]], device="cuda")
     parameter = torch.nn.Parameter(torch.zeros_like(nearly))
     target = -cauchylift_reference(nearly)
     status = cauchylift_hip_foreach_step_([parameter], [nearly], 1.0)

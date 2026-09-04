@@ -90,4 +90,42 @@ theorem raw_field_sign_alignment {g e : ℝ}
   rw [hid]
   exact div_nonneg (sq_nonneg g) (le_of_lt he)
 
+/-- CauchyLift v0.3 exact degree-0 scale invariance. -/
+theorem cauchylift_v3_scale_invariance {α g d : ℝ}
+    (hα : α ≠ 0) (hd : d ≠ 0) :
+    (α * g) / (α * d) = g / d := by
+  field_simp
+  ring
+
+/-- CauchyLift v0.3 strict positivity of fiber RMS denominator. -/
+theorem cauchylift_v3_denom_pos {u v : ℝ}
+    (hu : 0 < u) (hv : 0 ≤ v) :
+    0 < u + v := by
+  linarith
+
+/-- CauchyLift v0.3 strict descent alignment on active coordinates. -/
+theorem cauchylift_v3_strict_descent {g d : ℝ}
+    (hg : g ≠ 0) (hd : 0 < d) :
+    0 < g * (g / d) := by
+  have hid : g * (g / d) = g ^ 2 / d := by ring
+  rw [hid]
+  exact div_pos (sq_pos_of_ne_zero hg) hd
+
+/-- CauchyLift v0.3 coordinate magnitude bound: |g| / (u + v) ≤ √n when u² = r/n and |g| ≤ √r. -/
+theorem cauchylift_v3_coordinate_bound {g u v n : ℝ}
+    (hu : 0 < u) (hv : 0 ≤ v) (hg : |g| ≤ u * Real.sqrt n) :
+    |g / (u + v)| ≤ Real.sqrt n := by
+  have hden : 0 < u + v := by linarith
+  have hpos : u ≤ u + v := by linarith
+  rw [abs_div]
+  have hden_abs : |u + v| = u + v := abs_of_pos hden
+  rw [hden_abs]
+  have hle : |g| / (u + v) ≤ |g| / u := by
+    exact div_le_div_of_nonneg_left (abs_nonneg g) hu hpos
+  have hstep : |g| / u ≤ Real.sqrt n := by
+    exact (div_le_iff₀ hu).2 (by nlinarith)
+  exact le_trans hle hstep
+
 end CauchyLift
+
+

@@ -29,7 +29,7 @@ def cauchylift_oracle(
 
     active = g != 0
     count = int(active.sum())
-    radius = math.sqrt(min(g.shape))
+    radius = math.sqrt(max(g.shape))
     direction = torch.zeros_like(g)
     denominators: torch.Tensor | None = None
 
@@ -40,28 +40,21 @@ def cauchylift_oracle(
         zero, boundary = 0, 1
     else:
         zero, boundary = 0, 0
-        scaled = g / g.abs().max()
-        squares = scaled.square()
         m, n = g.shape
-        outside_rows = torch.empty(m, dtype=torch.float64)
-        outside_cols = torch.empty(n, dtype=torch.float64)
-        for i in range(m):
-            outside_rows[i] = squares[:i].sum() + squares[i + 1 :].sum()
-        for j in range(n):
-            outside_cols[j] = squares[:, :j].sum() + squares[:, j + 1 :].sum()
-        denominators = outside_rows[:, None] + outside_cols[None, :]
-        active_denominators = denominators[active]
-        if bool((active_denominators <= 0).any()):
-            raise FloatingPointError(
-                "positive active denominator was not representable in FP64"
-            )
-        e_min = active_denominators.min()
+        squares = g.square()
+        row_energy = squares.sum(dim=1, keepdim=True)
+        col_energy = squares.sum(dim=0, keepdim=True)
+        row_rms = (row_energy / n).sqrt()
+        col_rms = (col_energy / m).sqrt()
+        denominators = row_rms + col_rms
+        mask = (denominators > 0) & active
         raw = torch.zeros_like(g)
-        raw[active] = scaled[active] * e_min / active_denominators
+        raw[mask] = g[mask] / denominators[mask]
         raw_norm = torch.linalg.vector_norm(raw)
         if not bool(torch.isfinite(raw_norm)) or float(raw_norm) == 0.0:
             raise FloatingPointError("raw FP64 field cannot be normalized")
         direction = radius * raw / raw_norm
+
 
     output = direction.reshape(gradient.shape)
     if not return_diagnostics:

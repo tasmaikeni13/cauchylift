@@ -43,15 +43,16 @@ def test_zero_boundary_and_nearly_singular():
     boundary, boundary_info = cauchylift_reference(
         one_sparse, return_diagnostics=True
     )
-    assert boundary[1, 4] == -math.sqrt(3)
+    assert boundary[1, 4] == -math.sqrt(5)
     assert torch.count_nonzero(boundary) == 1
     assert boundary_info["one_sparse_boundary_count"] == 1
 
-    nearly = torch.tensor([[1.0, 1e-30], [0.0, 0.0]], dtype=torch.float32)
+    nearly = torch.tensor([[1e-25, 1e-25], [0.0, 0.0]], dtype=torch.float32)
     actual, info = cauchylift_reference(nearly, return_diagnostics=True)
     expected = cauchylift_oracle(nearly)
     torch.testing.assert_close(actual.double(), expected, **REFERENCE_FP32)
     assert info["fp64_rare_path_count"] == 1
+
 
 
 @pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16, torch.float32, torch.float64])
@@ -76,7 +77,7 @@ def test_noncontiguous_and_higher_tensor_matrixization():
     higher = torch.arange(1, 49, dtype=torch.float32).reshape(2, 3, 4, 2)
     output = cauchylift_reference(higher)
     assert output.shape == higher.shape
-    assert torch.linalg.vector_norm(output) == pytest.approx(math.sqrt(2), rel=1e-6)
+    assert torch.linalg.vector_norm(output) == pytest.approx(math.sqrt(24), rel=1e-6)
 
 
 @pytest.mark.parametrize(

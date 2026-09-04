@@ -27,7 +27,7 @@ def matrixize(tensor: torch.Tensor) -> torch.Tensor:
 
 def radius_for(tensor: torch.Tensor) -> float:
     matrix = matrixize(tensor)
-    return math.sqrt(min(matrix.shape))
+    return math.sqrt(max(matrix.shape))
 
 
 def diagnostics_from(

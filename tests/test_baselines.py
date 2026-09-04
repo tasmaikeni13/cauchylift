@@ -61,8 +61,8 @@ def test_normalized_gd_and_sign_descent_equations():
     p2.grad = torch.tensor([[5.0, -10.0]])
     opt_sd = SignDescent([p2], lr=0.1)
     opt_sd.step()
-    # Sign is [1, -1], norm is sqrt(2), radius is 1.0 -> direction is [1/sqrt(2), -1/sqrt(2)]
-    expected_step2 = 0.1 * 1.0 * (1.0 / math.sqrt(2))
+    # Sign is [1, -1], norm is sqrt(2), radius is sqrt(max(1, 2)) = sqrt(2) -> direction is [1.0, -1.0]
+    expected_step2 = 0.1 * math.sqrt(2) * (1.0 / math.sqrt(2))
     actual_step2 = 3.0 - p2[0, 0].item()
     assert abs(actual_step2 - expected_step2) < 1e-5
 

@@ -1,6 +1,6 @@
 {
   "protocol_hash": "d2228adaee66bdeadffc841aedf989a5edf6084c82d44799990bb5ebf41622ef",
-  "timestamp_utc": "2026-09-04T11:34:29Z",
+  "timestamp_utc": "2026-09-04T12:40:34Z",
   "tuning_results": {
     "small_decoder_lm": {
       "cauchylift": {
@@ -15,18 +15,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.495719909667969,
-          "final_val_loss": 10.479145050048828,
-          "best_val_loss": 10.479145050048828,
+          "final_loss": 9.733895301818848,
+          "final_val_loss": 9.684984016418458,
+          "best_val_loss": 9.684984016418458,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 5.069734690005134,
-          "mean_step_time_ms": 53.17798925001625,
-          "total_wall_time_sec": 11.622646835000069
+          "mean_opt_time_ms": 5.034192489956695,
+          "mean_step_time_ms": 52.47304282995174,
+          "total_wall_time_sec": 11.454300061999675
         },
         "0.001": {
           "run_id": "tune_small_decoder_lm_cauchylift_lr0.001_s42",
@@ -39,18 +39,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.077170372009277,
-          "final_val_loss": 10.055840873718262,
-          "best_val_loss": 10.055840873718262,
+          "final_loss": 8.053844451904297,
+          "final_val_loss": 7.937618350982666,
+          "best_val_loss": 7.937618350982666,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.40707740001380444,
-          "mean_step_time_ms": 10.560396009996111,
-          "total_wall_time_sec": 1.7543154190002497
+          "mean_opt_time_ms": 0.4081865199987078,
+          "mean_step_time_ms": 10.320001919981223,
+          "total_wall_time_sec": 1.7263751719992797
         },
         "0.003": {
           "run_id": "tune_small_decoder_lm_cauchylift_lr0.003_s42",
@@ -63,18 +63,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.159278869628906,
-          "final_val_loss": 9.105198669433594,
-          "best_val_loss": 9.105198669433594,
+          "final_loss": 7.477341651916504,
+          "final_val_loss": 7.299454689025879,
+          "best_val_loss": 7.299454689025879,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.4059865100089155,
-          "mean_step_time_ms": 10.439021909987787,
-          "total_wall_time_sec": 1.738125428999865
+          "mean_opt_time_ms": 0.41039115000785387,
+          "mean_step_time_ms": 10.369796210025015,
+          "total_wall_time_sec": 1.735778780000146
         },
         "0.01": {
           "run_id": "tune_small_decoder_lm_cauchylift_lr0.01_s42",
@@ -87,18 +87,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.302252769470215,
-          "final_val_loss": 8.180892181396484,
-          "best_val_loss": 8.180892181396484,
+          "final_loss": 7.231196403503418,
+          "final_val_loss": 7.042488956451416,
+          "best_val_loss": 7.042488956451416,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.4091842099933274,
-          "mean_step_time_ms": 10.482125340026869,
-          "total_wall_time_sec": 1.744943173000138
+          "mean_opt_time_ms": 0.4017000700059725,
+          "mean_step_time_ms": 10.100214179965405,
+          "total_wall_time_sec": 1.6974393810005495
         },
         "0.03": {
           "run_id": "tune_small_decoder_lm_cauchylift_lr0.03_s42",
@@ -111,18 +111,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.040825843811035,
-          "final_val_loss": 7.956851577758789,
-          "best_val_loss": 7.956851577758789,
+          "final_loss": 7.6204423904418945,
+          "final_val_loss": 7.462389850616455,
+          "best_val_loss": 7.462389850616455,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.4055695899978673,
-          "mean_step_time_ms": 10.501719340027194,
-          "total_wall_time_sec": 1.7430906760000653
+          "mean_opt_time_ms": 0.41098001002865203,
+          "mean_step_time_ms": 10.36874115995488,
+          "total_wall_time_sec": 1.733057282000118
         }
       },
       "adamw": {
@@ -146,9 +146,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.48681460001262167,
-          "mean_step_time_ms": 10.396530300008635,
-          "total_wall_time_sec": 1.7306409000002532
+          "mean_opt_time_ms": 0.4728759999943577,
+          "mean_step_time_ms": 10.291857539978082,
+          "total_wall_time_sec": 1.7174921189998713
         },
         "0.001": {
           "run_id": "tune_small_decoder_lm_adamw_lr0.001_s42",
@@ -170,9 +170,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.33878810000260273,
-          "mean_step_time_ms": 10.468539860007695,
-          "total_wall_time_sec": 1.7418263939998724
+          "mean_opt_time_ms": 0.33179715001097065,
+          "mean_step_time_ms": 10.131902989969603,
+          "total_wall_time_sec": 1.7025155009996524
         },
         "0.003": {
           "run_id": "tune_small_decoder_lm_adamw_lr0.003_s42",
@@ -194,9 +194,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.33703220997722383,
-          "mean_step_time_ms": 10.27953414998592,
-          "total_wall_time_sec": 1.7210482079999565
+          "mean_opt_time_ms": 0.32881147002626676,
+          "mean_step_time_ms": 10.147123570077383,
+          "total_wall_time_sec": 1.7040805320002619
         },
         "0.01": {
           "run_id": "tune_small_decoder_lm_adamw_lr0.01_s42",
@@ -218,9 +218,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.33381798999471357,
-          "mean_step_time_ms": 10.183098659977077,
-          "total_wall_time_sec": 1.7048302869998224
+          "mean_opt_time_ms": 0.3313445500225498,
+          "mean_step_time_ms": 10.178695239992521,
+          "total_wall_time_sec": 1.7071892630001457
         },
         "0.03": {
           "run_id": "tune_small_decoder_lm_adamw_lr0.03_s42",
@@ -242,9 +242,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.3372614600129964,
-          "mean_step_time_ms": 10.324129989994617,
-          "total_wall_time_sec": 1.7237405440000657
+          "mean_opt_time_ms": 0.32424051001726184,
+          "mean_step_time_ms": 9.961812529963936,
+          "total_wall_time_sec": 1.6760448069999256
         }
       },
       "muon": {
@@ -268,9 +268,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.627835400037839,
-          "mean_step_time_ms": 24.69195006998234,
-          "total_wall_time_sec": 3.1612158590000945
+          "mean_opt_time_ms": 14.41432720001103,
+          "mean_step_time_ms": 24.22520573996735,
+          "total_wall_time_sec": 3.107243415999619
         },
         "0.001": {
           "run_id": "tune_small_decoder_lm_muon_lr0.001_s42",
@@ -292,9 +292,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.394296680006846,
-          "mean_step_time_ms": 24.465840530001515,
-          "total_wall_time_sec": 3.143166869000197
+          "mean_opt_time_ms": 14.067138349964807,
+          "mean_step_time_ms": 23.862968460034608,
+          "total_wall_time_sec": 3.076061182000558
         },
         "0.003": {
           "run_id": "tune_small_decoder_lm_muon_lr0.003_s42",
@@ -316,9 +316,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.104666880007244,
-          "mean_step_time_ms": 24.012071240017576,
-          "total_wall_time_sec": 3.091004215000339
+          "mean_opt_time_ms": 13.986491020014,
+          "mean_step_time_ms": 23.80712365999898,
+          "total_wall_time_sec": 3.0691347920001135
         },
         "0.01": {
           "run_id": "tune_small_decoder_lm_muon_lr0.01_s42",
@@ -340,9 +340,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.182706080000571,
-          "mean_step_time_ms": 24.19486741001947,
-          "total_wall_time_sec": 3.10578340200027
+          "mean_opt_time_ms": 14.022996189942205,
+          "mean_step_time_ms": 23.91839588003677,
+          "total_wall_time_sec": 3.0813859999998385
         },
         "0.03": {
           "run_id": "tune_small_decoder_lm_muon_lr0.03_s42",
@@ -364,9 +364,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.29690273002052,
-          "mean_step_time_ms": 24.317939709999337,
-          "total_wall_time_sec": 3.1233409989999927
+          "mean_opt_time_ms": 14.135277609957484,
+          "mean_step_time_ms": 24.19054479006263,
+          "total_wall_time_sec": 3.1083850169998186
         }
       },
       "soap": {
@@ -390,9 +390,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 63.775493289999766,
-          "mean_step_time_ms": 74.00970173997393,
-          "total_wall_time_sec": 8.10233207400006
+          "mean_opt_time_ms": 63.213612439985816,
+          "mean_step_time_ms": 73.1682916400041,
+          "total_wall_time_sec": 8.006541763000314
         },
         "0.001": {
           "run_id": "tune_small_decoder_lm_soap_lr0.001_s42",
@@ -414,9 +414,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 27.345059129997935,
-          "mean_step_time_ms": 37.44724999002301,
-          "total_wall_time_sec": 4.443205777999992
+          "mean_opt_time_ms": 27.22673340998881,
+          "mean_step_time_ms": 37.19457277001311,
+          "total_wall_time_sec": 4.409548407999864
         },
         "0.003": {
           "run_id": "tune_small_decoder_lm_soap_lr0.003_s42",
@@ -438,9 +438,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 27.222833699997864,
-          "mean_step_time_ms": 37.31249708001087,
-          "total_wall_time_sec": 4.427537252000093
+          "mean_opt_time_ms": 27.09694660002242,
+          "mean_step_time_ms": 36.97965429002579,
+          "total_wall_time_sec": 4.388923675000115
         },
         "0.01": {
           "run_id": "tune_small_decoder_lm_soap_lr0.01_s42",
@@ -462,9 +462,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 27.155408930047997,
-          "mean_step_time_ms": 37.18084439000904,
-          "total_wall_time_sec": 4.410414528999809
+          "mean_opt_time_ms": 27.091577649998726,
+          "mean_step_time_ms": 37.029648589905264,
+          "total_wall_time_sec": 4.396285711000019
         },
         "0.03": {
           "run_id": "tune_small_decoder_lm_soap_lr0.03_s42",
@@ -486,9 +486,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 27.059816950018103,
-          "mean_step_time_ms": 37.07748344999345,
-          "total_wall_time_sec": 4.402503596000315
+          "mean_opt_time_ms": 27.043210069914494,
+          "mean_step_time_ms": 37.03229134001049,
+          "total_wall_time_sec": 4.396365839000282
         }
       },
       "sinkgd": {
@@ -512,9 +512,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.984938600003261,
-          "mean_step_time_ms": 16.98692604001735,
-          "total_wall_time_sec": 2.3819206509997457
+          "mean_opt_time_ms": 7.036633660018197,
+          "mean_step_time_ms": 17.195579260078375,
+          "total_wall_time_sec": 2.4171339429994987
         },
         "0.001": {
           "run_id": "tune_small_decoder_lm_sinkgd_lr0.001_s42",
@@ -536,9 +536,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.852573600017422,
-          "mean_step_time_ms": 16.93922826996186,
-          "total_wall_time_sec": 2.3861389140001847
+          "mean_opt_time_ms": 6.85290531994724,
+          "mean_step_time_ms": 16.860379780018775,
+          "total_wall_time_sec": 2.38550563499939
         },
         "0.003": {
           "run_id": "tune_small_decoder_lm_sinkgd_lr0.003_s42",
@@ -560,9 +560,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.795280150013241,
-          "mean_step_time_ms": 16.849854739994043,
-          "total_wall_time_sec": 2.3741334579999602
+          "mean_opt_time_ms": 6.745974080058659,
+          "mean_step_time_ms": 16.70455060997483,
+          "total_wall_time_sec": 2.3621897459997854
         },
         "0.01": {
           "run_id": "tune_small_decoder_lm_sinkgd_lr0.01_s42",
@@ -584,9 +584,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.787619489973622,
-          "mean_step_time_ms": 16.79216949001784,
-          "total_wall_time_sec": 2.3671021529999052
+          "mean_opt_time_ms": 6.750475759990877,
+          "mean_step_time_ms": 16.754230580017975,
+          "total_wall_time_sec": 2.3666173209994668
         },
         "0.03": {
           "run_id": "tune_small_decoder_lm_sinkgd_lr0.03_s42",
@@ -608,9 +608,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.9021618900023896,
-          "mean_step_time_ms": 17.187084779989164,
-          "total_wall_time_sec": 2.4178125240000554
+          "mean_opt_time_ms": 6.712343650042385,
+          "mean_step_time_ms": 16.615712319990052,
+          "total_wall_time_sec": 2.353382844999942
         }
       },
       "normalized_gd": {
@@ -625,18 +625,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.496566772460938,
-          "final_val_loss": 10.479937553405762,
-          "best_val_loss": 10.479937553405762,
+          "final_loss": 8.704692840576172,
+          "final_val_loss": 8.615583419799805,
+          "best_val_loss": 8.615583419799805,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.8782396399728896,
-          "mean_step_time_ms": 12.160852080023687,
-          "total_wall_time_sec": 1.9153854569999567
+          "mean_opt_time_ms": 1.8880670699854818,
+          "mean_step_time_ms": 11.919751689983968,
+          "total_wall_time_sec": 1.8806747230000838
         },
         "0.001": {
           "run_id": "tune_small_decoder_lm_normalized_gd_lr0.001_s42",
@@ -649,18 +649,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.078734397888184,
-          "final_val_loss": 10.057183265686035,
-          "best_val_loss": 10.057183265686035,
+          "final_loss": 8.007007598876953,
+          "final_val_loss": 7.89561710357666,
+          "best_val_loss": 7.89561710357666,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.8972758999689177,
-          "mean_step_time_ms": 12.232933370005412,
-          "total_wall_time_sec": 1.9285350399995878
+          "mean_opt_time_ms": 1.8920794899895554,
+          "mean_step_time_ms": 11.863662519908758,
+          "total_wall_time_sec": 1.8750281039992842
         },
         "0.003": {
           "run_id": "tune_small_decoder_lm_normalized_gd_lr0.003_s42",
@@ -673,18 +673,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.14714241027832,
-          "final_val_loss": 9.0918550491333,
-          "best_val_loss": 9.0918550491333,
+          "final_loss": 7.747271537780762,
+          "final_val_loss": 7.616898059844971,
+          "best_val_loss": 7.616898059844971,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.8680187699965245,
-          "mean_step_time_ms": 11.929262539983938,
-          "total_wall_time_sec": 1.884404132000327
+          "mean_opt_time_ms": 1.87067810006738,
+          "mean_step_time_ms": 11.593783370008168,
+          "total_wall_time_sec": 1.8394481420000375
         },
         "0.01": {
           "run_id": "tune_small_decoder_lm_normalized_gd_lr0.01_s42",
@@ -697,18 +697,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.297552108764648,
-          "final_val_loss": 8.1754940032959,
-          "best_val_loss": 8.1754940032959,
+          "final_loss": 7.953818321228027,
+          "final_val_loss": 7.846827030181885,
+          "best_val_loss": 7.846827030181885,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.8716977099620635,
-          "mean_step_time_ms": 12.083150160015066,
-          "total_wall_time_sec": 1.8986089889999676
+          "mean_opt_time_ms": 1.8656861100225797,
+          "mean_step_time_ms": 11.597624579972035,
+          "total_wall_time_sec": 1.841962023000633
         },
         "0.03": {
           "run_id": "tune_small_decoder_lm_normalized_gd_lr0.03_s42",
@@ -721,18 +721,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.965281963348389,
-          "final_val_loss": 7.8705589294433596,
-          "best_val_loss": 7.8705589294433596,
+          "final_loss": 7.913642406463623,
+          "final_val_loss": 7.799164962768555,
+          "best_val_loss": 7.799164962768555,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.8764923799926692,
-          "mean_step_time_ms": 11.881310619996839,
-          "total_wall_time_sec": 1.878012692000084
+          "mean_opt_time_ms": 1.8509354499383335,
+          "mean_step_time_ms": 11.55869561003783,
+          "total_wall_time_sec": 1.8350531960004446
         }
       },
       "sign_descent": {
@@ -747,18 +747,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.660907745361328,
-          "final_val_loss": 10.642044639587402,
-          "best_val_loss": 10.642044639587402,
+          "final_loss": 10.525197982788086,
+          "final_val_loss": 10.502476692199707,
+          "best_val_loss": 10.502476692199707,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.132656029989448,
-          "mean_step_time_ms": 12.295230939998874,
-          "total_wall_time_sec": 1.9159230539999044
+          "mean_opt_time_ms": 2.1352148100504564,
+          "mean_step_time_ms": 11.896527169947149,
+          "total_wall_time_sec": 1.871981333999429
         },
         "0.001": {
           "run_id": "tune_small_decoder_lm_sign_descent_lr0.001_s42",
@@ -771,18 +771,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.580267906188965,
-          "final_val_loss": 10.565532302856445,
-          "best_val_loss": 10.565532302856445,
+          "final_loss": 10.055484771728516,
+          "final_val_loss": 10.014546775817871,
+          "best_val_loss": 10.014546775817871,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.1452553800054375,
-          "mean_step_time_ms": 12.310095440034274,
-          "total_wall_time_sec": 1.9218618569998398
+          "mean_opt_time_ms": 2.143780729957143,
+          "mean_step_time_ms": 11.91875128999527,
+          "total_wall_time_sec": 1.8745758240002033
         },
         "0.003": {
           "run_id": "tune_small_decoder_lm_sign_descent_lr0.003_s42",
@@ -795,18 +795,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.420587539672852,
-          "final_val_loss": 10.38353443145752,
-          "best_val_loss": 10.38353443145752,
+          "final_loss": 8.688080787658691,
+          "final_val_loss": 8.601953887939453,
+          "best_val_loss": 8.601953887939453,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.137348039987046,
-          "mean_step_time_ms": 12.071813330012446,
-          "total_wall_time_sec": 1.8986866559998816
+          "mean_opt_time_ms": 2.133352569962881,
+          "mean_step_time_ms": 11.856301809939396,
+          "total_wall_time_sec": 1.8642683699999907
         },
         "0.01": {
           "run_id": "tune_small_decoder_lm_sign_descent_lr0.01_s42",
@@ -819,18 +819,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.191570281982422,
-          "final_val_loss": 10.1485990524292,
-          "best_val_loss": 10.1485990524292,
+          "final_loss": 7.458579063415527,
+          "final_val_loss": 7.269493293762207,
+          "best_val_loss": 7.269493293762207,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.1220490800396874,
-          "mean_step_time_ms": 12.158730490027665,
-          "total_wall_time_sec": 1.9007257329999447
+          "mean_opt_time_ms": 2.136728219984434,
+          "mean_step_time_ms": 11.89272631005224,
+          "total_wall_time_sec": 1.8695764570002211
         },
         "0.03": {
           "run_id": "tune_small_decoder_lm_sign_descent_lr0.03_s42",
@@ -843,18 +843,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.610879898071289,
-          "final_val_loss": 9.54579429626465,
-          "best_val_loss": 9.54579429626465,
+          "final_loss": 7.318955421447754,
+          "final_val_loss": 7.133370018005371,
+          "best_val_loss": 7.133370018005371,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.1048808100113092,
-          "mean_step_time_ms": 12.070277269999679,
-          "total_wall_time_sec": 1.8909266300001946
+          "mean_opt_time_ms": 2.124889290016654,
+          "mean_step_time_ms": 11.863946199919155,
+          "total_wall_time_sec": 1.8694881589999568
         }
       }
     },
@@ -871,18 +871,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.198575973510742,
-          "final_val_loss": 10.168572235107423,
-          "best_val_loss": 10.168572235107423,
+          "final_loss": 9.213035583496094,
+          "final_val_loss": 9.13270969390869,
+          "best_val_loss": 9.13270969390869,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.5689866899865592,
-          "mean_step_time_ms": 14.690622499992969,
-          "total_wall_time_sec": 2.473052758999984
+          "mean_opt_time_ms": 0.5807767700207478,
+          "mean_step_time_ms": 14.136040529974707,
+          "total_wall_time_sec": 2.4019730069994694
         },
         "0.001": {
           "run_id": "tune_medium_decoder_lm_cauchylift_lr0.001_s42",
@@ -895,18 +895,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.484701156616211,
-          "final_val_loss": 9.443166732788086,
-          "best_val_loss": 9.443166732788086,
+          "final_loss": 7.8614606857299805,
+          "final_val_loss": 7.718606567382812,
+          "best_val_loss": 7.718606567382812,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.5664117499782151,
-          "mean_step_time_ms": 14.564786939990881,
-          "total_wall_time_sec": 2.4562332560003597
+          "mean_opt_time_ms": 0.582705269989674,
+          "mean_step_time_ms": 14.10488379002345,
+          "total_wall_time_sec": 2.4026841120003155
         },
         "0.003": {
           "run_id": "tune_medium_decoder_lm_cauchylift_lr0.003_s42",
@@ -919,18 +919,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.540499687194824,
-          "final_val_loss": 8.409747505187989,
-          "best_val_loss": 8.409747505187989,
+          "final_loss": 7.396908283233643,
+          "final_val_loss": 7.2108988761901855,
+          "best_val_loss": 7.2108988761901855,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.56351059996814,
-          "mean_step_time_ms": 14.4791744499571,
-          "total_wall_time_sec": 2.442634597000051
+          "mean_opt_time_ms": 0.5824458999813942,
+          "mean_step_time_ms": 14.046753819930018,
+          "total_wall_time_sec": 2.3961411119998957
         },
         "0.01": {
           "run_id": "tune_medium_decoder_lm_cauchylift_lr0.01_s42",
@@ -943,18 +943,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.029117584228516,
-          "final_val_loss": 7.883807754516601,
-          "best_val_loss": 7.883807754516601,
+          "final_loss": 7.304013252258301,
+          "final_val_loss": 7.109697151184082,
+          "best_val_loss": 7.109697151184082,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.5722912100100075,
-          "mean_step_time_ms": 14.717280639997625,
-          "total_wall_time_sec": 2.4773315570000705
+          "mean_opt_time_ms": 0.5812554099975387,
+          "mean_step_time_ms": 14.040783760046907,
+          "total_wall_time_sec": 2.392998108000029
         },
         "0.03": {
           "run_id": "tune_medium_decoder_lm_cauchylift_lr0.03_s42",
@@ -967,18 +967,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.021186828613281,
-          "final_val_loss": 7.89937572479248,
-          "best_val_loss": 7.89937572479248,
+          "final_loss": 7.6074371337890625,
+          "final_val_loss": 7.463208198547363,
+          "best_val_loss": 7.463208198547363,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.5742734900150026,
-          "mean_step_time_ms": 14.568183450001015,
-          "total_wall_time_sec": 2.458080554999924
+          "mean_opt_time_ms": 0.5801336600507057,
+          "mean_step_time_ms": 14.06512678994659,
+          "total_wall_time_sec": 2.401535488999798
         }
       },
       "adamw": {
@@ -1002,9 +1002,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.4686401600110912,
-          "mean_step_time_ms": 14.544272589987486,
-          "total_wall_time_sec": 2.4729563680002684
+          "mean_opt_time_ms": 0.45986983991497254,
+          "mean_step_time_ms": 14.10213858998759,
+          "total_wall_time_sec": 2.4099070080001184
         },
         "0.001": {
           "run_id": "tune_medium_decoder_lm_adamw_lr0.001_s42",
@@ -1026,9 +1026,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.46461144000204513,
-          "mean_step_time_ms": 14.52561675999732,
-          "total_wall_time_sec": 2.455963980999968
+          "mean_opt_time_ms": 0.4615336699407635,
+          "mean_step_time_ms": 14.05574961997445,
+          "total_wall_time_sec": 2.4022460220003268
         },
         "0.003": {
           "run_id": "tune_medium_decoder_lm_adamw_lr0.003_s42",
@@ -1050,9 +1050,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.4624626799886755,
-          "mean_step_time_ms": 14.56059757998446,
-          "total_wall_time_sec": 2.464944404000107
+          "mean_opt_time_ms": 0.46302782000566367,
+          "mean_step_time_ms": 14.030451279968474,
+          "total_wall_time_sec": 2.40450915800011
         },
         "0.01": {
           "run_id": "tune_medium_decoder_lm_adamw_lr0.01_s42",
@@ -1074,9 +1074,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.4575924699929601,
-          "mean_step_time_ms": 14.393931960016744,
-          "total_wall_time_sec": 2.4450462449999577
+          "mean_opt_time_ms": 0.46449409004708286,
+          "mean_step_time_ms": 14.268544299993664,
+          "total_wall_time_sec": 2.4357608190002793
         },
         "0.03": {
           "run_id": "tune_medium_decoder_lm_adamw_lr0.03_s42",
@@ -1098,9 +1098,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.45666200000141544,
-          "mean_step_time_ms": 14.396618339997076,
-          "total_wall_time_sec": 2.441150495999864
+          "mean_opt_time_ms": 0.45168276989898004,
+          "mean_step_time_ms": 13.955974970031093,
+          "total_wall_time_sec": 2.385484921999705
         }
       },
       "muon": {
@@ -1124,9 +1124,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 22.4775882700078,
-          "mean_step_time_ms": 36.68848076998984,
-          "total_wall_time_sec": 4.669007973999669
+          "mean_opt_time_ms": 22.117947289989388,
+          "mean_step_time_ms": 35.645202670039,
+          "total_wall_time_sec": 4.556973629999447
         },
         "0.001": {
           "run_id": "tune_medium_decoder_lm_muon_lr0.001_s42",
@@ -1148,9 +1148,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 21.451587830010794,
-          "mean_step_time_ms": 35.72732386999178,
-          "total_wall_time_sec": 4.5731639149998955
+          "mean_opt_time_ms": 21.366369110010055,
+          "mean_step_time_ms": 35.19460767001874,
+          "total_wall_time_sec": 4.515541400999609
         },
         "0.003": {
           "run_id": "tune_medium_decoder_lm_muon_lr0.003_s42",
@@ -1172,9 +1172,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 21.996503539994592,
-          "mean_step_time_ms": 36.56697444996553,
-          "total_wall_time_sec": 4.671081475999927
+          "mean_opt_time_ms": 21.249903610023466,
+          "mean_step_time_ms": 34.85876696997366,
+          "total_wall_time_sec": 4.478674042999955
         },
         "0.01": {
           "run_id": "tune_medium_decoder_lm_muon_lr0.01_s42",
@@ -1196,9 +1196,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 21.693326769986925,
-          "mean_step_time_ms": 35.98116226999991,
-          "total_wall_time_sec": 4.601279049999903
+          "mean_opt_time_ms": 21.382720630044787,
+          "mean_step_time_ms": 35.043032749972554,
+          "total_wall_time_sec": 4.50415998400058
         },
         "0.03": {
           "run_id": "tune_medium_decoder_lm_muon_lr0.03_s42",
@@ -1220,9 +1220,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 21.49006628000734,
-          "mean_step_time_ms": 35.67752923998796,
-          "total_wall_time_sec": 4.5702352860002975
+          "mean_opt_time_ms": 21.352871330027483,
+          "mean_step_time_ms": 35.02290083000844,
+          "total_wall_time_sec": 4.5034187940000265
         }
       },
       "soap": {
@@ -1246,9 +1246,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 82.73385721000068,
-          "mean_step_time_ms": 96.97383810995234,
-          "total_wall_time_sec": 10.703514620000078
+          "mean_opt_time_ms": 82.66883988994778,
+          "mean_step_time_ms": 96.65476727001078,
+          "total_wall_time_sec": 10.672092168000745
         },
         "0.001": {
           "run_id": "tune_medium_decoder_lm_soap_lr0.001_s42",
@@ -1270,9 +1270,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 82.61191729999155,
-          "mean_step_time_ms": 96.714544439983,
-          "total_wall_time_sec": 10.691906556000049
+          "mean_opt_time_ms": 82.59226302997376,
+          "mean_step_time_ms": 96.44644079997306,
+          "total_wall_time_sec": 10.651280039000085
         },
         "0.003": {
           "run_id": "tune_medium_decoder_lm_soap_lr0.003_s42",
@@ -1294,9 +1294,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 82.51480937997712,
-          "mean_step_time_ms": 96.72827299001256,
-          "total_wall_time_sec": 10.688577755000097
+          "mean_opt_time_ms": 82.56128565998551,
+          "mean_step_time_ms": 96.48640543005058,
+          "total_wall_time_sec": 10.66272893399946
         },
         "0.01": {
           "run_id": "tune_medium_decoder_lm_soap_lr0.01_s42",
@@ -1318,9 +1318,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 82.38952951999636,
-          "mean_step_time_ms": 96.61606587002098,
-          "total_wall_time_sec": 10.674645667000277
+          "mean_opt_time_ms": 82.61863422000715,
+          "mean_step_time_ms": 96.8648835699696,
+          "total_wall_time_sec": 10.709448699999484
         },
         "0.03": {
           "run_id": "tune_medium_decoder_lm_soap_lr0.03_s42",
@@ -1342,9 +1342,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 82.50630450999779,
-          "mean_step_time_ms": 96.72251383000912,
-          "total_wall_time_sec": 10.68241108400025
+          "mean_opt_time_ms": 82.21859947997473,
+          "mean_step_time_ms": 95.95408500001213,
+          "total_wall_time_sec": 10.59868839199953
         }
       },
       "sinkgd": {
@@ -1368,9 +1368,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.344778149997182,
-          "mean_step_time_ms": 24.607259160025023,
-          "total_wall_time_sec": 3.465917187999821
+          "mean_opt_time_ms": 10.202972400047656,
+          "mean_step_time_ms": 23.80197929998758,
+          "total_wall_time_sec": 3.3777518440001586
         },
         "0.001": {
           "run_id": "tune_medium_decoder_lm_sinkgd_lr0.001_s42",
@@ -1392,9 +1392,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.377114799998708,
-          "mean_step_time_ms": 24.533704790005686,
-          "total_wall_time_sec": 3.465445916000135
+          "mean_opt_time_ms": 10.11207535990252,
+          "mean_step_time_ms": 23.67922454004656,
+          "total_wall_time_sec": 3.365647188999901
         },
         "0.003": {
           "run_id": "tune_medium_decoder_lm_sinkgd_lr0.003_s42",
@@ -1416,9 +1416,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.324335270024676,
-          "mean_step_time_ms": 24.42040928001461,
-          "total_wall_time_sec": 3.4490049159999216
+          "mean_opt_time_ms": 10.17886264997287,
+          "mean_step_time_ms": 23.828779800032862,
+          "total_wall_time_sec": 3.3843196640000315
         },
         "0.01": {
           "run_id": "tune_medium_decoder_lm_sinkgd_lr0.01_s42",
@@ -1440,9 +1440,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.272120710005765,
-          "mean_step_time_ms": 24.29140833000929,
-          "total_wall_time_sec": 3.4334593739999946
+          "mean_opt_time_ms": 10.108843070074727,
+          "mean_step_time_ms": 23.674283260024822,
+          "total_wall_time_sec": 3.3642771040003936
         },
         "0.03": {
           "run_id": "tune_medium_decoder_lm_sinkgd_lr0.03_s42",
@@ -1464,9 +1464,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.299376769999071,
-          "mean_step_time_ms": 24.314825350029423,
-          "total_wall_time_sec": 3.4361572500001785
+          "mean_opt_time_ms": 10.212310829983835,
+          "mean_step_time_ms": 23.885441340007674,
+          "total_wall_time_sec": 3.39237522699932
         }
       },
       "normalized_gd": {
@@ -1481,18 +1481,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.200067520141602,
-          "final_val_loss": 10.169779014587402,
-          "best_val_loss": 10.169779014587402,
+          "final_loss": 8.534494400024414,
+          "final_val_loss": 8.407316589355469,
+          "best_val_loss": 8.407316589355469,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.8469209100057924,
-          "mean_step_time_ms": 16.737869409976156,
-          "total_wall_time_sec": 2.668181812000057
+          "mean_opt_time_ms": 2.9000088499196863,
+          "mean_step_time_ms": 16.50096248000409,
+          "total_wall_time_sec": 2.64698061099989
         },
         "0.001": {
           "run_id": "tune_medium_decoder_lm_normalized_gd_lr0.001_s42",
@@ -1505,18 +1505,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.48019027709961,
-          "final_val_loss": 9.437387084960937,
-          "best_val_loss": 9.437387084960937,
+          "final_loss": 7.9856414794921875,
+          "final_val_loss": 7.853431129455567,
+          "best_val_loss": 7.853431129455567,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.8508360799969523,
-          "mean_step_time_ms": 16.857393959994624,
-          "total_wall_time_sec": 2.683475984999859
+          "mean_opt_time_ms": 2.91970863008828,
+          "mean_step_time_ms": 16.657638560018313,
+          "total_wall_time_sec": 2.6648945220003952
         },
         "0.003": {
           "run_id": "tune_medium_decoder_lm_normalized_gd_lr0.003_s42",
@@ -1529,18 +1529,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.529962539672852,
-          "final_val_loss": 8.399351119995117,
-          "best_val_loss": 8.399351119995117,
+          "final_loss": 7.809260845184326,
+          "final_val_loss": 7.682880306243897,
+          "best_val_loss": 7.682880306243897,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.871354949979832,
-          "mean_step_time_ms": 16.92991345995779,
-          "total_wall_time_sec": 2.6972839559998647
+          "mean_opt_time_ms": 2.913024579966077,
+          "mean_step_time_ms": 16.474335439997958,
+          "total_wall_time_sec": 2.6395812970004044
         },
         "0.01": {
           "run_id": "tune_medium_decoder_lm_normalized_gd_lr0.01_s42",
@@ -1553,18 +1553,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.9773640632629395,
-          "final_val_loss": 7.822674751281738,
-          "best_val_loss": 7.822674751281738,
+          "final_loss": 7.964507102966309,
+          "final_val_loss": 7.87317533493042,
+          "best_val_loss": 7.87317533493042,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.8558360099941638,
-          "mean_step_time_ms": 16.810459459989033,
-          "total_wall_time_sec": 2.678183060000265
+          "mean_opt_time_ms": 2.9121695200228714,
+          "mean_step_time_ms": 16.586538550000114,
+          "total_wall_time_sec": 2.658570159000192
         },
         "0.03": {
           "run_id": "tune_medium_decoder_lm_normalized_gd_lr0.03_s42",
@@ -1577,18 +1577,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.883619785308838,
-          "final_val_loss": 7.763652229309082,
-          "best_val_loss": 7.763652229309082,
+          "final_loss": 8.107656478881836,
+          "final_val_loss": 7.96275224685669,
+          "best_val_loss": 7.96275224685669,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.8609163799819726,
-          "mean_step_time_ms": 17.019958359992415,
-          "total_wall_time_sec": 2.7030296379998617
+          "mean_opt_time_ms": 2.9325237899774947,
+          "mean_step_time_ms": 16.672595690006347,
+          "total_wall_time_sec": 2.6764614969997638
         }
       },
       "sign_descent": {
@@ -1603,18 +1603,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.504355430603027,
-          "final_val_loss": 10.477194595336915,
-          "best_val_loss": 10.47310905456543,
+          "final_loss": 10.316593170166016,
+          "final_val_loss": 10.28090591430664,
+          "best_val_loss": 10.28090591430664,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.2118337700148913,
-          "mean_step_time_ms": 17.195266000021547,
-          "total_wall_time_sec": 2.715658193999843
+          "mean_opt_time_ms": 3.2885373400131357,
+          "mean_step_time_ms": 17.01046481000958,
+          "total_wall_time_sec": 2.7034824369993657
         },
         "0.001": {
           "run_id": "tune_medium_decoder_lm_sign_descent_lr0.001_s42",
@@ -1627,18 +1627,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.387920379638672,
-          "final_val_loss": 10.36495532989502,
-          "best_val_loss": 10.360462760925293,
+          "final_loss": 9.628103256225586,
+          "final_val_loss": 9.557302284240723,
+          "best_val_loss": 9.557302284240723,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.209144090001246,
-          "mean_step_time_ms": 17.15264190002017,
-          "total_wall_time_sec": 2.7101660690000244
+          "mean_opt_time_ms": 3.290844549974281,
+          "mean_step_time_ms": 17.056772470004944,
+          "total_wall_time_sec": 2.7277106860001368
         },
         "0.003": {
           "run_id": "tune_medium_decoder_lm_sign_descent_lr0.003_s42",
@@ -1651,18 +1651,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 10.05678653717041,
-          "final_val_loss": 9.98656177520752,
-          "best_val_loss": 9.98656177520752,
+          "final_loss": 7.942353248596191,
+          "final_val_loss": 7.781199836730957,
+          "best_val_loss": 7.781199836730957,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.2021778499984066,
-          "mean_step_time_ms": 17.080459800004064,
-          "total_wall_time_sec": 2.7030713240001205
+          "mean_opt_time_ms": 3.275633360035499,
+          "mean_step_time_ms": 16.868333990032625,
+          "total_wall_time_sec": 2.6862852220001514
         },
         "0.01": {
           "run_id": "tune_medium_decoder_lm_sign_descent_lr0.01_s42",
@@ -1675,18 +1675,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.624425888061523,
-          "final_val_loss": 9.527671813964844,
-          "best_val_loss": 9.527671813964844,
+          "final_loss": 7.360815048217773,
+          "final_val_loss": 7.172513866424561,
+          "best_val_loss": 7.172513866424561,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.226853890005259,
-          "mean_step_time_ms": 17.363151759991524,
-          "total_wall_time_sec": 2.7349575340003867
+          "mean_opt_time_ms": 3.2604988500315812,
+          "mean_step_time_ms": 16.81305680994228,
+          "total_wall_time_sec": 2.6742629439995653
         },
         "0.03": {
           "run_id": "tune_medium_decoder_lm_sign_descent_lr0.03_s42",
@@ -1699,18 +1699,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.552913665771484,
-          "final_val_loss": 8.420570755004883,
-          "best_val_loss": 8.420570755004883,
+          "final_loss": 7.3086347579956055,
+          "final_val_loss": 7.109816360473633,
+          "best_val_loss": 7.109816360473633,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.261964329985858,
-          "mean_step_time_ms": 17.451798879992566,
-          "total_wall_time_sec": 2.7569971100001567
+          "mean_opt_time_ms": 3.2701755000380217,
+          "mean_step_time_ms": 16.910404680029387,
+          "total_wall_time_sec": 2.68449243699979
         }
       }
     },
@@ -1727,18 +1727,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.1441493034362793,
-          "final_val_loss": 2.0741990566253663,
-          "best_val_loss": 2.0741990566253663,
+          "final_loss": 2.134331703186035,
+          "final_val_loss": 2.0170905113220217,
+          "best_val_loss": 2.0170905113220217,
           "tokens_to_target": {
             "2.2": 1280,
             "2.0": null,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.2929022200032705,
-          "mean_step_time_ms": 36.94791748999705,
-          "total_wall_time_sec": 5.580958931999703
+          "mean_opt_time_ms": 0.294117780013039,
+          "mean_step_time_ms": 36.69127232005849,
+          "total_wall_time_sec": 5.5548136219995286
         },
         "0.001": {
           "run_id": "tune_small_vit_cauchylift_lr0.001_s42",
@@ -1751,18 +1751,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.120511531829834,
-          "final_val_loss": 1.9851675510406495,
-          "best_val_loss": 1.9851675510406495,
+          "final_loss": 2.0887033939361572,
+          "final_val_loss": 1.9281877994537353,
+          "best_val_loss": 1.9281877994537353,
           "tokens_to_target": {
             "2.2": 640,
-            "2.0": 6400,
+            "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.2893459799952325,
-          "mean_step_time_ms": 36.4319647999946,
-          "total_wall_time_sec": 5.523797881000064
+          "mean_opt_time_ms": 0.2864583999962633,
+          "mean_step_time_ms": 36.660866560014256,
+          "total_wall_time_sec": 5.552942620000067
         },
         "0.003": {
           "run_id": "tune_small_vit_cauchylift_lr0.003_s42",
@@ -1775,18 +1775,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0828516483306885,
-          "final_val_loss": 1.9243797063827515,
-          "best_val_loss": 1.9243797063827515,
+          "final_loss": 2.060692548751831,
+          "final_val_loss": 1.8976448774337769,
+          "best_val_loss": 1.8976448774337769,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.29059479998522875,
-          "mean_step_time_ms": 36.66798008001024,
-          "total_wall_time_sec": 5.560464150000371
+          "mean_opt_time_ms": 0.2887417199326592,
+          "mean_step_time_ms": 36.61330288001409,
+          "total_wall_time_sec": 5.534918725000352
         },
         "0.01": {
           "run_id": "tune_small_vit_cauchylift_lr0.01_s42",
@@ -1799,18 +1799,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.08909010887146,
-          "final_val_loss": 1.9341328859329223,
-          "best_val_loss": 1.9341328859329223,
+          "final_loss": 2.0643208026885986,
+          "final_val_loss": 1.9203836441040039,
+          "best_val_loss": 1.9203836441040039,
           "tokens_to_target": {
             "2.2": 1280,
-            "2.0": 5120,
+            "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.2926638700091644,
-          "mean_step_time_ms": 36.565862690008544,
-          "total_wall_time_sec": 5.504711811999641
+          "mean_opt_time_ms": 0.293489320019944,
+          "mean_step_time_ms": 36.655523869994795,
+          "total_wall_time_sec": 5.536726024000018
         },
         "0.03": {
           "run_id": "tune_small_vit_cauchylift_lr0.03_s42",
@@ -1823,18 +1823,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.043605327606201,
-          "final_val_loss": 1.941556453704834,
-          "best_val_loss": 1.941556453704834,
+          "final_loss": 2.147430419921875,
+          "final_val_loss": 2.001109766960144,
+          "best_val_loss": 2.001109766960144,
           "tokens_to_target": {
             "2.2": 1280,
-            "2.0": 5120,
+            "2.0": null,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.293358660001104,
-          "mean_step_time_ms": 37.27323009999054,
-          "total_wall_time_sec": 5.608681374999833
+          "mean_opt_time_ms": 0.2880656800334691,
+          "mean_step_time_ms": 36.039667619988904,
+          "total_wall_time_sec": 5.4291815090000455
         }
       },
       "adamw": {
@@ -1858,9 +1858,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.251951929990355,
-          "mean_step_time_ms": 36.498172580018036,
-          "total_wall_time_sec": 5.52758373000006
+          "mean_opt_time_ms": 0.2475791199867672,
+          "mean_step_time_ms": 36.45071584001926,
+          "total_wall_time_sec": 5.537858873000005
         },
         "0.001": {
           "run_id": "tune_small_vit_adamw_lr0.001_s42",
@@ -1882,9 +1882,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.2512570899671118,
-          "mean_step_time_ms": 36.35539958000663,
-          "total_wall_time_sec": 5.40585731200008
+          "mean_opt_time_ms": 0.24704693996682184,
+          "mean_step_time_ms": 35.811476850012696,
+          "total_wall_time_sec": 5.349925020999763
         },
         "0.003": {
           "run_id": "tune_small_vit_adamw_lr0.003_s42",
@@ -1906,9 +1906,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.25366561997543613,
-          "mean_step_time_ms": 34.51870559999861,
-          "total_wall_time_sec": 5.231572974999835
+          "mean_opt_time_ms": 0.2498231799927453,
+          "mean_step_time_ms": 36.32798413002092,
+          "total_wall_time_sec": 5.529916772999968
         },
         "0.01": {
           "run_id": "tune_small_vit_adamw_lr0.01_s42",
@@ -1930,9 +1930,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.25125375999323296,
-          "mean_step_time_ms": 33.5497858700046,
-          "total_wall_time_sec": 4.7082493980001345
+          "mean_opt_time_ms": 0.24699923001207935,
+          "mean_step_time_ms": 36.45286991006287,
+          "total_wall_time_sec": 5.486713197999961
         },
         "0.03": {
           "run_id": "tune_small_vit_adamw_lr0.03_s42",
@@ -1954,9 +1954,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.24974090002160665,
-          "mean_step_time_ms": 35.52442524002345,
-          "total_wall_time_sec": 5.2512827440000365
+          "mean_opt_time_ms": 0.24937978999332697,
+          "mean_step_time_ms": 35.98264229995948,
+          "total_wall_time_sec": 5.420859533999646
         }
       },
       "muon": {
@@ -1980,9 +1980,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.274962470034552,
-          "mean_step_time_ms": 46.70448447002855,
-          "total_wall_time_sec": 6.552943197999866
+          "mean_opt_time_ms": 10.369655099975716,
+          "mean_step_time_ms": 46.69789601002776,
+          "total_wall_time_sec": 6.555517243000395
         },
         "0.001": {
           "run_id": "tune_small_vit_muon_lr0.001_s42",
@@ -2004,9 +2004,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.260962300008032,
-          "mean_step_time_ms": 47.091916470021715,
-          "total_wall_time_sec": 6.578913628000009
+          "mean_opt_time_ms": 10.140545299991572,
+          "mean_step_time_ms": 46.49986622007418,
+          "total_wall_time_sec": 6.4722028639998825
         },
         "0.003": {
           "run_id": "tune_small_vit_muon_lr0.003_s42",
@@ -2028,9 +2028,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.28206283000145,
-          "mean_step_time_ms": 46.890388500009976,
-          "total_wall_time_sec": 6.576438770000095
+          "mean_opt_time_ms": 10.078197999982876,
+          "mean_step_time_ms": 45.587003659966285,
+          "total_wall_time_sec": 6.445010123999964
         },
         "0.01": {
           "run_id": "tune_small_vit_muon_lr0.01_s42",
@@ -2052,9 +2052,9 @@
             "1.8": 4480,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.366780149997794,
-          "mean_step_time_ms": 45.51616153998111,
-          "total_wall_time_sec": 6.405603540999891
+          "mean_opt_time_ms": 10.250258999967627,
+          "mean_step_time_ms": 46.14972620996923,
+          "total_wall_time_sec": 6.5094971239996084
         },
         "0.03": {
           "run_id": "tune_small_vit_muon_lr0.03_s42",
@@ -2076,9 +2076,9 @@
             "1.8": 4480,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.349458270011382,
-          "mean_step_time_ms": 47.12664165003389,
-          "total_wall_time_sec": 6.581502022999757
+          "mean_opt_time_ms": 10.674939379978241,
+          "mean_step_time_ms": 47.26973728003941,
+          "total_wall_time_sec": 6.614898808999897
         }
       },
       "soap": {
@@ -2102,9 +2102,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 21.348843289993056,
-          "mean_step_time_ms": 56.69535653003095,
-          "total_wall_time_sec": 7.543637173999741
+          "mean_opt_time_ms": 21.37612307004929,
+          "mean_step_time_ms": 58.5437639999509,
+          "total_wall_time_sec": 7.697050800000397
         },
         "0.001": {
           "run_id": "tune_small_vit_soap_lr0.001_s42",
@@ -2126,9 +2126,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 20.851819089975834,
-          "mean_step_time_ms": 57.010055549990284,
-          "total_wall_time_sec": 7.550174884999706
+          "mean_opt_time_ms": 20.818075230026807,
+          "mean_step_time_ms": 57.04445053995187,
+          "total_wall_time_sec": 7.572632037999938
         },
         "0.003": {
           "run_id": "tune_small_vit_soap_lr0.003_s42",
@@ -2150,9 +2150,9 @@
             "1.8": 6400,
             "1.6": null
           },
-          "mean_opt_time_ms": 20.804256699998405,
-          "mean_step_time_ms": 57.28672351000114,
-          "total_wall_time_sec": 7.613290694999705
+          "mean_opt_time_ms": 20.72350500991888,
+          "mean_step_time_ms": 57.03541585004132,
+          "total_wall_time_sec": 7.562565974999416
         },
         "0.01": {
           "run_id": "tune_small_vit_soap_lr0.01_s42",
@@ -2174,9 +2174,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 20.67457953003668,
-          "mean_step_time_ms": 56.93378278000182,
-          "total_wall_time_sec": 7.577402423999956
+          "mean_opt_time_ms": 20.981378540009246,
+          "mean_step_time_ms": 57.46782534002705,
+          "total_wall_time_sec": 7.653077493000637
         },
         "0.03": {
           "run_id": "tune_small_vit_soap_lr0.03_s42",
@@ -2198,9 +2198,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 20.752904039959503,
-          "mean_step_time_ms": 57.23048970001855,
-          "total_wall_time_sec": 7.599521549000201
+          "mean_opt_time_ms": 21.11368982003114,
+          "mean_step_time_ms": 58.65473902998929,
+          "total_wall_time_sec": 7.78625093500068
         }
       },
       "sinkgd": {
@@ -2224,9 +2224,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.651593400017191,
-          "mean_step_time_ms": 41.26263651997306,
-          "total_wall_time_sec": 5.963525066000329
+          "mean_opt_time_ms": 4.665121040079612,
+          "mean_step_time_ms": 41.615871329986476,
+          "total_wall_time_sec": 6.07834445699973
         },
         "0.001": {
           "run_id": "tune_small_vit_sinkgd_lr0.001_s42",
@@ -2248,9 +2248,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.642105510006331,
-          "mean_step_time_ms": 41.296188409987735,
-          "total_wall_time_sec": 5.991896163000092
+          "mean_opt_time_ms": 4.544193770007041,
+          "mean_step_time_ms": 40.871226400013256,
+          "total_wall_time_sec": 5.963376982000227
         },
         "0.003": {
           "run_id": "tune_small_vit_sinkgd_lr0.003_s42",
@@ -2272,9 +2272,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.655227850016672,
-          "mean_step_time_ms": 39.64384659996085,
-          "total_wall_time_sec": 5.8473398229998566
+          "mean_opt_time_ms": 4.5759452800120926,
+          "mean_step_time_ms": 40.890619039964804,
+          "total_wall_time_sec": 5.969637244999831
         },
         "0.01": {
           "run_id": "tune_small_vit_sinkgd_lr0.01_s42",
@@ -2296,9 +2296,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.581394019992331,
-          "mean_step_time_ms": 40.9639898399746,
-          "total_wall_time_sec": 5.9664928980000695
+          "mean_opt_time_ms": 4.636579780044485,
+          "mean_step_time_ms": 41.23032926997439,
+          "total_wall_time_sec": 5.989019916999496
         },
         "0.03": {
           "run_id": "tune_small_vit_sinkgd_lr0.03_s42",
@@ -2320,9 +2320,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.602704420040027,
-          "mean_step_time_ms": 40.93404212000223,
-          "total_wall_time_sec": 5.985446553000202
+          "mean_opt_time_ms": 4.6411022799838975,
+          "mean_step_time_ms": 41.10813620994122,
+          "total_wall_time_sec": 6.011333432999891
         }
       },
       "normalized_gd": {
@@ -2337,18 +2337,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.1444642543792725,
-          "final_val_loss": 2.074305868148804,
-          "best_val_loss": 2.074305868148804,
+          "final_loss": 2.1309919357299805,
+          "final_val_loss": 2.0168511867523193,
+          "best_val_loss": 2.0168511867523193,
           "tokens_to_target": {
             "2.2": 1280,
             "2.0": null,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.4267883100274048,
-          "mean_step_time_ms": 36.47916342998997,
-          "total_wall_time_sec": 5.379241344000093
+          "mean_opt_time_ms": 1.4363790900279128,
+          "mean_step_time_ms": 35.782232829960776,
+          "total_wall_time_sec": 4.93895952999992
         },
         "0.001": {
           "run_id": "tune_small_vit_normalized_gd_lr0.001_s42",
@@ -2361,18 +2361,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.120645046234131,
-          "final_val_loss": 1.9852425575256347,
-          "best_val_loss": 1.9852425575256347,
+          "final_loss": 2.09263277053833,
+          "final_val_loss": 1.936379337310791,
+          "best_val_loss": 1.936379337310791,
           "tokens_to_target": {
             "2.2": 640,
-            "2.0": 6400,
+            "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.439002450024418,
-          "mean_step_time_ms": 37.123303469993516,
-          "total_wall_time_sec": 5.3508382270001675
+          "mean_opt_time_ms": 1.4477824599998712,
+          "mean_step_time_ms": 38.07370279997485,
+          "total_wall_time_sec": 5.573165695999705
         },
         "0.003": {
           "run_id": "tune_small_vit_normalized_gd_lr0.003_s42",
@@ -2385,18 +2385,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0827488899230957,
-          "final_val_loss": 1.9243337631225585,
-          "best_val_loss": 1.9243337631225585,
+          "final_loss": 2.063014030456543,
+          "final_val_loss": 1.90421781539917,
+          "best_val_loss": 1.90421781539917,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.4279546800025855,
-          "mean_step_time_ms": 37.05369997001526,
-          "total_wall_time_sec": 5.485950866000167
+          "mean_opt_time_ms": 1.471972130029826,
+          "mean_step_time_ms": 37.86005476002174,
+          "total_wall_time_sec": 5.5870667059998596
         },
         "0.01": {
           "run_id": "tune_small_vit_normalized_gd_lr0.01_s42",
@@ -2409,18 +2409,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.096473455429077,
-          "final_val_loss": 1.9348257780075073,
-          "best_val_loss": 1.9348257780075073,
+          "final_loss": 2.081289291381836,
+          "final_val_loss": 1.9317657470703125,
+          "best_val_loss": 1.9317657470703125,
           "tokens_to_target": {
-            "2.2": 1280,
-            "2.0": 1920,
+            "2.2": 1920,
+            "2.0": 5120,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.4390713599914307,
-          "mean_step_time_ms": 37.03625381997426,
-          "total_wall_time_sec": 5.37062310500005
+          "mean_opt_time_ms": 1.4577361200190353,
+          "mean_step_time_ms": 37.55064314993433,
+          "total_wall_time_sec": 5.4164980420000575
         },
         "0.03": {
           "run_id": "tune_small_vit_normalized_gd_lr0.03_s42",
@@ -2433,18 +2433,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.071667194366455,
-          "final_val_loss": 1.948479127883911,
-          "best_val_loss": 1.948479127883911,
+          "final_loss": 2.0974960327148438,
+          "final_val_loss": 1.9933874368667603,
+          "best_val_loss": 1.9933874368667603,
           "tokens_to_target": {
-            "2.2": 1280,
-            "2.0": 5120,
+            "2.2": 1920,
+            "2.0": 6400,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.4703979200157846,
-          "mean_step_time_ms": 37.689193640003396,
-          "total_wall_time_sec": 5.371172440000009
+          "mean_opt_time_ms": 1.4564571400842397,
+          "mean_step_time_ms": 36.682413409962464,
+          "total_wall_time_sec": 5.38487680200069
         }
       },
       "sign_descent": {
@@ -2459,18 +2459,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.156484603881836,
-          "final_val_loss": 2.106789064407349,
-          "best_val_loss": 2.106789064407349,
+          "final_loss": 2.1382179260253906,
+          "final_val_loss": 2.044823718070984,
+          "best_val_loss": 2.044823718070984,
           "tokens_to_target": {
-            "2.2": 1920,
+            "2.2": 1280,
             "2.0": null,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.664325970009486,
-          "mean_step_time_ms": 37.434945800018795,
-          "total_wall_time_sec": 5.501789621999706
+          "mean_opt_time_ms": 1.6781749099300214,
+          "mean_step_time_ms": 35.87025122994419,
+          "total_wall_time_sec": 5.317003187999944
         },
         "0.001": {
           "run_id": "tune_small_vit_sign_descent_lr0.001_s42",
@@ -2483,18 +2483,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.131436824798584,
-          "final_val_loss": 2.0058224201202393,
-          "best_val_loss": 2.0058224201202393,
+          "final_loss": 2.1003494262695312,
+          "final_val_loss": 1.9486565113067627,
+          "best_val_loss": 1.9486565113067627,
           "tokens_to_target": {
-            "2.2": 1280,
-            "2.0": null,
+            "2.2": 640,
+            "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.6506722399935825,
-          "mean_step_time_ms": 37.399176469998565,
-          "total_wall_time_sec": 5.542956059000062
+          "mean_opt_time_ms": 1.6636347399889928,
+          "mean_step_time_ms": 36.44999001998258,
+          "total_wall_time_sec": 5.1532498509996
         },
         "0.003": {
           "run_id": "tune_small_vit_sign_descent_lr0.003_s42",
@@ -2507,18 +2507,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0856692790985107,
-          "final_val_loss": 1.9279176235198974,
-          "best_val_loss": 1.9279176235198974,
+          "final_loss": 2.0592398643493652,
+          "final_val_loss": 1.8909268856048584,
+          "best_val_loss": 1.8909268856048584,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.6845917400087274,
-          "mean_step_time_ms": 37.924638420008705,
-          "total_wall_time_sec": 5.508920853000291
+          "mean_opt_time_ms": 1.660639390029246,
+          "mean_step_time_ms": 35.496973300023456,
+          "total_wall_time_sec": 5.349862871000369
         },
         "0.01": {
           "run_id": "tune_small_vit_sign_descent_lr0.01_s42",
@@ -2531,18 +2531,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.051819324493408,
-          "final_val_loss": 1.8842689990997314,
-          "best_val_loss": 1.8842689990997314,
+          "final_loss": 2.053166151046753,
+          "final_val_loss": 1.9051837921142578,
+          "best_val_loss": 1.9051837921142578,
           "tokens_to_target": {
-            "2.2": 640,
+            "2.2": 1280,
             "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.6463829599979363,
-          "mean_step_time_ms": 36.2962292200109,
-          "total_wall_time_sec": 5.0206661419997545
+          "mean_opt_time_ms": 1.647852780051835,
+          "mean_step_time_ms": 36.947977429954335,
+          "total_wall_time_sec": 5.305097823000324
         },
         "0.03": {
           "run_id": "tune_small_vit_sign_descent_lr0.03_s42",
@@ -2555,30 +2555,30 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0573432445526123,
-          "final_val_loss": 1.955474066734314,
-          "best_val_loss": 1.9429091453552245,
+          "final_loss": 2.0783262252807617,
+          "final_val_loss": 1.950140643119812,
+          "best_val_loss": 1.950140643119812,
           "tokens_to_target": {
-            "2.2": 1280,
-            "2.0": 1920,
+            "2.2": 1920,
+            "2.0": 5120,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.6300255799978913,
-          "mean_step_time_ms": 35.48664752996501,
-          "total_wall_time_sec": 5.089930977000222
+          "mean_opt_time_ms": 1.675202550013637,
+          "mean_step_time_ms": 37.99218077005207,
+          "total_wall_time_sec": 5.486028002999774
         }
       }
     }
   },
   "selected_lrs": {
     "small_decoder_lm": {
-      "cauchylift": 0.03,
+      "cauchylift": 0.01,
       "adamw": 0.003,
       "muon": 0.03,
       "soap": 0.003,
       "sinkgd": 0.03,
-      "normalized_gd": 0.03,
+      "normalized_gd": 0.003,
       "sign_descent": 0.03
     },
     "medium_decoder_lm": {
@@ -2587,7 +2587,7 @@
       "muon": 0.03,
       "soap": 0.001,
       "sinkgd": 0.03,
-      "normalized_gd": 0.03,
+      "normalized_gd": 0.003,
       "sign_descent": 0.03
     },
     "small_vit": {
@@ -2597,83 +2597,83 @@
       "soap": 0.003,
       "sinkgd": 0.01,
       "normalized_gd": 0.003,
-      "sign_descent": 0.01
+      "sign_descent": 0.003
     }
   },
   "confirmation_results": {
     "small_decoder_lm": {
       "cauchylift": [
         {
-          "run_id": "conf_small_decoder_lm_cauchylift_lr0.03_s42",
+          "run_id": "conf_small_decoder_lm_cauchylift_lr0.01_s42",
           "workload_id": "small_decoder_lm",
           "optimizer": "cauchylift",
-          "lr": 0.03,
+          "lr": 0.01,
           "seed": 42,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.040825843811035,
-          "final_val_loss": 7.956851577758789,
-          "best_val_loss": 7.956851577758789,
+          "final_loss": 7.231196403503418,
+          "final_val_loss": 7.042488956451416,
+          "best_val_loss": 7.042488956451416,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.4055695899978673,
-          "mean_step_time_ms": 10.501719340027194,
-          "total_wall_time_sec": 1.7430906760000653
+          "mean_opt_time_ms": 0.4017000700059725,
+          "mean_step_time_ms": 10.100214179965405,
+          "total_wall_time_sec": 1.6974393810005495
         },
         {
-          "run_id": "conf_small_decoder_lm_cauchylift_lr0.03_s43",
+          "run_id": "conf_small_decoder_lm_cauchylift_lr0.01_s43",
           "workload_id": "small_decoder_lm",
           "optimizer": "cauchylift",
-          "lr": 0.03,
+          "lr": 0.01,
           "seed": 43,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.937741279602051,
-          "final_val_loss": 7.816250896453857,
-          "best_val_loss": 7.816250896453857,
+          "final_loss": 7.256979942321777,
+          "final_val_loss": 7.051912498474121,
+          "best_val_loss": 7.051912498474121,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.412633449977875,
-          "mean_step_time_ms": 10.496623239996552,
-          "total_wall_time_sec": 1.743311998000081
+          "mean_opt_time_ms": 0.4114888599906408,
+          "mean_step_time_ms": 11.01830114999757,
+          "total_wall_time_sec": 1.8200507210003707
         },
         {
-          "run_id": "conf_small_decoder_lm_cauchylift_lr0.03_s44",
+          "run_id": "conf_small_decoder_lm_cauchylift_lr0.01_s44",
           "workload_id": "small_decoder_lm",
           "optimizer": "cauchylift",
-          "lr": 0.03,
+          "lr": 0.01,
           "seed": 44,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.014533996582031,
-          "final_val_loss": 7.939227104187012,
-          "best_val_loss": 7.939227104187012,
+          "final_loss": 7.22852897644043,
+          "final_val_loss": 7.029429340362549,
+          "best_val_loss": 7.029429340362549,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.40718009998272464,
-          "mean_step_time_ms": 10.429116200039061,
-          "total_wall_time_sec": 1.7355117219999556
+          "mean_opt_time_ms": 0.41379561995199765,
+          "mean_step_time_ms": 11.017846060030934,
+          "total_wall_time_sec": 1.822410538999975
         }
       ],
       "adamw": [
@@ -2697,9 +2697,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.33703220997722383,
-          "mean_step_time_ms": 10.27953414998592,
-          "total_wall_time_sec": 1.7210482079999565
+          "mean_opt_time_ms": 0.32881147002626676,
+          "mean_step_time_ms": 10.147123570077383,
+          "total_wall_time_sec": 1.7040805320002619
         },
         {
           "run_id": "conf_small_decoder_lm_adamw_lr0.003_s43",
@@ -2721,9 +2721,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.34055551001983986,
-          "mean_step_time_ms": 10.569864579979367,
-          "total_wall_time_sec": 1.753332207999847
+          "mean_opt_time_ms": 0.33439116006775293,
+          "mean_step_time_ms": 10.660005370018553,
+          "total_wall_time_sec": 1.7801811819999784
         },
         {
           "run_id": "conf_small_decoder_lm_adamw_lr0.003_s44",
@@ -2745,9 +2745,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 0.3357011000161947,
-          "mean_step_time_ms": 10.347369109967985,
-          "total_wall_time_sec": 1.7245221369998944
+          "mean_opt_time_ms": 0.3318577100526454,
+          "mean_step_time_ms": 10.338549240004795,
+          "total_wall_time_sec": 1.7293802730000607
         }
       ],
       "muon": [
@@ -2771,9 +2771,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.29690273002052,
-          "mean_step_time_ms": 24.317939709999337,
-          "total_wall_time_sec": 3.1233409989999927
+          "mean_opt_time_ms": 14.135277609957484,
+          "mean_step_time_ms": 24.19054479006263,
+          "total_wall_time_sec": 3.1083850169998186
         },
         {
           "run_id": "conf_small_decoder_lm_muon_lr0.03_s43",
@@ -2795,9 +2795,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.408571849976397,
-          "mean_step_time_ms": 24.534757100000206,
-          "total_wall_time_sec": 3.150199948000136
+          "mean_opt_time_ms": 14.236983290074932,
+          "mean_step_time_ms": 24.10046593993684,
+          "total_wall_time_sec": 3.098720123000021
         },
         {
           "run_id": "conf_small_decoder_lm_muon_lr0.03_s44",
@@ -2819,9 +2819,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 14.472715369979596,
-          "mean_step_time_ms": 24.619541209999625,
-          "total_wall_time_sec": 3.1590150309998535
+          "mean_opt_time_ms": 14.11835515002167,
+          "mean_step_time_ms": 23.898059640032443,
+          "total_wall_time_sec": 3.079773491999731
         }
       ],
       "soap": [
@@ -2845,9 +2845,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 27.222833699997864,
-          "mean_step_time_ms": 37.31249708001087,
-          "total_wall_time_sec": 4.427537252000093
+          "mean_opt_time_ms": 27.09694660002242,
+          "mean_step_time_ms": 36.97965429002579,
+          "total_wall_time_sec": 4.388923675000115
         },
         {
           "run_id": "conf_small_decoder_lm_soap_lr0.003_s43",
@@ -2869,9 +2869,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 27.33859060001123,
-          "mean_step_time_ms": 37.663280609999674,
-          "total_wall_time_sec": 4.466645789999802
+          "mean_opt_time_ms": 27.059368540012656,
+          "mean_step_time_ms": 36.932024860007004,
+          "total_wall_time_sec": 4.384780431000763
         },
         {
           "run_id": "conf_small_decoder_lm_soap_lr0.003_s44",
@@ -2893,9 +2893,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 27.28481539999848,
-          "mean_step_time_ms": 37.34065841997108,
-          "total_wall_time_sec": 4.428081892000137
+          "mean_opt_time_ms": 27.193528510033502,
+          "mean_step_time_ms": 37.142947060028746,
+          "total_wall_time_sec": 4.405835200000183
         }
       ],
       "sinkgd": [
@@ -2919,9 +2919,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.9021618900023896,
-          "mean_step_time_ms": 17.187084779989164,
-          "total_wall_time_sec": 2.4178125240000554
+          "mean_opt_time_ms": 6.712343650042385,
+          "mean_step_time_ms": 16.615712319990052,
+          "total_wall_time_sec": 2.353382844999942
         },
         {
           "run_id": "conf_small_decoder_lm_sinkgd_lr0.03_s43",
@@ -2943,9 +2943,9 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.912684219978473,
-          "mean_step_time_ms": 17.11467365000317,
-          "total_wall_time_sec": 2.4141419419997874
+          "mean_opt_time_ms": 6.734420089997002,
+          "mean_step_time_ms": 16.662387029991805,
+          "total_wall_time_sec": 2.3573443510003926
         },
         {
           "run_id": "conf_small_decoder_lm_sinkgd_lr0.03_s44",
@@ -2967,83 +2967,83 @@
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 6.898399829979098,
-          "mean_step_time_ms": 17.195731200031332,
-          "total_wall_time_sec": 2.4184695210001337
+          "mean_opt_time_ms": 6.759661580035754,
+          "mean_step_time_ms": 16.66245837007409,
+          "total_wall_time_sec": 2.3590987340003267
         }
       ],
       "normalized_gd": [
         {
-          "run_id": "conf_small_decoder_lm_normalized_gd_lr0.03_s42",
+          "run_id": "conf_small_decoder_lm_normalized_gd_lr0.003_s42",
           "workload_id": "small_decoder_lm",
           "optimizer": "normalized_gd",
-          "lr": 0.03,
+          "lr": 0.003,
           "seed": 42,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.965281963348389,
-          "final_val_loss": 7.8705589294433596,
-          "best_val_loss": 7.8705589294433596,
+          "final_loss": 7.747271537780762,
+          "final_val_loss": 7.616898059844971,
+          "best_val_loss": 7.616898059844971,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.8764923799926692,
-          "mean_step_time_ms": 11.881310619996839,
-          "total_wall_time_sec": 1.878012692000084
+          "mean_opt_time_ms": 1.87067810006738,
+          "mean_step_time_ms": 11.593783370008168,
+          "total_wall_time_sec": 1.8394481420000375
         },
         {
-          "run_id": "conf_small_decoder_lm_normalized_gd_lr0.03_s43",
+          "run_id": "conf_small_decoder_lm_normalized_gd_lr0.003_s43",
           "workload_id": "small_decoder_lm",
           "optimizer": "normalized_gd",
-          "lr": 0.03,
+          "lr": 0.003,
           "seed": 43,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.930140495300293,
-          "final_val_loss": 7.815257263183594,
-          "best_val_loss": 7.815257263183594,
+          "final_loss": 7.739039421081543,
+          "final_val_loss": 7.594328784942627,
+          "best_val_loss": 7.594328784942627,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.8735236400289068,
-          "mean_step_time_ms": 12.033425079998779,
-          "total_wall_time_sec": 1.9022555540000212
+          "mean_opt_time_ms": 1.88621215999774,
+          "mean_step_time_ms": 11.805943690014828,
+          "total_wall_time_sec": 1.8679949209999904
         },
         {
-          "run_id": "conf_small_decoder_lm_normalized_gd_lr0.03_s44",
+          "run_id": "conf_small_decoder_lm_normalized_gd_lr0.003_s44",
           "workload_id": "small_decoder_lm",
           "optimizer": "normalized_gd",
-          "lr": 0.03,
+          "lr": 0.003,
           "seed": 44,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.908503532409668,
-          "final_val_loss": 7.818589782714843,
-          "best_val_loss": 7.818589782714843,
+          "final_loss": 7.709630966186523,
+          "final_val_loss": 7.563578414916992,
+          "best_val_loss": 7.563578414916992,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 1.878606319969549,
-          "mean_step_time_ms": 12.092931730007876,
-          "total_wall_time_sec": 1.9054968030000055
+          "mean_opt_time_ms": 1.8770317300641182,
+          "mean_step_time_ms": 11.8313331400077,
+          "total_wall_time_sec": 1.8678372949998447
         }
       ],
       "sign_descent": [
@@ -3058,18 +3058,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.610879898071289,
-          "final_val_loss": 9.54579429626465,
-          "best_val_loss": 9.54579429626465,
+          "final_loss": 7.318955421447754,
+          "final_val_loss": 7.133370018005371,
+          "best_val_loss": 7.133370018005371,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.1048808100113092,
-          "mean_step_time_ms": 12.070277269999679,
-          "total_wall_time_sec": 1.8909266300001946
+          "mean_opt_time_ms": 2.124889290016654,
+          "mean_step_time_ms": 11.863946199919155,
+          "total_wall_time_sec": 1.8694881589999568
         },
         {
           "run_id": "conf_small_decoder_lm_sign_descent_lr0.03_s43",
@@ -3082,18 +3082,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.603700637817383,
-          "final_val_loss": 9.535887908935546,
-          "best_val_loss": 9.535887908935546,
+          "final_loss": 7.3054609298706055,
+          "final_val_loss": 7.115437126159668,
+          "best_val_loss": 7.115437126159668,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.147664120002446,
-          "mean_step_time_ms": 12.44648315001541,
-          "total_wall_time_sec": 1.936363627999981
+          "mean_opt_time_ms": 2.1464540800025134,
+          "mean_step_time_ms": 12.022963499994148,
+          "total_wall_time_sec": 1.887936781999997
         },
         {
           "run_id": "conf_small_decoder_lm_sign_descent_lr0.03_s44",
@@ -3106,18 +3106,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 9.638029098510742,
-          "final_val_loss": 9.571878051757812,
-          "best_val_loss": 9.571878051757812,
+          "final_loss": 7.300078868865967,
+          "final_val_loss": 7.114025211334228,
+          "best_val_loss": 7.114025211334228,
           "tokens_to_target": {
             "5.5": null,
             "5.0": null,
             "4.5": null,
             "4.0": null
           },
-          "mean_opt_time_ms": 2.162797380005941,
-          "mean_step_time_ms": 12.522947209977247,
-          "total_wall_time_sec": 1.954809529999693
+          "mean_opt_time_ms": 2.154730070005826,
+          "mean_step_time_ms": 12.08453678998012,
+          "total_wall_time_sec": 1.8933351589994345
         }
       ]
     },
@@ -3134,18 +3134,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.029117584228516,
-          "final_val_loss": 7.883807754516601,
-          "best_val_loss": 7.883807754516601,
+          "final_loss": 7.304013252258301,
+          "final_val_loss": 7.109697151184082,
+          "best_val_loss": 7.109697151184082,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.5722912100100075,
-          "mean_step_time_ms": 14.717280639997625,
-          "total_wall_time_sec": 2.4773315570000705
+          "mean_opt_time_ms": 0.5812554099975387,
+          "mean_step_time_ms": 14.040783760046907,
+          "total_wall_time_sec": 2.392998108000029
         },
         {
           "run_id": "conf_medium_decoder_lm_cauchylift_lr0.01_s43",
@@ -3158,18 +3158,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.114570617675781,
-          "final_val_loss": 8.030325508117675,
-          "best_val_loss": 8.030325508117675,
+          "final_loss": 7.279946327209473,
+          "final_val_loss": 7.08356294631958,
+          "best_val_loss": 7.08356294631958,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.5783375999772034,
-          "mean_step_time_ms": 14.786289320018113,
-          "total_wall_time_sec": 2.4908718369997587
+          "mean_opt_time_ms": 0.5901715600248281,
+          "mean_step_time_ms": 14.331053409960077,
+          "total_wall_time_sec": 2.4318457380004475
         },
         {
           "run_id": "conf_medium_decoder_lm_cauchylift_lr0.01_s44",
@@ -3182,18 +3182,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.019006729125977,
-          "final_val_loss": 7.886521434783935,
-          "best_val_loss": 7.886521434783935,
+          "final_loss": 7.307524681091309,
+          "final_val_loss": 7.104098606109619,
+          "best_val_loss": 7.104098606109619,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.5720113700226648,
-          "mean_step_time_ms": 14.738749729999654,
-          "total_wall_time_sec": 2.4881491190003544
+          "mean_opt_time_ms": 0.5892624600437557,
+          "mean_step_time_ms": 14.470577700012655,
+          "total_wall_time_sec": 2.440016908999496
         }
       ],
       "adamw": [
@@ -3217,9 +3217,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.46461144000204513,
-          "mean_step_time_ms": 14.52561675999732,
-          "total_wall_time_sec": 2.455963980999968
+          "mean_opt_time_ms": 0.4615336699407635,
+          "mean_step_time_ms": 14.05574961997445,
+          "total_wall_time_sec": 2.4022460220003268
         },
         {
           "run_id": "conf_medium_decoder_lm_adamw_lr0.001_s43",
@@ -3241,9 +3241,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.4664885099737148,
-          "mean_step_time_ms": 14.680552390022967,
-          "total_wall_time_sec": 2.4696560689999387
+          "mean_opt_time_ms": 0.46007496998754505,
+          "mean_step_time_ms": 14.41760906998752,
+          "total_wall_time_sec": 2.440999675999592
         },
         {
           "run_id": "conf_medium_decoder_lm_adamw_lr0.001_s44",
@@ -3265,9 +3265,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 0.46951997002452117,
-          "mean_step_time_ms": 14.818661479976072,
-          "total_wall_time_sec": 2.490272039000047
+          "mean_opt_time_ms": 0.46084774990958977,
+          "mean_step_time_ms": 14.266128940016642,
+          "total_wall_time_sec": 2.425918654999805
         }
       ],
       "muon": [
@@ -3291,9 +3291,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 21.49006628000734,
-          "mean_step_time_ms": 35.67752923998796,
-          "total_wall_time_sec": 4.5702352860002975
+          "mean_opt_time_ms": 21.352871330027483,
+          "mean_step_time_ms": 35.02290083000844,
+          "total_wall_time_sec": 4.5034187940000265
         },
         {
           "run_id": "conf_medium_decoder_lm_muon_lr0.03_s43",
@@ -3315,9 +3315,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 22.01748418000534,
-          "mean_step_time_ms": 36.35329954000554,
-          "total_wall_time_sec": 4.650270950000049
+          "mean_opt_time_ms": 21.525478260000455,
+          "mean_step_time_ms": 35.42033772994728,
+          "total_wall_time_sec": 4.545678810000027
         },
         {
           "run_id": "conf_medium_decoder_lm_muon_lr0.03_s44",
@@ -3339,9 +3339,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 21.897160480011735,
-          "mean_step_time_ms": 36.20796090996919,
-          "total_wall_time_sec": 4.635635965999882
+          "mean_opt_time_ms": 21.511764030010454,
+          "mean_step_time_ms": 35.445811270037666,
+          "total_wall_time_sec": 4.548331000999497
         }
       ],
       "soap": [
@@ -3365,9 +3365,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 82.61191729999155,
-          "mean_step_time_ms": 96.714544439983,
-          "total_wall_time_sec": 10.691906556000049
+          "mean_opt_time_ms": 82.59226302997376,
+          "mean_step_time_ms": 96.44644079997306,
+          "total_wall_time_sec": 10.651280039000085
         },
         {
           "run_id": "conf_medium_decoder_lm_soap_lr0.001_s43",
@@ -3389,9 +3389,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 83.12360333002744,
-          "mean_step_time_ms": 97.49932670002636,
-          "total_wall_time_sec": 10.767553166000198
+          "mean_opt_time_ms": 82.59386228000949,
+          "mean_step_time_ms": 96.34526091002044,
+          "total_wall_time_sec": 10.634977728000194
         },
         {
           "run_id": "conf_medium_decoder_lm_soap_lr0.001_s44",
@@ -3413,9 +3413,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 83.28175540002121,
-          "mean_step_time_ms": 97.96619284000371,
-          "total_wall_time_sec": 10.820256930000141
+          "mean_opt_time_ms": 82.56380105000062,
+          "mean_step_time_ms": 96.51840560000892,
+          "total_wall_time_sec": 10.655738191000637
         }
       ],
       "sinkgd": [
@@ -3439,9 +3439,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.299376769999071,
-          "mean_step_time_ms": 24.314825350029423,
-          "total_wall_time_sec": 3.4361572500001785
+          "mean_opt_time_ms": 10.212310829983835,
+          "mean_step_time_ms": 23.885441340007674,
+          "total_wall_time_sec": 3.39237522699932
         },
         {
           "run_id": "conf_medium_decoder_lm_sinkgd_lr0.03_s43",
@@ -3463,9 +3463,9 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.485866710023402,
-          "mean_step_time_ms": 24.95464142999026,
-          "total_wall_time_sec": 3.507939995000015
+          "mean_opt_time_ms": 10.280570800068745,
+          "mean_step_time_ms": 24.127587350021713,
+          "total_wall_time_sec": 3.4211937030004265
         },
         {
           "run_id": "conf_medium_decoder_lm_sinkgd_lr0.03_s44",
@@ -3487,83 +3487,83 @@
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 10.401625900003637,
-          "mean_step_time_ms": 24.93008115999146,
-          "total_wall_time_sec": 3.5039126159999796
+          "mean_opt_time_ms": 10.244624829983877,
+          "mean_step_time_ms": 24.138344020020668,
+          "total_wall_time_sec": 3.414751253000759
         }
       ],
       "normalized_gd": [
         {
-          "run_id": "conf_medium_decoder_lm_normalized_gd_lr0.03_s42",
+          "run_id": "conf_medium_decoder_lm_normalized_gd_lr0.003_s42",
           "workload_id": "medium_decoder_lm",
           "optimizer": "normalized_gd",
-          "lr": 0.03,
+          "lr": 0.003,
           "seed": 42,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.883619785308838,
-          "final_val_loss": 7.763652229309082,
-          "best_val_loss": 7.763652229309082,
+          "final_loss": 7.809260845184326,
+          "final_val_loss": 7.682880306243897,
+          "best_val_loss": 7.682880306243897,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.8609163799819726,
-          "mean_step_time_ms": 17.019958359992415,
-          "total_wall_time_sec": 2.7030296379998617
+          "mean_opt_time_ms": 2.913024579966077,
+          "mean_step_time_ms": 16.474335439997958,
+          "total_wall_time_sec": 2.6395812970004044
         },
         {
-          "run_id": "conf_medium_decoder_lm_normalized_gd_lr0.03_s43",
+          "run_id": "conf_medium_decoder_lm_normalized_gd_lr0.003_s43",
           "workload_id": "medium_decoder_lm",
           "optimizer": "normalized_gd",
-          "lr": 0.03,
+          "lr": 0.003,
           "seed": 43,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.8836493492126465,
-          "final_val_loss": 7.778671836853027,
-          "best_val_loss": 7.778671836853027,
+          "final_loss": 7.789694786071777,
+          "final_val_loss": 7.665643787384033,
+          "best_val_loss": 7.665643787384033,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.885247909980535,
-          "mean_step_time_ms": 17.082501130039418,
-          "total_wall_time_sec": 2.7093136480002613
+          "mean_opt_time_ms": 2.8975332600748516,
+          "mean_step_time_ms": 16.592614160017547,
+          "total_wall_time_sec": 2.651949338999657
         },
         {
-          "run_id": "conf_medium_decoder_lm_normalized_gd_lr0.03_s44",
+          "run_id": "conf_medium_decoder_lm_normalized_gd_lr0.003_s44",
           "workload_id": "medium_decoder_lm",
           "optimizer": "normalized_gd",
-          "lr": 0.03,
+          "lr": 0.003,
           "seed": 44,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 7.88633394241333,
-          "final_val_loss": 7.787931728363037,
-          "best_val_loss": 7.787931728363037,
+          "final_loss": 7.746822357177734,
+          "final_val_loss": 7.616579341888428,
+          "best_val_loss": 7.616579341888428,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 2.86792448001961,
-          "mean_step_time_ms": 17.144950050010266,
-          "total_wall_time_sec": 2.718107150000378
+          "mean_opt_time_ms": 2.9165696300151467,
+          "mean_step_time_ms": 16.689426260008986,
+          "total_wall_time_sec": 2.6664342530002614
         }
       ],
       "sign_descent": [
@@ -3578,18 +3578,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.552913665771484,
-          "final_val_loss": 8.420570755004883,
-          "best_val_loss": 8.420570755004883,
+          "final_loss": 7.3086347579956055,
+          "final_val_loss": 7.109816360473633,
+          "best_val_loss": 7.109816360473633,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.261964329985858,
-          "mean_step_time_ms": 17.451798879992566,
-          "total_wall_time_sec": 2.7569971100001567
+          "mean_opt_time_ms": 3.2701755000380217,
+          "mean_step_time_ms": 16.910404680029387,
+          "total_wall_time_sec": 2.68449243699979
         },
         {
           "run_id": "conf_medium_decoder_lm_sign_descent_lr0.03_s43",
@@ -3602,18 +3602,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.532185554504395,
-          "final_val_loss": 8.420548820495606,
-          "best_val_loss": 8.420548820495606,
+          "final_loss": 7.328921318054199,
+          "final_val_loss": 7.150339126586914,
+          "best_val_loss": 7.150339126586914,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.2246984300354598,
-          "mean_step_time_ms": 17.241310939984942,
-          "total_wall_time_sec": 2.7220983419997538
+          "mean_opt_time_ms": 3.293576380046943,
+          "mean_step_time_ms": 17.962490989975777,
+          "total_wall_time_sec": 2.8013558290003857
         },
         {
           "run_id": "conf_medium_decoder_lm_sign_descent_lr0.03_s44",
@@ -3626,18 +3626,18 @@
           "steps_completed": 100,
           "total_progress": 204800,
           "metric_unit": "tokens",
-          "final_loss": 8.555246353149414,
-          "final_val_loss": 8.418240356445313,
-          "best_val_loss": 8.418240356445313,
+          "final_loss": 7.314962387084961,
+          "final_val_loss": 7.10146541595459,
+          "best_val_loss": 7.10146541595459,
           "tokens_to_target": {
             "5.0": null,
             "4.5": null,
             "4.0": null,
             "3.8": null
           },
-          "mean_opt_time_ms": 3.2597826999881363,
-          "mean_step_time_ms": 17.540991260007104,
-          "total_wall_time_sec": 2.7633999380000205
+          "mean_opt_time_ms": 3.3337956499781285,
+          "mean_step_time_ms": 18.438333269996292,
+          "total_wall_time_sec": 2.8758295910001834
         }
       ]
     },
@@ -3654,18 +3654,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0828516483306885,
-          "final_val_loss": 1.9243797063827515,
-          "best_val_loss": 1.9243797063827515,
+          "final_loss": 2.060692548751831,
+          "final_val_loss": 1.8976448774337769,
+          "best_val_loss": 1.8976448774337769,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.29059479998522875,
-          "mean_step_time_ms": 36.66798008001024,
-          "total_wall_time_sec": 5.560464150000371
+          "mean_opt_time_ms": 0.2887417199326592,
+          "mean_step_time_ms": 36.61330288001409,
+          "total_wall_time_sec": 5.534918725000352
         },
         {
           "run_id": "conf_small_vit_cauchylift_lr0.003_s43",
@@ -3678,18 +3678,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 1.9668854475021362,
-          "final_val_loss": 1.9750760555267335,
-          "best_val_loss": 1.948527956008911,
+          "final_loss": 1.9428439140319824,
+          "final_val_loss": 1.9401201248168944,
+          "best_val_loss": 1.9268271207809449,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 3840,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.29222215998743195,
-          "mean_step_time_ms": 35.866072039993924,
-          "total_wall_time_sec": 5.1546913099996345
+          "mean_opt_time_ms": 0.2949430200169445,
+          "mean_step_time_ms": 37.28783100996225,
+          "total_wall_time_sec": 5.575542867999502
         },
         {
           "run_id": "conf_small_vit_cauchylift_lr0.003_s44",
@@ -3702,18 +3702,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0353617668151855,
-          "final_val_loss": 1.928927206993103,
-          "best_val_loss": 1.928927206993103,
+          "final_loss": 2.0247726440429688,
+          "final_val_loss": 1.8943912744522096,
+          "best_val_loss": 1.8943912744522096,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 4480,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.2921663600091051,
-          "mean_step_time_ms": 36.29326504000346,
-          "total_wall_time_sec": 5.3677245519998
+          "mean_opt_time_ms": 0.28746840002895624,
+          "mean_step_time_ms": 35.879583029927744,
+          "total_wall_time_sec": 5.348842242000501
         }
       ],
       "adamw": [
@@ -3737,9 +3737,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.2512570899671118,
-          "mean_step_time_ms": 36.35539958000663,
-          "total_wall_time_sec": 5.40585731200008
+          "mean_opt_time_ms": 0.24704693996682184,
+          "mean_step_time_ms": 35.811476850012696,
+          "total_wall_time_sec": 5.349925020999763
         },
         {
           "run_id": "conf_small_vit_adamw_lr0.001_s43",
@@ -3761,9 +3761,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.25200265000421496,
-          "mean_step_time_ms": 36.00815545999012,
-          "total_wall_time_sec": 5.318334417000187
+          "mean_opt_time_ms": 0.2467885199621378,
+          "mean_step_time_ms": 34.085872619980364,
+          "total_wall_time_sec": 5.094087714000125
         },
         {
           "run_id": "conf_small_vit_adamw_lr0.001_s44",
@@ -3785,9 +3785,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 0.25111599999036116,
-          "mean_step_time_ms": 34.33861757998784,
-          "total_wall_time_sec": 5.12678638899979
+          "mean_opt_time_ms": 0.24755818999437906,
+          "mean_step_time_ms": 33.93469773001925,
+          "total_wall_time_sec": 4.900115693999396
         }
       ],
       "muon": [
@@ -3811,9 +3811,9 @@
             "1.8": 4480,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.349458270011382,
-          "mean_step_time_ms": 47.12664165003389,
-          "total_wall_time_sec": 6.581502022999757
+          "mean_opt_time_ms": 10.674939379978241,
+          "mean_step_time_ms": 47.26973728003941,
+          "total_wall_time_sec": 6.614898808999897
         },
         {
           "run_id": "conf_small_vit_muon_lr0.03_s43",
@@ -3835,9 +3835,9 @@
             "1.8": 3840,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.388758679987404,
-          "mean_step_time_ms": 46.87297691999902,
-          "total_wall_time_sec": 6.552093257999786
+          "mean_opt_time_ms": 10.313361000035002,
+          "mean_step_time_ms": 47.21297663995756,
+          "total_wall_time_sec": 6.583182327000031
         },
         {
           "run_id": "conf_small_vit_muon_lr0.03_s44",
@@ -3859,9 +3859,9 @@
             "1.8": 4480,
             "1.6": null
           },
-          "mean_opt_time_ms": 10.379068900015227,
-          "mean_step_time_ms": 46.81158867000704,
-          "total_wall_time_sec": 6.568611423999755
+          "mean_opt_time_ms": 10.228953709984125,
+          "mean_step_time_ms": 46.81735172996923,
+          "total_wall_time_sec": 6.551486961000592
         }
       ],
       "soap": [
@@ -3885,9 +3885,9 @@
             "1.8": 6400,
             "1.6": null
           },
-          "mean_opt_time_ms": 20.804256699998405,
-          "mean_step_time_ms": 57.28672351000114,
-          "total_wall_time_sec": 7.613290694999705
+          "mean_opt_time_ms": 20.72350500991888,
+          "mean_step_time_ms": 57.03541585004132,
+          "total_wall_time_sec": 7.562565974999416
         },
         {
           "run_id": "conf_small_vit_soap_lr0.003_s43",
@@ -3909,9 +3909,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 20.85713772001327,
-          "mean_step_time_ms": 57.59158466001736,
-          "total_wall_time_sec": 7.645289694999974
+          "mean_opt_time_ms": 20.774852660033503,
+          "mean_step_time_ms": 57.15954056002374,
+          "total_wall_time_sec": 7.582564059000106
         },
         {
           "run_id": "conf_small_vit_soap_lr0.003_s44",
@@ -3933,9 +3933,9 @@
             "1.8": 4480,
             "1.6": null
           },
-          "mean_opt_time_ms": 20.922542769990287,
-          "mean_step_time_ms": 57.612823059944276,
-          "total_wall_time_sec": 7.652572501999657
+          "mean_opt_time_ms": 20.940738800063627,
+          "mean_step_time_ms": 56.912907480018475,
+          "total_wall_time_sec": 7.447464845000468
         }
       ],
       "sinkgd": [
@@ -3959,9 +3959,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.581394019992331,
-          "mean_step_time_ms": 40.9639898399746,
-          "total_wall_time_sec": 5.9664928980000695
+          "mean_opt_time_ms": 4.636579780044485,
+          "mean_step_time_ms": 41.23032926997439,
+          "total_wall_time_sec": 5.989019916999496
         },
         {
           "run_id": "conf_small_vit_sinkgd_lr0.01_s43",
@@ -3983,9 +3983,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.63587490000009,
-          "mean_step_time_ms": 41.507283219984856,
-          "total_wall_time_sec": 6.0259814430000915
+          "mean_opt_time_ms": 4.620151739973153,
+          "mean_step_time_ms": 40.93989775008595,
+          "total_wall_time_sec": 5.971121562999542
         },
         {
           "run_id": "conf_small_vit_sinkgd_lr0.01_s44",
@@ -4007,9 +4007,9 @@
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 4.652577899996686,
-          "mean_step_time_ms": 41.8816519100028,
-          "total_wall_time_sec": 6.038847609000186
+          "mean_opt_time_ms": 4.60565880998729,
+          "mean_step_time_ms": 41.488952169993354,
+          "total_wall_time_sec": 6.071641766999164
         }
       ],
       "normalized_gd": [
@@ -4024,18 +4024,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0827488899230957,
-          "final_val_loss": 1.9243337631225585,
-          "best_val_loss": 1.9243337631225585,
+          "final_loss": 2.063014030456543,
+          "final_val_loss": 1.90421781539917,
+          "best_val_loss": 1.90421781539917,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.4279546800025855,
-          "mean_step_time_ms": 37.05369997001526,
-          "total_wall_time_sec": 5.485950866000167
+          "mean_opt_time_ms": 1.471972130029826,
+          "mean_step_time_ms": 37.86005476002174,
+          "total_wall_time_sec": 5.5870667059998596
         },
         {
           "run_id": "conf_small_vit_normalized_gd_lr0.003_s43",
@@ -4048,18 +4048,18 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 1.9668560028076172,
-          "final_val_loss": 1.975134253501892,
-          "best_val_loss": 1.9486988306045532,
+          "final_loss": 1.9516668319702148,
+          "final_val_loss": 1.9538557529449463,
+          "best_val_loss": 1.9359754085540772,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 3840,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.425983820017791,
-          "mean_step_time_ms": 38.290985399999045,
-          "total_wall_time_sec": 5.701069233999988
+          "mean_opt_time_ms": 1.4533202700658876,
+          "mean_step_time_ms": 37.387675580012,
+          "total_wall_time_sec": 5.521228919999885
         },
         {
           "run_id": "conf_small_vit_normalized_gd_lr0.003_s44",
@@ -4072,92 +4072,92 @@
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0355734825134277,
-          "final_val_loss": 1.9287754774093628,
-          "best_val_loss": 1.9287754774093628,
+          "final_loss": 2.02554988861084,
+          "final_val_loss": 1.9026848316192626,
+          "best_val_loss": 1.9026848316192626,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 4480,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.4214254400349091,
-          "mean_step_time_ms": 38.04637116998947,
-          "total_wall_time_sec": 5.687306751000051
+          "mean_opt_time_ms": 1.4494588799789199,
+          "mean_step_time_ms": 36.47930663993975,
+          "total_wall_time_sec": 5.2008408459996645
         }
       ],
       "sign_descent": [
         {
-          "run_id": "conf_small_vit_sign_descent_lr0.01_s42",
+          "run_id": "conf_small_vit_sign_descent_lr0.003_s42",
           "workload_id": "small_vit",
           "optimizer": "sign_descent",
-          "lr": 0.01,
+          "lr": 0.003,
           "seed": 42,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.051819324493408,
-          "final_val_loss": 1.8842689990997314,
-          "best_val_loss": 1.8842689990997314,
+          "final_loss": 2.0592398643493652,
+          "final_val_loss": 1.8909268856048584,
+          "best_val_loss": 1.8909268856048584,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 1920,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.6463829599979363,
-          "mean_step_time_ms": 36.2962292200109,
-          "total_wall_time_sec": 5.0206661419997545
+          "mean_opt_time_ms": 1.660639390029246,
+          "mean_step_time_ms": 35.496973300023456,
+          "total_wall_time_sec": 5.349862871000369
         },
         {
-          "run_id": "conf_small_vit_sign_descent_lr0.01_s43",
+          "run_id": "conf_small_vit_sign_descent_lr0.003_s43",
           "workload_id": "small_vit",
           "optimizer": "sign_descent",
-          "lr": 0.01,
+          "lr": 0.003,
           "seed": 43,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 1.9132732152938843,
-          "final_val_loss": 1.9308578014373778,
-          "best_val_loss": 1.930240535736084,
+          "final_loss": 1.9365355968475342,
+          "final_val_loss": 1.9364701986312867,
+          "best_val_loss": 1.9236321449279785,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 3840,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.6291805700029727,
-          "mean_step_time_ms": 38.58780558999115,
-          "total_wall_time_sec": 5.727533501999915
+          "mean_opt_time_ms": 1.6409924799972941,
+          "mean_step_time_ms": 36.64709018004032,
+          "total_wall_time_sec": 5.360714892000033
         },
         {
-          "run_id": "conf_small_vit_sign_descent_lr0.01_s44",
+          "run_id": "conf_small_vit_sign_descent_lr0.003_s44",
           "workload_id": "small_vit",
           "optimizer": "sign_descent",
-          "lr": 0.01,
+          "lr": 0.003,
           "seed": 44,
           "status": "SUCCESS",
           "failure_reason": null,
           "steps_completed": 100,
           "total_progress": 6400,
           "metric_unit": "examples",
-          "final_loss": 2.0162997245788574,
-          "final_val_loss": 1.8951412200927735,
-          "best_val_loss": 1.8951412200927735,
+          "final_loss": 2.018191337585449,
+          "final_val_loss": 1.8826986074447631,
+          "best_val_loss": 1.8826986074447631,
           "tokens_to_target": {
             "2.2": 640,
             "2.0": 4480,
             "1.8": null,
             "1.6": null
           },
-          "mean_opt_time_ms": 1.6350253100245027,
-          "mean_step_time_ms": 38.13293114001681,
-          "total_wall_time_sec": 5.698598437000328
+          "mean_opt_time_ms": 1.6554988600182696,
+          "mean_step_time_ms": 37.442000669971094,
+          "total_wall_time_sec": 5.3916627609996794
         }
       ]
     }
@@ -4165,76 +4165,76 @@
   "heldout_results": {
     "cauchylift": [
       {
-        "run_id": "heldout_conv_ssm_cauchylift_lr0.03_s42",
+        "run_id": "heldout_conv_ssm_cauchylift_lr0.01_s42",
         "workload_id": "conv_ssm_heldout",
         "optimizer": "cauchylift",
-        "lr": 0.03,
+        "lr": 0.01,
         "seed": 42,
         "status": "SUCCESS",
         "failure_reason": null,
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 8.065431594848633,
-        "final_val_loss": 8.160570907592774,
-        "best_val_loss": 8.160570907592774,
+        "final_loss": 7.5364532470703125,
+        "final_val_loss": 7.692905044555664,
+        "best_val_loss": 7.692905044555664,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 0.3974298599860049,
-        "mean_step_time_ms": 27.7228716800073,
-        "total_wall_time_sec": 3.4105287019997377
+        "mean_opt_time_ms": 0.3939657299360988,
+        "mean_step_time_ms": 27.037331789997552,
+        "total_wall_time_sec": 3.3381565570007297
       },
       {
-        "run_id": "heldout_conv_ssm_cauchylift_lr0.03_s43",
+        "run_id": "heldout_conv_ssm_cauchylift_lr0.01_s43",
         "workload_id": "conv_ssm_heldout",
         "optimizer": "cauchylift",
-        "lr": 0.03,
+        "lr": 0.01,
         "seed": 43,
         "status": "SUCCESS",
         "failure_reason": null,
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.9687299728393555,
-        "final_val_loss": 8.098541641235352,
-        "best_val_loss": 8.098541641235352,
+        "final_loss": 7.529513359069824,
+        "final_val_loss": 7.6944074630737305,
+        "best_val_loss": 7.6944074630737305,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 0.3943807400219157,
-        "mean_step_time_ms": 8.936076710010639,
-        "total_wall_time_sec": 1.5334327450000274
+        "mean_opt_time_ms": 0.3962754799522372,
+        "mean_step_time_ms": 8.689120139970328,
+        "total_wall_time_sec": 1.5083767030000672
       },
       {
-        "run_id": "heldout_conv_ssm_cauchylift_lr0.03_s44",
+        "run_id": "heldout_conv_ssm_cauchylift_lr0.01_s44",
         "workload_id": "conv_ssm_heldout",
         "optimizer": "cauchylift",
-        "lr": 0.03,
+        "lr": 0.01,
         "seed": 44,
         "status": "SUCCESS",
         "failure_reason": null,
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 8.061156272888184,
-        "final_val_loss": 8.09701910018921,
-        "best_val_loss": 8.09701910018921,
+        "final_loss": 7.52642297744751,
+        "final_val_loss": 7.69056978225708,
+        "best_val_loss": 7.69056978225708,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 0.38693221001267375,
-        "mean_step_time_ms": 8.850682979982594,
-        "total_wall_time_sec": 1.5236846140001035
+        "mean_opt_time_ms": 0.4053294199547963,
+        "mean_step_time_ms": 8.894059500016738,
+        "total_wall_time_sec": 1.5353518860001714
       }
     ],
     "adamw": [
@@ -4249,18 +4249,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.616037368774414,
-        "final_val_loss": 7.574476623535157,
-        "best_val_loss": 7.574476623535157,
+        "final_loss": 7.6516618728637695,
+        "final_val_loss": 7.585520267486572,
+        "best_val_loss": 7.585520267486572,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 0.3124527199770455,
-        "mean_step_time_ms": 8.865367099997457,
-        "total_wall_time_sec": 1.536429028999919
+        "mean_opt_time_ms": 0.317170270054703,
+        "mean_step_time_ms": 9.529223009967609,
+        "total_wall_time_sec": 1.6063213339994036
       },
       {
         "run_id": "heldout_conv_ssm_adamw_lr0.003_s43",
@@ -4273,18 +4273,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.6285905838012695,
-        "final_val_loss": 7.586134719848633,
-        "best_val_loss": 7.586134719848633,
+        "final_loss": 7.66063117980957,
+        "final_val_loss": 7.588566780090332,
+        "best_val_loss": 7.588566780090332,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 0.31117944997276936,
-        "mean_step_time_ms": 8.835425609986487,
-        "total_wall_time_sec": 1.5280544649999683
+        "mean_opt_time_ms": 0.31287838999560336,
+        "mean_step_time_ms": 8.930681110023215,
+        "total_wall_time_sec": 1.5464014979997955
       },
       {
         "run_id": "heldout_conv_ssm_adamw_lr0.003_s44",
@@ -4297,18 +4297,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.641082763671875,
-        "final_val_loss": 7.595194149017334,
-        "best_val_loss": 7.595194149017334,
+        "final_loss": 7.641801834106445,
+        "final_val_loss": 7.581154918670654,
+        "best_val_loss": 7.581154918670654,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 0.3161944999874322,
-        "mean_step_time_ms": 8.967881819989998,
-        "total_wall_time_sec": 1.5501596669996616
+        "mean_opt_time_ms": 0.3123616100219806,
+        "mean_step_time_ms": 9.120342940004775,
+        "total_wall_time_sec": 1.5615153349999673
       }
     ],
     "muon": [
@@ -4323,18 +4323,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.559494972229004,
-        "final_val_loss": 7.571103191375732,
-        "best_val_loss": 7.571103191375732,
+        "final_loss": 7.848812580108643,
+        "final_val_loss": 7.658704566955566,
+        "best_val_loss": 7.605502128601074,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 12.816817439984334,
-        "mean_step_time_ms": 21.567916430026344,
-        "total_wall_time_sec": 2.803217309000047
+        "mean_opt_time_ms": 12.871764119990985,
+        "mean_step_time_ms": 21.72147916007816,
+        "total_wall_time_sec": 2.820815531000335
       },
       {
         "run_id": "heldout_conv_ssm_muon_lr0.03_s43",
@@ -4347,18 +4347,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.564723014831543,
-        "final_val_loss": 7.575178813934326,
-        "best_val_loss": 7.575178813934326,
+        "final_loss": 7.574163436889648,
+        "final_val_loss": 7.563316726684571,
+        "best_val_loss": 7.563316726684571,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 12.76081232001161,
-        "mean_step_time_ms": 21.62380336998922,
-        "total_wall_time_sec": 2.8107888039999125
+        "mean_opt_time_ms": 12.562055309954303,
+        "mean_step_time_ms": 21.072817919985027,
+        "total_wall_time_sec": 2.749613181999848
       },
       {
         "run_id": "heldout_conv_ssm_muon_lr0.03_s44",
@@ -4371,18 +4371,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.573285102844238,
-        "final_val_loss": 7.573539352416992,
-        "best_val_loss": 7.573539352416992,
+        "final_loss": 7.569003582000732,
+        "final_val_loss": 7.57251672744751,
+        "best_val_loss": 7.57251672744751,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 12.741699779994633,
-        "mean_step_time_ms": 21.454753320017517,
-        "total_wall_time_sec": 2.7906809979999707
+        "mean_opt_time_ms": 12.710339409950393,
+        "mean_step_time_ms": 21.312185059932744,
+        "total_wall_time_sec": 2.7748275029998695
       }
     ],
     "soap": [
@@ -4397,18 +4397,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.627142429351807,
-        "final_val_loss": 7.57943058013916,
-        "best_val_loss": 7.57943058013916,
+        "final_loss": 7.654849052429199,
+        "final_val_loss": 7.609344005584717,
+        "best_val_loss": 7.609344005584717,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 19.95744873996955,
-        "mean_step_time_ms": 28.90958602995852,
-        "total_wall_time_sec": 3.5447586010000123
+        "mean_opt_time_ms": 19.759738519987877,
+        "mean_step_time_ms": 28.270184730035908,
+        "total_wall_time_sec": 3.4705023540000184
       },
       {
         "run_id": "heldout_conv_ssm_soap_lr0.003_s43",
@@ -4421,18 +4421,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.635540008544922,
-        "final_val_loss": 7.583045291900635,
-        "best_val_loss": 7.583045291900635,
+        "final_loss": 7.616826057434082,
+        "final_val_loss": 7.567331123352051,
+        "best_val_loss": 7.567331123352051,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 19.96357572001216,
-        "mean_step_time_ms": 28.752551620000304,
-        "total_wall_time_sec": 3.525774525000088
+        "mean_opt_time_ms": 19.683944770040398,
+        "mean_step_time_ms": 28.13683486005175,
+        "total_wall_time_sec": 3.455842649999795
       },
       {
         "run_id": "heldout_conv_ssm_soap_lr0.003_s44",
@@ -4445,18 +4445,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.633162498474121,
-        "final_val_loss": 7.581835651397705,
-        "best_val_loss": 7.581835651397705,
+        "final_loss": 7.626651763916016,
+        "final_val_loss": 7.577255916595459,
+        "best_val_loss": 7.577255916595459,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 19.958109699978195,
-        "mean_step_time_ms": 28.85397113000181,
-        "total_wall_time_sec": 3.5372589160001553
+        "mean_opt_time_ms": 19.64961459000733,
+        "mean_step_time_ms": 28.016062679998868,
+        "total_wall_time_sec": 3.440893462000531
       }
     ],
     "sinkgd": [
@@ -4471,18 +4471,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 9.897329330444336,
-        "final_val_loss": 9.878511428833008,
-        "best_val_loss": 9.878511428833008,
+        "final_loss": 9.870128631591797,
+        "final_val_loss": 9.84638843536377,
+        "best_val_loss": 9.84638843536377,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 6.951657730023726,
-        "mean_step_time_ms": 15.765002790021754,
-        "total_wall_time_sec": 2.2251986090000173
+        "mean_opt_time_ms": 6.645491620001849,
+        "mean_step_time_ms": 15.056671050042496,
+        "total_wall_time_sec": 2.142588996000086
       },
       {
         "run_id": "heldout_conv_ssm_sinkgd_lr0.03_s43",
@@ -4495,18 +4495,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 9.827129364013672,
-        "final_val_loss": 9.833670806884765,
-        "best_val_loss": 9.833670806884765,
+        "final_loss": 9.833710670471191,
+        "final_val_loss": 9.841054344177246,
+        "best_val_loss": 9.841054344177246,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 6.922576409988324,
-        "mean_step_time_ms": 15.85935359004452,
-        "total_wall_time_sec": 2.2363883480002187
+        "mean_opt_time_ms": 6.676663899979758,
+        "mean_step_time_ms": 15.16014701000131,
+        "total_wall_time_sec": 2.1545708520006883
       },
       {
         "run_id": "heldout_conv_ssm_sinkgd_lr0.03_s44",
@@ -4519,92 +4519,92 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 9.798906326293945,
-        "final_val_loss": 9.795832443237305,
-        "best_val_loss": 9.795832443237305,
+        "final_loss": 9.79252815246582,
+        "final_val_loss": 9.793486404418946,
+        "best_val_loss": 9.793486404418946,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 6.859949209988372,
-        "mean_step_time_ms": 15.621408960000736,
-        "total_wall_time_sec": 2.208108675999938
+        "mean_opt_time_ms": 6.71454475002065,
+        "mean_step_time_ms": 15.336249749962008,
+        "total_wall_time_sec": 2.175846017999902
       }
     ],
     "normalized_gd": [
       {
-        "run_id": "heldout_conv_ssm_normalized_gd_lr0.03_s42",
+        "run_id": "heldout_conv_ssm_normalized_gd_lr0.003_s42",
         "workload_id": "conv_ssm_heldout",
         "optimizer": "normalized_gd",
-        "lr": 0.03,
+        "lr": 0.003,
         "seed": 42,
         "status": "SUCCESS",
         "failure_reason": null,
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.970660209655762,
-        "final_val_loss": 8.078269577026367,
-        "best_val_loss": 8.078269577026367,
+        "final_loss": 7.738456726074219,
+        "final_val_loss": 7.841727447509766,
+        "best_val_loss": 7.841727447509766,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 1.8813437899962082,
-        "mean_step_time_ms": 10.577899529994284,
-        "total_wall_time_sec": 1.697352783000042
+        "mean_opt_time_ms": 1.886396789986975,
+        "mean_step_time_ms": 10.301186939977924,
+        "total_wall_time_sec": 1.6638392920003753
       },
       {
-        "run_id": "heldout_conv_ssm_normalized_gd_lr0.03_s43",
+        "run_id": "heldout_conv_ssm_normalized_gd_lr0.003_s43",
         "workload_id": "conv_ssm_heldout",
         "optimizer": "normalized_gd",
-        "lr": 0.03,
+        "lr": 0.003,
         "seed": 43,
         "status": "SUCCESS",
         "failure_reason": null,
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.990703582763672,
-        "final_val_loss": 12.576982688903808,
-        "best_val_loss": 8.227330017089844,
+        "final_loss": 7.8235087394714355,
+        "final_val_loss": 7.956458663940429,
+        "best_val_loss": 7.956458663940429,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 1.8818683700010297,
-        "mean_step_time_ms": 10.62035062997893,
-        "total_wall_time_sec": 1.7044116729998677
+        "mean_opt_time_ms": 1.8963035899651004,
+        "mean_step_time_ms": 10.383179729988115,
+        "total_wall_time_sec": 1.6788630680002825
       },
       {
-        "run_id": "heldout_conv_ssm_normalized_gd_lr0.03_s44",
+        "run_id": "heldout_conv_ssm_normalized_gd_lr0.003_s44",
         "workload_id": "conv_ssm_heldout",
         "optimizer": "normalized_gd",
-        "lr": 0.03,
+        "lr": 0.003,
         "seed": 44,
         "status": "SUCCESS",
         "failure_reason": null,
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 7.978769302368164,
-        "final_val_loss": 8.08222074508667,
-        "best_val_loss": 8.08222074508667,
+        "final_loss": 7.828219413757324,
+        "final_val_loss": 7.961842727661133,
+        "best_val_loss": 7.961842727661133,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 1.8758466600093016,
-        "mean_step_time_ms": 10.499278350002896,
-        "total_wall_time_sec": 1.6882490269999835
+        "mean_opt_time_ms": 1.8899776600028417,
+        "mean_step_time_ms": 10.423025270019934,
+        "total_wall_time_sec": 1.677556118999746
       }
     ],
     "sign_descent": [
@@ -4619,18 +4619,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 9.823434829711914,
-        "final_val_loss": 9.80815601348877,
-        "best_val_loss": 9.80815601348877,
+        "final_loss": 7.645434856414795,
+        "final_val_loss": 7.723138809204102,
+        "best_val_loss": 7.723138809204102,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 2.1131839800000307,
-        "mean_step_time_ms": 10.821681999991597,
-        "total_wall_time_sec": 1.7203864170000998
+        "mean_opt_time_ms": 2.161751630001163,
+        "mean_step_time_ms": 10.638488449958459,
+        "total_wall_time_sec": 1.7022207989994058
       },
       {
         "run_id": "heldout_conv_ssm_sign_descent_lr0.03_s43",
@@ -4643,18 +4643,18 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 9.776056289672852,
-        "final_val_loss": 9.783157348632812,
-        "best_val_loss": 9.783157348632812,
+        "final_loss": 7.598903656005859,
+        "final_val_loss": 7.679390621185303,
+        "best_val_loss": 7.679390621185303,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 2.1167750299809995,
-        "mean_step_time_ms": 10.75403677002214,
-        "total_wall_time_sec": 1.7136884450001162
+        "mean_opt_time_ms": 2.1502058700025373,
+        "mean_step_time_ms": 10.544646410053247,
+        "total_wall_time_sec": 1.6931667700000617
       },
       {
         "run_id": "heldout_conv_ssm_sign_descent_lr0.03_s44",
@@ -4667,69 +4667,69 @@
         "steps_completed": 100,
         "total_progress": 204800,
         "metric_unit": "tokens",
-        "final_loss": 9.801212310791016,
-        "final_val_loss": 9.794057083129882,
-        "best_val_loss": 9.794057083129882,
+        "final_loss": 7.604960918426514,
+        "final_val_loss": 7.740667819976807,
+        "best_val_loss": 7.740667819976807,
         "tokens_to_target": {
           "5.5": null,
           "5.0": null,
           "4.5": null,
           "4.0": null
         },
-        "mean_opt_time_ms": 2.110057630011397,
-        "mean_step_time_ms": 10.771199419991717,
-        "total_wall_time_sec": 1.7151117529997464
+        "mean_opt_time_ms": 2.1620241899472603,
+        "mean_step_time_ms": 10.655660899919894,
+        "total_wall_time_sec": 1.7079256420001911
       }
     ]
   },
   "ablation_results": {
     "backend_reference": {
-      "run_id": "ablation_reference_cauchylift_lr0.03_s42",
+      "run_id": "ablation_reference_cauchylift_lr0.01_s42",
       "workload_id": "small_decoder_lm",
       "optimizer": "cauchylift_reference",
-      "lr": 0.03,
+      "lr": 0.01,
       "seed": 42,
       "status": "SUCCESS",
       "failure_reason": null,
       "steps_completed": 100,
       "total_progress": 204800,
       "metric_unit": "tokens",
-      "final_loss": 8.013790130615234,
-      "final_val_loss": 7.926884555816651,
-      "best_val_loss": 7.926884555816651,
+      "final_loss": 7.260872840881348,
+      "final_val_loss": 7.053523254394531,
+      "best_val_loss": 7.053523254394531,
       "tokens_to_target": {
         "5.5": null,
         "5.0": null,
         "4.5": null,
         "4.0": null
       },
-      "mean_opt_time_ms": 23.68325616997481,
-      "mean_step_time_ms": 33.84647386999859,
-      "total_wall_time_sec": 4.067504023999845
+      "mean_opt_time_ms": 16.578965839999,
+      "mean_step_time_ms": 26.487095750062508,
+      "total_wall_time_sec": 3.330957056999978
     },
     "backend_hip_fast": {
-      "run_id": "ablation_hip_fast_cauchylift_lr0.03_s42",
+      "run_id": "ablation_hip_fast_cauchylift_lr0.01_s42",
       "workload_id": "small_decoder_lm",
       "optimizer": "cauchylift_hip",
-      "lr": 0.03,
+      "lr": 0.01,
       "seed": 42,
       "status": "SUCCESS",
       "failure_reason": null,
       "steps_completed": 100,
       "total_progress": 204800,
       "metric_unit": "tokens",
-      "final_loss": 8.040048599243164,
-      "final_val_loss": 7.9512683868408205,
-      "best_val_loss": 7.9512683868408205,
+      "final_loss": 7.244816780090332,
+      "final_val_loss": 7.061000919342041,
+      "best_val_loss": 7.061000919342041,
       "tokens_to_target": {
         "5.5": null,
         "5.0": null,
         "4.5": null,
         "4.0": null
       },
-      "mean_opt_time_ms": 0.29150664001463156,
-      "mean_step_time_ms": 10.197774350021973,
-      "total_wall_time_sec": 1.703548001999934
+      "mean_opt_time_ms": 0.2872501300589647,
+      "mean_step_time_ms": 9.865833750045567,
+      "total_wall_time_sec": 1.664248305000001
     }
   },
   "total_runs": 170

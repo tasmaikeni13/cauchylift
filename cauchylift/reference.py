@@ -31,7 +31,7 @@ def _reference_impl(
         raise ValueError("CauchyLift rejects nonfinite gradients")
     active = g != 0
     count = int(active.sum().item())
-    radius = math.sqrt(min(g.shape))
+    radius = math.sqrt(max(g.shape))
     direction = torch.zeros_like(g)
     denominators: torch.Tensor | None = None
     zero = int(count == 0)
@@ -40,28 +40,16 @@ def _reference_impl(
     if count == 1:
         direction[active] = g[active].sign() * radius
     elif count > 1:
-        scaled = g / g.abs().max()
-        squares = scaled.square()
-        row_energy = squares.sum(dim=1)
-        column_energy = squares.sum(dim=0)
-        outside_rows = _exclusion_sum(row_energy)
-        outside_columns = _exclusion_sum(column_energy)
-        denominators = outside_rows[:, None] + outside_columns[None, :]
-        active_denominators = denominators[active]
-        if bool((active_denominators <= 0).any().item()):
-            if accumulation_dtype != torch.float64:
-                return _reference_impl(
-                    gradient,
-                    torch.float64,
-                    return_diagnostics=return_diagnostics,
-                    rare_path=rare_path + 1,
-                )
-            raise FloatingPointError(
-                "positive active denominator was not representable in FP64"
-            )
-        e_min = active_denominators.min()
+        m, n = g.shape
+        squares = g.square()
+        row_energy = squares.sum(dim=1, keepdim=True)
+        column_energy = squares.sum(dim=0, keepdim=True)
+        row_rms = (row_energy / n).sqrt()
+        col_rms = (column_energy / m).sqrt()
+        denominators = row_rms + col_rms
+        mask = (denominators > 0) & active
         raw = torch.zeros_like(g)
-        raw[active] = scaled[active] * e_min / active_denominators
+        raw[mask] = g[mask] / denominators[mask]
         norm = torch.linalg.vector_norm(raw)
         if not bool(torch.isfinite(norm).item()) or float(norm.item()) == 0.0:
             if accumulation_dtype != torch.float64:
@@ -73,6 +61,7 @@ def _reference_impl(
                 )
             raise FloatingPointError("raw FP64 field cannot be normalized")
         direction = radius * raw / norm
+
 
     output = direction.reshape(gradient.shape)
     if not return_diagnostics:

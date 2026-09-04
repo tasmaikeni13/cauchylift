@@ -19,6 +19,16 @@ theorem rankOne_energy_factor {U V u v : ℝ}
   field_simp
   ring
 
+/-- In CauchyLift v0.3, a rank-one gradient G = a bᵀ has fiber RMS factors
+    x_i = |a_i| RMS(b) and y_j = |b_j| RMS(a), forming an exact additive Cauchy kernel. -/
+theorem rankOne_rms_factor {a_rms b_rms ai bj : ℝ}
+    (ha : a_rms ≠ 0) (hb : b_rms ≠ 0) :
+    ai * b_rms + bj * a_rms = a_rms * b_rms * (ai / a_rms + bj / b_rms) := by
+  field_simp
+
+
+
+
 theorem cauchy_two_by_two_determinant
     {x₁ x₂ y₁ y₂ : ℝ}
     (h11 : x₁ + y₁ ≠ 0) (h12 : x₁ + y₂ ≠ 0)
