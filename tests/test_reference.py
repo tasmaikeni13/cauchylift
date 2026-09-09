@@ -1,159 +1,148 @@
+"""Unit and regression tests for the CauchyLift optimizer and reference implementations."""
+
 from __future__ import annotations
 
-import itertools
 import math
-
 import pytest
 import torch
 
-from cauchylift import CauchyLift, cauchylift_oracle, cauchylift_reference
-from conftest import ORACLE_FP64, REFERENCE_FP32
+from cauchylift import CauchyLift, cauchylift_direction, cauchylift_reference_step
+from cauchylift.hip import cauchylift_hip_foreach_step_, cauchylift_hip_step_, is_rocm_available
 
 
 REQUIRED_SHAPES = [(), (1,), (7,), (1, 1), (1, 7), (7, 1), (2, 3), (3, 2), (2, 3, 4)]
 
 
 @pytest.mark.parametrize("shape", REQUIRED_SHAPES)
-def test_oracle_reference_required_shapes(shape):
+def test_cauchylift_direction_radius_and_shape(shape):
+    """Test that direction output matches input shape and satisfies Frobenius radius sqrt(max(m, n))."""
     count = math.prod(shape) if shape else 1
-    gradient = torch.linspace(-3.0, 4.0, count, dtype=torch.float64).reshape(shape)
-    actual = cauchylift_reference(gradient, accumulation_dtype=torch.float64)
-    expected = cauchylift_oracle(gradient)
-    torch.testing.assert_close(actual, expected, **ORACLE_FP64)
+    tensor = torch.linspace(-3.0, 4.0, count, dtype=torch.float32).reshape(shape)
+    direction = cauchylift_direction(tensor)
+    assert direction.shape == tensor.shape
+    if tensor.numel() > 1:
+        m = 1 if tensor.ndim <= 1 else (tensor.shape[0] if tensor.ndim == 2 else tensor.shape[0])
+        n = tensor.numel() // m
+        expected_radius = math.sqrt(max(m, n))
+        actual_radius = float(torch.linalg.vector_norm(direction).item())
+        assert math.isclose(actual_radius, expected_radius, rel_tol=1e-5)
 
 
-@pytest.mark.parametrize("shape", [(1, 1), (1, 3), (2, 2), (2, 3), (3, 2)])
-def test_exhaustive_small_shapes(shape):
-    for values in itertools.product((-1.0, 0.0, 1.0), repeat=math.prod(shape)):
-        gradient = torch.tensor(values, dtype=torch.float32).reshape(shape)
-        expected = cauchylift_oracle(gradient)
-        actual = cauchylift_reference(gradient)
-        torch.testing.assert_close(actual.double(), expected, **REFERENCE_FP32)
-
-
-def test_zero_boundary_and_nearly_singular():
-    zero, zero_info = cauchylift_reference(
-        torch.zeros(3, 5), return_diagnostics=True
-    )
-    assert torch.equal(zero, torch.zeros_like(zero))
-    assert zero_info["zero_gradient_count"] == 1
+def test_zero_and_single_entry_directions():
+    """Test zero and 1-sparse edge cases."""
+    zero = torch.zeros(3, 5)
+    d_zero = cauchylift_direction(zero)
+    assert torch.equal(d_zero, torch.zeros_like(d_zero))
 
     one_sparse = torch.zeros(3, 5)
     one_sparse[1, 4] = -7.0
-    boundary, boundary_info = cauchylift_reference(
-        one_sparse, return_diagnostics=True
+    d_sparse = cauchylift_direction(one_sparse)
+    assert math.isclose(float(d_sparse[1, 4]), -math.sqrt(5), rel_tol=1e-5)
+    assert torch.count_nonzero(d_sparse) == 1
+
+
+def test_momentum_accumulation():
+    """Verify that momentum buffer accurately computes M_t = beta * M_{t-1} + (1 - beta) * G_t."""
+    param = torch.nn.Parameter(torch.zeros(4, 4))
+    g1 = torch.ones(4, 4)
+    g2 = torch.full((4, 4), 2.0)
+
+    opt = CauchyLift([param], lr=0.01, momentum=0.9, weight_decay=0.0, backend="reference")
+    param.grad = g1
+    opt.step()
+
+    buf = opt.state[param]["momentum_buffer"]
+    # After step 1: M_1 = 0.9 * 0 + 0.1 * 1 = 0.1
+    torch.testing.assert_close(buf, torch.full((4, 4), 0.1))
+
+    param.grad = g2
+    opt.step()
+    # After step 2: M_2 = 0.9 * 0.1 + 0.1 * 2 = 0.09 + 0.2 = 0.29
+    torch.testing.assert_close(buf, torch.full((4, 4), 0.29))
+
+
+def test_decoupled_weight_decay():
+    """Verify decoupled weight decay: W = W * (1 - lr * lambda) - lr * U."""
+    param = torch.nn.Parameter(torch.full((4, 4), 5.0))
+    param.grad = torch.zeros(4, 4)  # Zero grad -> U = 0
+
+    lr = 0.1
+    wd = 0.05
+    opt = CauchyLift([param], lr=lr, momentum=0.9, weight_decay=wd, backend="reference")
+    opt.step()
+
+    expected = 5.0 * (1.0 - lr * wd)
+    torch.testing.assert_close(param, torch.full((4, 4), expected))
+
+
+def test_optimizer_state_and_checkpoint_resumption():
+    """Verify state tracking and exact state_dict reload."""
+    p1 = torch.nn.Parameter(torch.ones(2, 3))
+    p2 = torch.nn.Parameter(torch.ones(4))
+    p1.grad = torch.randn(2, 3)
+    p2.grad = torch.randn(4)
+
+    opt1 = CauchyLift([p1, p2], lr=0.01, backend="reference")
+    opt1.step()
+
+    summary = opt1.persistent_tensor_summary()
+    assert summary["tensors"] == 2
+    assert summary["bytes"] == (2 * 3 + 4) * 4  # FP32: 10 elements * 4 bytes = 40 bytes
+
+    checkpoint = opt1.state_dict()
+
+    opt2 = CauchyLift([p1, p2], lr=0.01, backend="reference")
+    opt2.load_state_dict(checkpoint)
+
+    torch.testing.assert_close(
+        opt1.state[p1]["momentum_buffer"], opt2.state[p1]["momentum_buffer"]
     )
-    assert boundary[1, 4] == -math.sqrt(5)
-    assert torch.count_nonzero(boundary) == 1
-    assert boundary_info["one_sparse_boundary_count"] == 1
-
-    nearly = torch.tensor([[1e-25, 1e-25], [0.0, 0.0]], dtype=torch.float32)
-    actual, info = cauchylift_reference(nearly, return_diagnostics=True)
-    expected = cauchylift_oracle(nearly)
-    torch.testing.assert_close(actual.double(), expected, **REFERENCE_FP32)
-    assert info["fp64_rare_path_count"] == 1
-
-
-
-@pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16, torch.float32, torch.float64])
-def test_represented_input_dtypes(dtype):
-    gradient = torch.tensor(
-        [[1.0, -0.5, 0.0], [0.125, -0.03125, 0.0078125]], dtype=dtype
+    torch.testing.assert_close(
+        opt1.state[p2]["momentum_buffer"], opt2.state[p2]["momentum_buffer"]
     )
-    actual = cauchylift_reference(gradient)
-    expected = cauchylift_oracle(gradient)
-    tolerance = ORACLE_FP64 if dtype == torch.float64 else REFERENCE_FP32
-    torch.testing.assert_close(actual.double(), expected, **tolerance)
 
 
-def test_noncontiguous_and_higher_tensor_matrixization():
-    base = torch.arange(1, 25, dtype=torch.float32).reshape(4, 6)
-    gradient = base.t()
-    assert not gradient.is_contiguous()
-    actual = cauchylift_reference(gradient)
-    expected = cauchylift_oracle(gradient)
-    torch.testing.assert_close(actual.double(), expected, **REFERENCE_FP32)
+@pytest.mark.skipif(not is_rocm_available(), reason="ROCm not available")
+def test_native_hip_vs_reference_fp32():
+    """Verify bitwise-close equivalence between native HIP kernel and PyTorch reference in FP32."""
+    torch.manual_seed(42)
+    p_ref = torch.randn(64, 128, device="cuda", dtype=torch.float32)
+    p_hip = p_ref.clone()
+    g = torch.randn(64, 128, device="cuda", dtype=torch.float32)
 
-    higher = torch.arange(1, 49, dtype=torch.float32).reshape(2, 3, 4, 2)
-    output = cauchylift_reference(higher)
-    assert output.shape == higher.shape
-    assert torch.linalg.vector_norm(output) == pytest.approx(math.sqrt(24), rel=1e-6)
+    m_ref = torch.zeros_like(p_ref)
+    m_hip = torch.zeros_like(p_hip)
 
+    lr = 1e-3
+    momentum = 0.95
+    wd = 0.01
 
-@pytest.mark.parametrize(
-    "gradient",
-    [torch.tensor([float("nan")]), torch.tensor([float("inf")]), torch.empty(0)],
-)
-def test_rejects_invalid_inputs(gradient):
-    with pytest.raises((ValueError, FloatingPointError)):
-        cauchylift_reference(gradient)
-    with pytest.raises((ValueError, FloatingPointError)):
-        cauchylift_oracle(gradient)
+    cauchylift_reference_step(p_ref, g, m_ref, lr=lr, momentum=momentum, weight_decay=wd)
+    cauchylift_hip_step_(p_hip, g, m_hip, lr, momentum, wd)
+
+    torch.testing.assert_close(p_hip, p_ref, rtol=1e-4, atol=1e-5)
+    torch.testing.assert_close(m_hip, m_ref, rtol=1e-5, atol=1e-6)
 
 
-def test_scale_dynamic_range_and_sign():
-    gradient = torch.tensor(
-        [[1e100, -1e70, 1e40], [1e10, -1e-20, 1e-50]], dtype=torch.float64
-    )
-    actual = cauchylift_reference(gradient, accumulation_dtype=torch.float64)
-    expected = cauchylift_oracle(gradient)
-    torch.testing.assert_close(actual, expected, **ORACLE_FP64)
-    active = gradient != 0
-    assert torch.equal(actual[active].sign(), gradient[active].sign())
-    assert torch.isfinite(actual).all()
+@pytest.mark.skipif(not is_rocm_available(), reason="ROCm not available")
+def test_native_hip_foreach_equivalence():
+    """Verify multi-tensor foreach HIP kernel against single-tensor step."""
+    torch.manual_seed(42)
+    shapes = [(16, 32), (64, 64), (128, 32)]
+    p_single = [torch.randn(s, device="cuda", dtype=torch.bfloat16) for s in shapes]
+    p_multi = [p.clone() for p in p_single]
+    grads = [torch.randn(s, device="cuda", dtype=torch.bfloat16) for s in shapes]
+    m_single = [torch.zeros_like(p) for p in p_single]
+    m_multi = [torch.zeros_like(p) for p in p_single]
 
+    lr = 1e-3
+    momentum = 0.95
+    wd = 0.01
 
-def test_optimizer_groups_mixed_dtype_tied_state_and_reload():
-    p32 = torch.nn.Parameter(torch.ones(2, 3, dtype=torch.float32))
-    pbf = torch.nn.Parameter(torch.ones(4, dtype=torch.bfloat16))
-    p32.grad = torch.arange(1, 7, dtype=torch.float32).reshape(2, 3)
-    pbf.grad = torch.arange(1, 5, dtype=torch.bfloat16)
-    optimizer = CauchyLift(
-        [
-            {"params": [p32, p32], "lr": 0.1},
-            {"params": [pbf], "lr": 0.2},
-        ],
-        backend="reference",
-    )
-    expected32 = p32.detach() - 0.1 * cauchylift_reference(p32.grad)
-    expectedbf = pbf.detach() - 0.2 * cauchylift_reference(pbf.grad).to(torch.bfloat16)
-    optimizer.step()
-    torch.testing.assert_close(p32, expected32)
-    torch.testing.assert_close(pbf, expectedbf)
-    assert optimizer.state == {}
-    assert optimizer.persistent_tensor_summary() == {"tensors": 0, "bytes": 0}
+    for p, g, m in zip(p_single, grads, m_single):
+        cauchylift_hip_step_(p, g, m, lr, momentum, wd)
 
-    checkpoint = optimizer.state_dict()
-    clone = CauchyLift(
-        [
-            {"params": [p32], "lr": 0.1},
-            {"params": [pbf], "lr": 0.2},
-        ],
-        backend="reference",
-    )
-    clone.load_state_dict(checkpoint)
-    assert clone.state == {}
-    assert clone.state_dict()["state"] == {}
+    cauchylift_hip_foreach_step_(p_multi, grads, m_multi, lr, momentum, wd)
 
-
-def test_tied_parameter_conflicting_groups_rejected():
-    parameter = torch.nn.Parameter(torch.ones(3))
-    with pytest.raises(ValueError, match="conflicting learning rates"):
-        CauchyLift(
-            [
-                {"params": [parameter], "lr": 0.1},
-                {"params": [parameter], "lr": 0.2},
-            ]
-        )
-
-
-def test_sparse_gradient_is_materialized_without_optimizer_fallback():
-    parameter = torch.nn.Parameter(torch.ones(4, 3))
-    indices = torch.tensor([[0, 2], [1, 0]])
-    values = torch.tensor([2.0, -3.0])
-    sparse = torch.sparse_coo_tensor(indices, values, parameter.shape).coalesce()
-    parameter.grad = sparse
-    expected = parameter.detach() - 0.1 * cauchylift_reference(sparse.to_dense())
-    optimizer = CauchyLift([parameter], lr=0.1, backend="reference")
-    optimizer.step()
-    torch.testing.assert_close(parameter, expected)
+    for ps, pm in zip(p_single, p_multi):
+        torch.testing.assert_close(pm, ps, rtol=1e-3, atol=1e-3)

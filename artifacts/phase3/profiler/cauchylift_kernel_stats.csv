@@ -1,9 +1,0 @@
-"Name","Calls","TotalDurationNs","AverageNs","Percentage","MinNs","MaxNs","StdDev"
-"void (anonymous namespace)::foreach_marginal_energy_kernel<float, false>(long const*, int, int*, float*, float*, float*)",4,275185,68796.250000,33.53,64908,78057,6199.867116
-"void (anonymous namespace)::foreach_raw_norm_kernel<float, true>(long const*, int, int*, float const*, float const*, float const*, float const*, float*)",4,241547,60386.750000,29.43,57410,68836,5633.974167
-"void (anonymous namespace)::foreach_output_kernel<float, true>(long const*, int, int*, float const*, float const*, float const*, float const*, float)",4,224831,56207.750000,27.39,53802,62222,4042.004319
-"void (anonymous namespace)::elementwise_kernel_with_index_grid_stride<int, at::native::linspace_cuda_out(c10::Scalar const&, c10::Scalar const&, long, at::Tensor&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(long)#1}>(int, at::native::linspace_cuda_out(c10::Scalar const&, c10::Scalar const&, long, at::Tensor&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(long)#1}, function_traits<at::native::linspace_cuda_out(c10::Scalar const&, c10::Scalar const&, long, at::Tensor&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(long)#1}>::result_type*)",1,24737,24737.000000,3.01,24737,24737,0.00000000e+00
-"__amd_rocclr_copyBuffer",4,16357,4089.250000,1.99,2886,6896,1898.833216
-"void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<float>, std::array<char*, 1ul> >(int, at::native::FillFunctor<float>, std::array<char*, 1ul>)",1,15154,15154.000000,1.85,15154,15154,0.00000000e+00
-"(anonymous namespace)::foreach_finalize_scale_kernel(long const*, int*, float*, float const*, int)",4,12629,3157.250000,1.54,2726,3608,418.355013
-"(anonymous namespace)::foreach_initialize_kernel(int*, float*, float*, float*, float*, long, float*, long, int, bool)",4,10383,2595.750000,1.26,2205,3568,651.722525

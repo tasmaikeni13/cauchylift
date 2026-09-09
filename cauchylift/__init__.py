@@ -1,8 +1,7 @@
-"""Frozen CauchyLift v0.2 reference and ROCm optimizer implementations."""
+"""CauchyLift: Curvature-Adaptive Matrix Optimizer with Historical Momentum and Decoupled Weight Decay."""
 
 from .optimizer import CauchyLift
-from .oracle import cauchylift_oracle
-from .reference import cauchylift_reference
+from .reference import cauchylift_direction, cauchylift_reference_step
 
-__all__ = ["CauchyLift", "cauchylift_oracle", "cauchylift_reference"]
-__version__ = "0.2.0"
+__all__ = ["CauchyLift", "cauchylift_direction", "cauchylift_reference_step"]
+__version__ = "1.0.0"

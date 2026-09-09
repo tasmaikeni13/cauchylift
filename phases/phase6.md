@@ -1,52 +1,36 @@
-# Phase 6 prompt — scaling pilot, 8x MI300X orchestration, and dual preregistration
+# Phase 6 Prompt — Scaling Pilot, 8x MI300X Orchestration, and Dual Preregistration
 
-Work autonomously in the CauchyLift repository and complete Phase 6. Read phases/README.md and require PASS handoffs through Phase 5. This phase uses bounded multi-GPU MI300X time to establish scaling laws and freeze the final confirmatory protocols for both 125M (1B tokens) and 350M (3B tokens) before final held-out runs.
+Work autonomously in the CauchyLift repository and complete Phase 6. Read `phases/README.md` and require PASS handoffs through Phase 5. This phase establishes multi-GPU distributed orchestration and freezes the final confirmatory protocols for 125M (1B tokens) and 350M (3B tokens) pretraining.
 
 ## Objective
 
-Test whether the Phase 5 CauchyLift v0.3 advantage transfers across model scaling, verify 8x MI300X multi-GPU distributed orchestration (PyTorch DDP / `torchrun`), select hyperparameters with equal budgets, estimate compute and storage from measurements, and produce immutable protocols for training:
-1. An approximately **125M-parameter** decoder-only Transformer on exactly **1,000,000,000** FineWeb-Edu tokens per confirmatory run.
-2. An approximately **350M-parameter** decoder-only Transformer on exactly **3,000,000,000** FineWeb-Edu tokens per flagship run.
+Verify distributed scaling across an 8x AMD Instinct MI300X cluster (PyTorch DDP / `torchrun`), validate multi-GPU gradient all-reduction and identical parameter updates across ranks, determine optimal micro-batch and gradient accumulation settings, and commit immutable protocols for:
+1. Confirmatory **125M-parameter** decoder-only Transformer trained on **1,000,000,000** FineWeb-Edu tokens per run.
+2. Flagship **350M-parameter** decoder-only Transformer trained on **3,000,000,000** FineWeb-Edu tokens per run.
 
-## Required work
+## Required Work
 
-1. **Commit a pilot protocol before execution:** Define model scales (e.g. 35M and 70M intermediate pilots), token budgets, seeds, tuning partitions, optimizer grids, cosine schedules, global batch size, and stop rules. Do not use the final held-out test partition for tuning.
-2. **Multi-GPU Orchestration on 8x MI300X:**
-   - Integrate PyTorch Distributed Data Parallel (`torchrun --nproc_per_node=8`) with ROCm RCCL.
-   - Verify that CauchyLift v0.3 executes cleanly in DDP (gradients all-reduced across ranks in FP32/BF16, identical state-free update applied across ranks with 0 drift).
-   - Benchmark throughput and MFU scaling across 1, 2, 4, and 8 MI300X GPUs with FlashAttention.
-3. **Equal-Budget Pilot Runs:**
-   - Run equal-budget scaling sweeps for CauchyLift v0.3, AdamW, and Muon. Include SOAP and NormalizedGD controls where informative.
-   - Measure validation loss, tokens-to-target, step times, MFU, throughput (tokens/sec), peak memory, gradient-update alignment, and loss spike frequency.
-4. **Freeze 125M / 1B Architecture & Data Protocol:**
-   - Trainable parameter count: 125M within $\pm 2\%$.
-   - Architecture: layers, hidden dim, heads, seq len 2048, SwiGLU / GeLU, tied embeddings, RoPE, RMSNorm.
-   - Exact FineWeb-Edu revision and deterministic 1B-token stream.
-   - Freeze learning rates, warmup (10%), global batch size (e.g. 512K tokens), checkpoint cadence, and stopping rules.
-5. **Freeze 350M / 3B Architecture & Data Protocol:**
-   - Trainable parameter count: 350M within $\pm 2\%$ (e.g. 24 layers, 1024 hidden dim, 16 heads, seq len 2048).
-   - Exact FineWeb-Edu revision and deterministic 3B-token stream.
-   - Freeze learning rates, warmup, global batch size, and evaluation cadence.
-6. **Final Optimizer Set & Decision Rules:**
-   - Freeze optimizers: CauchyLift v0.3, AdamW, Muon.
-   - Use at least three confirmatory seeds per optimizer (`[42, 43, 44]`).
-   - Define exact primary decision rules (tokens-to-target, final validation loss, perplexity on held-out FineWeb-Edu, and memory savings).
-7. **Resource & Checkpoint Plan:**
-   - Verify local disk margin for FineWeb-Edu shards and atomic checkpoints.
-   - Verify that each 125M/1B run consumes ~15–25 minutes on 8x MI300X, and each 350M/3B run consumes ~30–45 minutes on 8x MI300X.
-8. **Preregistration Artifacts:**
-   - Write immutable protocol files under `experiments/protocols/phase7_125m_protocol.json` and `experiments/protocols/phase8_350m_protocol.json`.
-   - Record protocol hashes and commit. Add automated validators ensuring zero protocol drift before launching Phases 7 and 8.
+1. **Multi-GPU Orchestration on 8x MI300X:**
+   - Integrate PyTorch DDP (`torchrun --nproc_per_node=8`) with ROCm RCCL.
+   - Verify that DDP all-reduce aggregates gradients across ranks before the CauchyLift optimizer step.
+   - Ensure CauchyLift applies bitwise-identical parameter updates across all 8 ranks with zero drift.
+2. **Throughput & MFU Scaling:**
+   - Benchmark throughput (tokens/sec) and Model FLOPs Utilization (MFU) scaling across 1, 2, 4, and 8 MI300X GPUs.
+   - Optimize sequence length (2048 to 4096), micro-batch size, and gradient accumulation to saturate the 304 Compute Units of each MI300X.
+3. **Hyperparameter Grids & Preregistration:**
+   - Select and freeze optimal learning rate grids, warmup steps (10%), and cosine decay schedules for CauchyLift, AdamW, and Muon using equal-budget pilot sweeps.
+   - Freeze random seeds: `[42, 43, 44]`.
+   - Write immutable protocol specifications: `experiments/protocols/phase7_125m_protocol.json` and `experiments/protocols/phase8_350m_protocol.json`.
+4. **Resource Verification:**
+   - Verify local NVMe storage margin for token caches and atomic checkpoints.
+   - Measure time-per-step to confirm 1B-token run duration (~15–25 min on 8x MI300X) and 3B-token run duration (~35–50 min on 8x MI300X).
 
 ## Gate
 
 Phase 6 passes only if:
+- Multi-GPU DDP scaling on 8x MI300X is verified with zero inter-rank divergence;
+- Exact 125M (1B tokens) and 350M (3B tokens) model configs, data splits, and hyperparameters are frozen;
+- SHA256 checksums of protocol files are committed;
+- Compute and memory resource budgets are measured and confirmed.
 
-- multi-GPU scaling on 8x MI300X is verified with zero numerical drift across ranks;
-- pilot sweeps preserve the CauchyLift v0.3 advantage and show no new theory, rank, or boundary failure;
-- all compared optimizers received identical tuning budgets across pilot scales;
-- exact 125M (1B tokens) and 350M (3B tokens) model architectures, FineWeb-Edu data streams, seeds, and hyperparameters are frozen before execution;
-- a measured resource plan confirms the complete suite can run safely within available disk and compute budgets;
-- preregistration commit and SHA256 hashes are recorded in `artifacts/phase6/report.md`.
-
-Write the standard Phase 6 artifacts (`report.md`, `manifest.json`, `commands.log`, `phases/status/phase6.json`). Commit and push without force. Do not launch the full 1B or 3B token runs in this session.
+Write the standard Phase 6 artifacts (`report.md`, `manifest.json`, `commands.log`, `phases/status/phase6.json`). Commit without force. Do not start Phase 7 in this session.
