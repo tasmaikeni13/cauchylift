@@ -1,3 +1,21 @@
-artifacts/phase3/environment.txt -whitespace
-artifacts/phase3/profiler/* -whitespace
-artifacts/phase3/report.md -whitespace
+# Auto-detect text files and normalize line endings to LF across OS
+* text=auto eol=lf
+
+# Source code and documentation
+*.py text eol=lf
+*.cu text eol=lf
+*.cuh text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+
+# Binary data and checkpoints
+*.bin binary
+*.pt binary
+*.parquet binary
+*.png binary
+*.jpg binary

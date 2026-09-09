@@ -16,4 +16,3 @@ runs/
 *.parquet
 *.bin
 *.jsonl
-artifacts/*/profiler/*.json
