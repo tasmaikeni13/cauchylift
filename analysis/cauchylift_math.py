@@ -1,168 +1,74 @@
-"""Pure mathematical implementation of the CauchyLift direction.
+"""Pure Python mathematical implementation of the CauchyLift operator.
 
-This module contains no training loop and has no third-party dependencies.  It
-uses nested Python lists so that every arithmetic operation remains inspectable.
+Standard library only, zero external dependencies.
+Uses nested Python lists so that every arithmetic operation remains inspectable.
 """
 
 from __future__ import annotations
 
 import math
-from typing import Iterable, Sequence
+from typing import Sequence
 
 Matrix = list[list[float]]
 
 
-def _as_matrix(values: Sequence[Sequence[float]]) -> Matrix:
+def as_matrix(values: Sequence[Sequence[float]]) -> Matrix:
+    """Validate and convert rectangular matrix values."""
     matrix = [[float(value) for value in row] for row in values]
     if not matrix or not matrix[0]:
-        raise ValueError("a nonempty rectangular matrix is required")
+        raise ValueError("A nonempty rectangular matrix is required")
     width = len(matrix[0])
     if any(len(row) != width for row in matrix):
-        raise ValueError("ragged matrices are not supported")
+        raise ValueError("Ragged matrices are not supported")
     if any(not math.isfinite(value) for row in matrix for value in row):
-        raise ValueError("all entries must be finite")
+        raise ValueError("All entries must be finite")
     return matrix
 
 
-def frobenius_sq(matrix: Sequence[Sequence[float]]) -> float:
-    return math.fsum(value * value for row in matrix for value in row)
-
-
 def frobenius_norm(matrix: Sequence[Sequence[float]]) -> float:
-    return math.sqrt(frobenius_sq(matrix))
+    """Compute Frobenius norm of a matrix."""
+    return math.sqrt(math.fsum(x * x for row in matrix for x in row))
 
 
-def inner(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> float:
-    return math.fsum(
-        x * y for left_row, right_row in zip(left, right) for x, y in zip(left_row, right_row)
-    )
+def inner_product(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> float:
+    """Compute Frobenius inner product <A, B> = tr(A^T B)."""
+    return math.fsum(x * y for r1, r2 in zip(left, right) for x, y in zip(r1, r2))
 
 
-def scale(matrix: Sequence[Sequence[float]], factor: float) -> Matrix:
-    return [[factor * value for value in row] for row in matrix]
+def fiber_rms_denominator(matrix: Sequence[Sequence[float]]) -> Matrix:
+    """Compute D_ij = RMS(row_i) + RMS(col_j)."""
+    mat = as_matrix(matrix)
+    rows, cols = len(mat), len(mat[0])
+
+    row_energy = [math.fsum(x * x for x in row) for row in mat]
+    col_energy = [math.fsum(mat[i][j] * mat[i][j] for i in range(rows)) for j in range(cols)]
+
+    row_rms = [math.sqrt(re / cols) for re in row_energy]
+    col_rms = [math.sqrt(ce / rows) for ce in col_energy]
+
+    return [[row_rms[i] + col_rms[j] for j in range(cols)] for i in range(rows)]
 
 
-def _exclusive_nonnegative_sums(values: Sequence[float]) -> list[float]:
-    """Return each sum with its own entry excluded, without total-minus-entry.
+def cauchylift_direction(matrix: Sequence[Sequence[float]]) -> Matrix:
+    """Compute normalized CauchyLift direction U = sqrt(max(m, n)) * Z / ||Z||_F."""
+    mat = as_matrix(matrix)
+    rows, cols = len(mat), len(mat[0])
+    radius = math.sqrt(max(rows, cols))
 
-    Prefix/suffix accumulation is linear work and avoids the catastrophic
-    cancellation of ``total - dominant`` near the one-sparse boundary.
-    """
+    non_zero_entries = [(i, j) for i in range(rows) for j in range(cols) if mat[i][j] != 0.0]
+    if len(non_zero_entries) == 0:
+        return [[0.0] * cols for _ in range(rows)]
+    if len(non_zero_entries) == 1:
+        i, j = non_zero_entries[0]
+        out = [[0.0] * cols for _ in range(rows)]
+        out[i][j] = math.copysign(radius, mat[i][j])
+        return out
 
-    prefix = [0.0]
-    for value in values:
-        prefix.append(prefix[-1] + value)
-    suffix = [0.0] * (len(values) + 1)
-    for index in range(len(values) - 1, -1, -1):
-        suffix[index] = suffix[index + 1] + values[index]
-    return [prefix[index] + suffix[index + 1] for index in range(len(values))]
-
-
-def cotransverse_energy(matrix: Sequence[Sequence[float]]) -> Matrix:
-    """Return E_ij = (S-r_i) + (S-c_j), computed after safe rescaling.
-
-    The returned field is dimensionless up to a common positive factor.  That
-    factor cancels in the projectively normalized CauchyLift direction.
-    """
-
-    gradient = _as_matrix(matrix)
-    rows, columns = len(gradient), len(gradient[0])
-    maximum = max(abs(value) for row in gradient for value in row)
-    if maximum == 0.0:
-        return [[0.0] * columns for _ in range(rows)]
-    normalized = [[value / maximum for value in row] for row in gradient]
-    row_energy = [math.fsum(value * value for value in row) for row in normalized]
-    column_energy = [
-        math.fsum(normalized[i][j] * normalized[i][j] for i in range(rows))
-        for j in range(columns)
-    ]
-    outside_row = _exclusive_nonnegative_sums(row_energy)
-    outside_column = _exclusive_nonnegative_sums(column_energy)
-    return [
-        [outside_row[i] + outside_column[j] for j in range(columns)]
-        for i in range(rows)
-    ]
-
-
-def raw_cauchylift(matrix: Sequence[Sequence[float]]) -> Matrix:
-    """Return a numerically scaled representative of G_ij / E_ij.
-
-    Common scaling is irrelevant because :func:`cauchylift` normalizes the
-    result.  Multiplying every reciprocal by the smallest positive denominator
-    avoids overflow.  If the projective boundary E_ij=0 is reached, the exact
-    epsilon-to-zero limit is supported on those active boundary entries.
-    """
-
-    gradient = _as_matrix(matrix)
-    rows, columns = len(gradient), len(gradient[0])
-    maximum = max(abs(value) for row in gradient for value in row)
-    if maximum == 0.0:
-        return [[0.0] * columns for _ in range(rows)]
-    normalized = [[value / maximum for value in row] for row in gradient]
-    energy = cotransverse_energy(normalized)
-
-    boundary = [
-        (i, j)
-        for i in range(rows)
-        for j in range(columns)
-        if normalized[i][j] != 0.0 and energy[i][j] == 0.0
-    ]
-    if boundary:
-        active = set(boundary)
-        return [
-            [normalized[i][j] if (i, j) in active else 0.0 for j in range(columns)]
-            for i in range(rows)
-        ]
-
-    positive = [
-        energy[i][j]
-        for i in range(rows)
-        for j in range(columns)
-        if normalized[i][j] != 0.0 and energy[i][j] > 0.0
-    ]
-    common = min(positive)
-    return [
-        [
-            normalized[i][j] * common / energy[i][j] if normalized[i][j] != 0.0 else 0.0
-            for j in range(columns)
-        ]
-        for i in range(rows)
-    ]
-
-
-def cauchylift(matrix: Sequence[Sequence[float]], radius: float | None = None) -> Matrix:
-    """Compute the projectively normalized CauchyLift direction.
-
-    The default radius is sqrt(min(m, n)), matching the Frobenius norm of a
-    full-rank rectangular partial isometry.  A zero gradient maps to zero.
-    """
-
-    gradient = _as_matrix(matrix)
-    rows, columns = len(gradient), len(gradient[0])
-    raw = raw_cauchylift(gradient)
+    denom = fiber_rms_denominator(mat)
+    raw = [[(mat[i][j] / denom[i][j]) if denom[i][j] > 0 and mat[i][j] != 0.0 else 0.0 for j in range(cols)] for i in range(rows)]
     norm = frobenius_norm(raw)
     if norm == 0.0:
-        return [[0.0] * columns for _ in range(rows)]
-    target = math.sqrt(min(rows, columns)) if radius is None else float(radius)
-    if not math.isfinite(target) or target <= 0.0:
-        raise ValueError("radius must be finite and positive")
-    return scale(raw, target / norm)
+        return [[0.0] * cols for _ in range(rows)]
 
-
-def cosine(left: Sequence[Sequence[float]], right: Sequence[Sequence[float]]) -> float:
-    denominator = frobenius_norm(left) * frobenius_norm(right)
-    if denominator == 0.0:
-        raise ValueError("cosine is undefined for a zero matrix")
-    return inner(left, right) / denominator
-
-
-def transpose(matrix: Sequence[Sequence[float]]) -> Matrix:
-    return [list(column) for column in zip(*matrix)]
-
-
-def flatten(matrix: Sequence[Sequence[float]]) -> list[float]:
-    return [value for row in matrix for value in row]
-
-
-def maximum_absolute_error(left: Iterable[float], right: Iterable[float]) -> float:
-    return max((abs(x - y) for x, y in zip(left, right)), default=0.0)
+    scale = radius / norm
+    return [[scale * val for val in row] for row in raw]

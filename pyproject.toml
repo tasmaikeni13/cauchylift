@@ -1,14 +1,18 @@
 [build-system]
-requires = ["setuptools==81.0.0"]
+requires = ["setuptools>=61.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cauchylift"
-version = "0.2.0"
-description = "Phase 3 reference and native ROCm implementation of CauchyLift"
+version = "1.0.0"
+description = "CauchyLift: Curvature-Adaptive Matrix Optimizer with Historical Momentum and Decoupled Weight Decay"
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
 readme = "README.md"
+authors = [
+    {name = "Tasmai Keni", email = "tas.ken.rt25@dypatil.edu"}
+]
+keywords = ["deep-learning", "optimizer", "transformer", "rocm", "pytorch"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

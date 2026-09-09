@@ -1,0 +1,50 @@
+{
+  "protocol_version": "1.0",
+  "experiment_name": "cauchylift_125m_1b_tokens",
+  "target_model": {
+    "name": "125M Decoder Transformer",
+    "parameters": 123550000,
+    "vocab_size": 50257,
+    "hidden_dim": 768,
+    "num_layers": 12,
+    "num_heads": 12,
+    "intermediate_dim": 2048,
+    "max_seq_len": 4096,
+    "activation": "swiglu",
+    "norm_eps": 1e-5,
+    "tied_embeddings": true
+  },
+  "dataset": {
+    "name": "FineWeb-Edu",
+    "subset": "sample/10BT",
+    "train_split": "train_tokens_350m.bin",
+    "val_split": "val_tokens.bin",
+    "total_token_budget": 1000000000
+  },
+  "training": {
+    "seq_len": 4096,
+    "micro_batch_size": 4,
+    "grad_accum_steps": 4,
+    "effective_batch_tokens": 65536,
+    "total_optimization_steps": 15259,
+    "warmup_steps": 1526,
+    "learning_rate_schedule": "cosine_decay_to_0.1",
+    "precision": "bfloat16",
+    "compiler": "torch.compile"
+  },
+  "optimizers": {
+    "cauchylift": {
+      "lr": 0.001,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "backend": "auto"
+    },
+    "adamw": {
+      "lr": 0.0006,
+      "betas": [0.9, 0.95],
+      "eps": 1e-8,
+      "weight_decay": 0.01
+    }
+  },
+  "seeds": [42, 1337]
+}

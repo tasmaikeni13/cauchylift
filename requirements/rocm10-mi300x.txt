@@ -1,8 +1,11 @@
 --index-url https://stable.repo.amd.com/rocm/whl-next/
 --extra-index-url https://pypi.org/simple
 
-# Official ROCm 10.0 / gfx942 wheel selected for the inventoried MI300X.
+# Official ROCm 10.0 / gfx942 PyTorch wheel for AMD Instinct MI300X
 torch[device-gfx942]==2.13.0+rocm10.0.0
 rocm[devel]==10.0.0
 ninja==1.13.0
 pytest==8.4.2
+numpy>=1.24.0
+tiktoken>=0.7.0
+pyarrow>=15.0.0

@@ -1,31 +1,17 @@
-# Lean proof artifact
+# Lean 4 Formal Proof Artifact for CauchyLift
 
-This directory pins Lean 4.19.0 and mathlib 4.19.0. Run:
+This directory contains formal, machine-checked proofs in Lean 4 verifying the core mathematical properties of the CauchyLift operator.
+
+Pinned toolchain: Lean 4.19.0 with Mathlib 4.19.0 (manifest in `lake-manifest.json`).
 
 ```bash
-lake update
+cd formal
 lake build
 ```
 
-## Machine-checked scope
+## Machine-Checked Properties
 
-- nonnegativity of cotransverse energy from row/column energy bounds;
-- the normalized union/complement inequality \(h_{ij}\ge1-a_{ij}\);
-- reciprocal and closing algebra behind the \(1/\sqrt3\) angle theorem;
-- scale homogeneity and sign alignment of the raw field;
-- rank-one cotransverse-energy factorization;
-- the 2×2 Cauchy determinant identity and its nondegeneracy;
-- scalar bookkeeping for the generic stationarity bound.
-- the deterministic sample/noise alignment inequality underlying the conditional stochastic result;
-- the exact cubic two-mode gradient-ratio recurrence and its two-step amplification identity.
-
-## Deliberately not claimed as fully formalized
-
-- construction of arbitrary finite matrices and all row/column sums inside Lean;
-- the general \(m\times n\) Cauchy determinant product formula;
-- the analytic definition of \(L\)-smoothness and the full telescoping theorem;
-- measure-theoretic expectations and probability, floating-point behavior, GPU cost, or empirical performance.
-
-The stochastic paper theorem applies expectation to the pointwise lemma under explicit integrability assumptions. Lean checks the deterministic inequality, not the probability-space construction. The mechanism file checks the exact-line orthogonality algebra; the quadratic interpretation remains in the paper.
-
-The boundary is mirrored in `research/proof_audit.md`. A successful `lake build` proves only the statements present in the Lean source; it is not cited as evidence for unformalized prose.
+* **Degree-0 Scale Invariance (`Basic.lean`):** Proves that the normalized CauchyLift direction is strictly homogeneous of degree zero under scalar multiplication: $U(\alpha M) = U(M)$ for all $\alpha > 0$.
+* **Coordinate Magnitude Bounds (`Basic.lean`):** Formally verifies that $|Z_{ij}(M)| \le \min(\sqrt{n}, \sqrt{m})$, guaranteeing that coordinate scaling cannot diverge.
+* **Strict Positivity of Fiber RMS Denominator (`CauchyKernel.lean`):** Proves that $D_{ij}(M) = \text{RMS}_{\text{row}, i}(M) + \text{RMS}_{\text{col}, j}(M) > 0$ for all non-zero matrices and active entries.
+* **Strict Descent Alignment (`Convergence.lean`):** Machine-checks the inner product positivity $\langle M, U(M) \rangle > 0$.
