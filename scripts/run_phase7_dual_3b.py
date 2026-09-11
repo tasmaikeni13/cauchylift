@@ -21,20 +21,13 @@ SCRIPT = str(pathlib.Path(__file__).parent / "train_distributed.py")
 def run_command(cmd, log_path):
     print(f"\n[LAUNCHING] {' '.join(cmd)}")
     print(f"[LOG FILE]  {log_path}\n")
+    sys.stdout.flush()
     with open(log_path, "a") as log_fp:
         process = subprocess.Popen(
             cmd,
-            stdout=subprocess.PIPE,
+            stdout=log_fp,
             stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
         )
-        for line in process.stdout:
-            sys.stdout.write(line)
-            sys.stdout.flush()
-            log_fp.write(line)
-            log_fp.flush()
-
         process.wait()
         if process.returncode != 0:
             raise RuntimeError(f"Command failed with returncode {process.returncode}")
