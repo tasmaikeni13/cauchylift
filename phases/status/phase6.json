@@ -1,0 +1,21 @@
+{
+  "gate": "PASS",
+  "invalidated_downstream_phases": [],
+  "phase": 6,
+  "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
+  "phase2_handoff_commit": "ef6c726b62cf693216aedcf42afe8669c0a2719e",
+  "phase3_handoff_commit": "28e9285517c9d56971afcd4895c21595add517f1",
+  "phase4_handoff_commit": "ccfce69622d10397587ef76ea1da08fa11ae79ef",
+  "phase5_handoff_commit": "063f0e5",
+  "reasons": [
+    "Multi-core distributed scaling across all 8 Google Cloud TPU v6e (Trillium) chips verified using Torch-XLA PJRT with bitwise-identical parameter evolution across ranks (max parameter drift = 0.000000e+00 across 10 optimization steps).",
+    "Throughput and MFU scaling benchmarked on 125M decoder-only Transformer in BF16 mixed precision with native XLA Scaled Dot-Product Attention: achieving 789,030 tokens/sec on 8 TPU chips (7.60x speedup over single-chip, 95.1% parallel scaling efficiency).",
+    "Equal-budget hyperparameter pilot sweeps executed across candidate learning rates for CauchyLift and AdamW on 125M Transformer on FineWeb-Edu, confirming monotonic descent without NaNs or instabilities.",
+    "Optimal learning rates frozen for 3B-token pretraining: CauchyLift lr=0.005, AdamW lr=0.0006, with 10% warmup and cosine decay to 0.1.",
+    "Dual pretraining protocols frozen with SHA256 checksums: protocol_125m_fineweb.json (d1a7203bb2c58f8e4cf2b90c3b7017b873675b09ac9e11054a83554323c522ab) and protocol_350m_fineweb.json (e9eaf6386d407eb1e6c56e6f4617d9218695fc6805edfdf695bfbfa5971470e2).",
+    "Storage margin confirmed on host (/dev/root has 85 GB free space, >7.5x margin over the 11 GB required for 3B tokens and checkpoints).",
+    "Phase 6 gate criteria are completely met; Phase 7 confirmatory pretraining is unblocked pending user authorization."
+  ],
+  "run_id": "phase6-20260911T110000Z",
+  "timestamp_utc": "2026-09-11T11:00:00Z"
+}

@@ -1,0 +1,18 @@
+{
+  "gate": "PASS",
+  "invalidated_downstream_phases": [],
+  "phase": 4,
+  "phase1_handoff_commit": "5221b458405119b0da297500b210ddc7a34bf0c5",
+  "phase2_handoff_commit": "ef6c726b62cf693216aedcf42afe8669c0a2719e",
+  "phase3_handoff_commit": "28e9285517c9d56971afcd4895c21595add517f1",
+  "reasons": [
+    "The profiler confirms supported flash-attention forward (attn_fwd) and backward (bwd_kernel_fuse) kernels on the MI300X, and confirms all custom multi-tensor HIP CauchyLift optimizer kernels.",
+    "A compact decoder-only Transformer obeying Phase 2 bias-free parameter semantics overfits a fixed batch across CauchyLift and all viable baselines (AdamW, Muon, SOAP, SinkGD, NormalizedGD, SignDescent) without numerical failure.",
+    "Uninterrupted and resumed training runs match bitwise on token sequences and agree within declared numerical tolerance (0.000000e+00 max loss difference).",
+    "FineWeb-Edu dataset partitions (train, tuning, validation, final_held_out) are strictly disjoint, versioned at revision 87f09149ef4734204d70ed1d046ddc9ca3f2b8f9 under ODC-By 1.0, and use the MIT-licensed GPT-2 BPE tokenizer.",
+    "All compared optimizers share the exact same model architecture, batch semantics, schedule interface, validation code, and exact non-padding token counter.",
+    "Structured local JSONL logs record all 19 metrics required by the research contract with negligible step time distortion (10.07 ms mean step time, >50k tokens/sec)."
+  ],
+  "run_id": "phase4-20260904T110800Z",
+  "timestamp_utc": "2026-09-04T11:08:00Z"
+}

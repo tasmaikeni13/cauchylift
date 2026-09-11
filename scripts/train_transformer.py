@@ -55,12 +55,16 @@ class MemoryMappedTokenDataset:
         return x, y
 
 
+from cauchylift.xla import is_tpu_available, sync_tpu, get_tpu_device
+
+
 def build_optimizer(
     model: nn.Module,
     optimizer_name: str,
     lr: float,
     momentum: float,
     weight_decay: float,
+    is_cuda: bool = False,
 ) -> torch.optim.Optimizer:
     """Build the requested optimizer with appropriate parameter grouping."""
     decay_params = []
@@ -94,7 +98,7 @@ def build_optimizer(
             betas=(0.9, 0.95),
             eps=1e-8,
             weight_decay=weight_decay,
-            fused=True,
+            fused=is_cuda,
         )
     else:
         raise ValueError(f"Unsupported optimizer: {optimizer_name}")
@@ -112,13 +116,13 @@ def get_cosine_lr(step: int, warmup_steps: int, total_steps: int, base_lr: float
 
 
 @torch.no_grad()
-def evaluate(model: nn.Module, val_dataset: MemoryMappedTokenDataset, eval_batches: int, batch_size: int, device: str) -> tuple[float, float]:
+def evaluate(model: nn.Module, val_dataset: MemoryMappedTokenDataset, eval_batches: int, batch_size: int, device: Any, device_type: str) -> tuple[float, float]:
     """Run validation evaluation and compute loss and perplexity."""
     model.eval()
     total_loss = 0.0
     for _ in range(eval_batches):
         x, y = val_dataset.get_batch(batch_size, device=device)
-        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
             _, loss = model(x, y)
         total_loss += loss.item()
     val_loss = total_loss / eval_batches
@@ -148,7 +152,19 @@ def main():
 
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    if is_tpu_available():
+        device = get_tpu_device()
+        device_type = "xla"
+        device_name = "Google Cloud TPU (XLA)"
+    elif torch.cuda.is_available():
+        device = "cuda"
+        device_type = "cuda"
+        device_name = torch.cuda.get_device_name(0)
+    else:
+        device = "cpu"
+        device_type = "cpu"
+        device_name = "CPU"
 
     output_dir = pathlib.Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -157,7 +173,7 @@ def main():
     print("=" * 80)
     print(f"Pretraining 125M Transformer with {args.optimizer.upper()}")
     print(f"Tokens: {args.total_tokens:,} | SeqLen: {args.seq_len} | Effective Batch: {args.batch_size * args.grad_accum * args.seq_len:,} tokens/step")
-    print(f"Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
+    print(f"Device: {device_name}")
     print("=" * 80)
 
     # 1. Dataset
@@ -187,7 +203,14 @@ def main():
     total_steps = math.ceil(args.total_tokens / tokens_per_step)
     warmup_steps = int(0.05 * total_steps)
 
-    optimizer = build_optimizer(model, args.optimizer, args.lr, args.momentum, args.weight_decay)
+    optimizer = build_optimizer(
+        model,
+        args.optimizer,
+        args.lr,
+        args.momentum,
+        args.weight_decay,
+        is_cuda=(device_type == "cuda"),
+    )
 
     if args.compile and hasattr(torch, "compile"):
         print("Compiling model with torch.compile (Inductor)...")
@@ -209,7 +232,7 @@ def main():
 
         for _ in range(args.grad_accum):
             x, y = train_dataset.get_batch(args.batch_size, device=device)
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
                 _, loss = model(x, y)
                 loss_scaled = loss / args.grad_accum
             loss_scaled.backward()
@@ -223,6 +246,9 @@ def main():
         grad_norm = math.sqrt(total_norm_sq)
 
         optimizer.step()
+        if device_type == "xla":
+            sync_tpu()
+
         tokens_seen += tokens_per_step
         step_duration = time.time() - step_start
         tok_per_sec = tokens_per_step / max(step_duration, 1e-6)
@@ -242,7 +268,7 @@ def main():
                 }) + "\n")
 
         if step % args.eval_interval == 0 or step == total_steps:
-            val_loss, ppl = evaluate(model, val_dataset, args.eval_batches, args.batch_size, device)
+            val_loss, ppl = evaluate(model, val_dataset, args.eval_batches, args.batch_size, device, device_type)
             print(f">>> EVAL @ Step {step:4d} | Val Loss: {val_loss:.4f} | Perplexity: {ppl:.2f}")
             with open(log_file, "a") as fp:
                 fp.write(json.dumps({

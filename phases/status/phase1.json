@@ -1,0 +1,13 @@
+{
+  "gate": "PASS",
+  "invalidated_downstream_phases": [],
+  "phase": 1,
+  "reasons": [
+    "All active written theorems are correct after repairing the generic rank-lift nonzero-factor hypothesis.",
+    "All declared Lean targets and deterministic analysis gates pass.",
+    "The dated search found no exact formula or operationally equivalent composition within its recorded scope.",
+    "All hard exclusions remain satisfied and negative cases remain visible."
+  ],
+  "run_id": "phase1-20260828T102240Z",
+  "timestamp_utc": "2026-08-28T10:22:40Z"
+}

@@ -1,0 +1,5 @@
+/home/tas_ken_rt25/venv/bin/python3 scripts/verify_8x_tpu_orchestration.py
+/home/tas_ken_rt25/venv/bin/python3 scripts/benchmark_mfu_scaling.py --mode all
+/home/tas_ken_rt25/venv/bin/python3 scripts/run_phase6_pilot_sweep.py
+sha256sum experiments/protocols/protocol_125m_fineweb.json experiments/protocols/protocol_350m_fineweb.json
+df -h

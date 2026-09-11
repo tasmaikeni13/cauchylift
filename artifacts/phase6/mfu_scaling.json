@@ -1,0 +1,26 @@
+{
+  "single_chip": {
+    "devices": 1,
+    "batch_size_per_chip": 4,
+    "global_batch_size": 4,
+    "seq_len": 2048,
+    "tokens_per_step": 8192,
+    "step_time_ms": 78.95564546664293,
+    "tokens_per_sec": 103754.45544879933,
+    "achieved_tflops": 100.41354206249255,
+    "mfu_percent": 21.829030883150555
+  },
+  "distributed_8x": {
+    "devices": 8,
+    "batch_size_per_chip": 4,
+    "global_batch_size": 32,
+    "seq_len": 2048,
+    "tokens_per_step": 65536,
+    "step_time_ms": 83.05893573336411,
+    "tokens_per_sec": 789030.095574349,
+    "achieved_tflops": 763.6231750030767,
+    "mfu_percent": 20.75062975551839
+  },
+  "speedup": 7.604782774497034,
+  "scaling_efficiency_percent": 95.05978468121292
+}
