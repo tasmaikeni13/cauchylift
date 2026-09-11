@@ -1,22 +1,22 @@
 # Reproducibility Guide for CauchyLift
 
-This repository provides end-to-end reproducibility for the mathematical proofs, native ROCm/HIP kernels, and empirical pretraining benchmarks of the CauchyLift optimizer.
+This repository provides end-to-end reproducibility for the mathematical proofs, native Google Cloud TPU / XLA kernels, and empirical pretraining benchmarks of the CauchyLift optimizer.
 
 ---
 
 ## 1. Environment & Hardware Specification
 
 * **Operating System:** Linux (Ubuntu 22.04 LTS or compatible)
-* **Target Hardware:** AMD Instinct MI300X (192 GB HBM3, 304 CUs, `gfx942`)
+* **Target Hardware:** Google Cloud TPU v6e (Trillium) (8 TPU chips, `v6e-8`, 2x4 topology)
 * **Software Stack:**
-  * ROCm 10.0.0
-  * Python 3.12.3
-  * PyTorch 2.13.0+rocm10.0.0 (`torch[device-gfx942]`)
-  * Ninja 1.13.0, PyTest 8.4.2
+  * Torch-XLA 2.9.0 with libtpu
+  * Python 3.10+
+  * PyTorch 2.9.0+cpu
+  * PyTest 9.1+
 
 Install required dependencies:
 ```bash
-pip install -r requirements/rocm10-mi300x.txt
+pip install -r requirements/tpu-v6e.txt
 pip install -e .
 ```
 
@@ -41,7 +41,7 @@ ALL MATHEMATICAL THEOREMS VERIFIED SUCCESSFULLY!
 
 ## 3. Full-Stack Smoke Test Reproduction
 
-Verify that the native ROCm/HIP kernels, memory tracking, and Transformer FlashAttention steps execute cleanly on the MI300X GPU:
+Verify that the native Google Cloud TPU / XLA kernels, memory tracking, and Transformer steps execute cleanly on the TPU v6e:
 ```bash
 python scripts/smoke_test.py
 ```
@@ -54,7 +54,7 @@ Execute the entire test suite across all modules:
 ```bash
 pytest -v
 ```
-All 67 tests across model architecture, attention, reference implementations, and native ROCm kernels should pass with 100% success.
+All unit tests across model architecture, attention, reference implementations, and Google Cloud TPU kernels should pass with 100% success.
 
 ---
 

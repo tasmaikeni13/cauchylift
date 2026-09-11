@@ -214,8 +214,8 @@ class Transformer(nn.Module):
         if targets is not None:
             # Shifted cross-entropy with FP32 reduction
             # Flatten predictions and targets
-            logits_flat = logits.view(-1, self.config.vocab_size).to(torch.float32)
-            targets_flat = targets.view(-1)
+            logits_flat = logits.reshape(-1, self.config.vocab_size).to(torch.float32)
+            targets_flat = targets.reshape(-1)
             loss = F.cross_entropy(logits_flat, targets_flat, ignore_index=-100)
 
         return logits, loss

@@ -7,7 +7,6 @@ import pytest
 import torch
 
 from cauchylift import CauchyLift, cauchylift_direction, cauchylift_reference_step
-from cauchylift.hip import cauchylift_hip_foreach_step_, cauchylift_hip_step_, is_rocm_available
 
 
 REQUIRED_SHAPES = [(), (1,), (7,), (1, 1), (1, 7), (7, 1), (2, 3), (3, 2), (2, 3, 4)]
@@ -100,49 +99,3 @@ def test_optimizer_state_and_checkpoint_resumption():
     torch.testing.assert_close(
         opt1.state[p2]["momentum_buffer"], opt2.state[p2]["momentum_buffer"]
     )
-
-
-@pytest.mark.skipif(not is_rocm_available(), reason="ROCm not available")
-def test_native_hip_vs_reference_fp32():
-    """Verify bitwise-close equivalence between native HIP kernel and PyTorch reference in FP32."""
-    torch.manual_seed(42)
-    p_ref = torch.randn(64, 128, device="cuda", dtype=torch.float32)
-    p_hip = p_ref.clone()
-    g = torch.randn(64, 128, device="cuda", dtype=torch.float32)
-
-    m_ref = torch.zeros_like(p_ref)
-    m_hip = torch.zeros_like(p_hip)
-
-    lr = 1e-3
-    momentum = 0.95
-    wd = 0.01
-
-    cauchylift_reference_step(p_ref, g, m_ref, lr=lr, momentum=momentum, weight_decay=wd)
-    cauchylift_hip_step_(p_hip, g, m_hip, lr, momentum, wd)
-
-    torch.testing.assert_close(p_hip, p_ref, rtol=1e-4, atol=1e-5)
-    torch.testing.assert_close(m_hip, m_ref, rtol=1e-5, atol=1e-6)
-
-
-@pytest.mark.skipif(not is_rocm_available(), reason="ROCm not available")
-def test_native_hip_foreach_equivalence():
-    """Verify multi-tensor foreach HIP kernel against single-tensor step."""
-    torch.manual_seed(42)
-    shapes = [(16, 32), (64, 64), (128, 32)]
-    p_single = [torch.randn(s, device="cuda", dtype=torch.bfloat16) for s in shapes]
-    p_multi = [p.clone() for p in p_single]
-    grads = [torch.randn(s, device="cuda", dtype=torch.bfloat16) for s in shapes]
-    m_single = [torch.zeros_like(p) for p in p_single]
-    m_multi = [torch.zeros_like(p) for p in p_single]
-
-    lr = 1e-3
-    momentum = 0.95
-    wd = 0.01
-
-    for p, g, m in zip(p_single, grads, m_single):
-        cauchylift_hip_step_(p, g, m, lr, momentum, wd)
-
-    cauchylift_hip_foreach_step_(p_multi, grads, m_multi, lr, momentum, wd)
-
-    for ps, pm in zip(p_single, p_multi):
-        torch.testing.assert_close(pm, ps, rtol=1e-3, atol=1e-3)

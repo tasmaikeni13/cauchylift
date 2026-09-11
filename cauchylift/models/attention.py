@@ -151,29 +151,23 @@ class CausalSelfAttention(nn.Module):
             k = k.repeat_interleave(repeats, dim=1)
             v = v.repeat_interleave(repeats, dim=1)
 
-        # Attention dispatch: on ROCm MI300X, flash attention requires bfloat16 or float16
-        use_flash = (
-            (self.backend == "flash" or (self.backend == "auto" and x.is_cuda))
-            and x.is_cuda
-            and q.dtype in (torch.bfloat16, torch.float16)
+        # Attention dispatch: on TPU / XLA or GPU, use scaled_dot_product_attention
+        is_xla = x.device.type == "xla"
+        is_cuda = x.is_cuda
+        use_sdpa = (
+            (self.backend in ("flash", "auto") and (is_xla or is_cuda))
+            or (self.backend == "flash")
         )
 
-        if use_flash:
-            # Enforce FLASH_ATTENTION backend kernel on ROCm / MI300X
+        if use_sdpa:
             try:
-                with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
-                    attn_out = F.scaled_dot_product_attention(
-                        q, k, v,
-                        dropout_p=self.dropout_p if self.training else 0.0,
-                        is_causal=True,
-                    )
+                attn_out = F.scaled_dot_product_attention(
+                    q, k, v,
+                    dropout_p=self.dropout_p if self.training else 0.0,
+                    is_causal=True,
+                )
             except Exception:
-                with sdpa_kernel(SDPBackend.EFFICIENT_ATTENTION):
-                    attn_out = F.scaled_dot_product_attention(
-                        q, k, v,
-                        dropout_p=self.dropout_p if self.training else 0.0,
-                        is_causal=True,
-                    )
+                attn_out = eager_causal_attention(q, k, v)
         else:
             # Eager FP32 reference
             attn_out = eager_causal_attention(q, k, v)

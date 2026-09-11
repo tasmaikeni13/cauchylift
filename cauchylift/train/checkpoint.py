@@ -29,10 +29,25 @@ def get_git_commit() -> str:
 
 def get_environment_fingerprint() -> dict[str, Any]:
     """Capture environment fingerprint."""
-    device_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"
+    tpu_avail = False
+    tpu_devices = []
+    try:
+        import torch_xla.core.xla_model as xm
+        tpu_devices = [str(d) for d in xm.get_xla_supported_devices()]
+        tpu_avail = len(tpu_devices) > 0
+    except Exception:
+        pass
+
+    device_name = "cpu"
+    if tpu_avail:
+        device_name = f"Google Cloud TPU ({len(tpu_devices)} devices)"
+    elif torch.cuda.is_available():
+        device_name = torch.cuda.get_device_name(0)
+
     return {
         "torch_version": torch.__version__,
-        "hip_version": getattr(torch.version, "hip", None),
+        "tpu_available": tpu_avail,
+        "tpu_devices": tpu_devices,
         "cuda_available": torch.cuda.is_available(),
         "device_name": device_name,
     }

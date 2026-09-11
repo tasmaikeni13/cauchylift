@@ -24,10 +24,10 @@ def create_optimizer(
     """Create an optimizer by name with a unified interface.
 
     Supported optimizer names:
-    - 'cauchylift' (auto backend, native HIP on GPU, reference on CPU)
-    - 'cauchylift_hip' (strict=False native fast path on GPU)
+    - 'cauchylift' (auto backend, native TPU/XLA on TPU, reference on CPU)
+    - 'cauchylift_tpu' / 'cauchylift_xla' (strict=False native fast path on TPU)
     - 'cauchylift_reference' (FP32 reference path)
-    - 'adamw' (standard AdamW, fused=True on GPU if available)
+    - 'adamw' (standard AdamW)
     - 'muon' (Muon with Newton-Schulz 5)
     - 'soap' (SOAP with Shampoo preconditioning in eigenbasis)
     - 'sinkgd' (SinkGD with 5-round Sinkhorn normalization)
@@ -43,8 +43,8 @@ def create_optimizer(
     if name_clean in ("cauchylift", "cauchylift_auto"):
         # CauchyLift does not accept weight decay in primitive
         return CauchyLift(params, lr=lr, backend="auto", strict=True)
-    elif name_clean in ("cauchylift_hip", "cauchylift_fast"):
-        return CauchyLift(params, lr=lr, backend="hip", strict=False)
+    elif name_clean in ("cauchylift_tpu", "cauchylift_xla", "cauchylift_hip", "cauchylift_fast"):
+        return CauchyLift(params, lr=lr, backend="xla", strict=False)
     elif name_clean == "cauchylift_reference":
         return CauchyLift(params, lr=lr, backend="reference", strict=True)
     elif name_clean == "adamw":

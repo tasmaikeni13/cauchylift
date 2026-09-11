@@ -6,17 +6,17 @@ build-backend = "setuptools.build_meta"
 name = "cauchylift"
 version = "1.0.0"
 description = "CauchyLift: Curvature-Adaptive Matrix Optimizer with Historical Momentum and Decoupled Weight Decay"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 readme = "README.md"
 authors = [
     {name = "Tasmai Keni", email = "tas.ken.rt25@dypatil.edu"}
 ]
-keywords = ["deep-learning", "optimizer", "transformer", "rocm", "pytorch"]
+keywords = ["deep-learning", "optimizer", "transformer", "tpu", "xla", "pytorch"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-  "rocm: requires a PyTorch ROCm build and an available AMD GPU",
+  "tpu: requires a PyTorch XLA build and an available Google Cloud TPU",
   "stress: repeated-step, dynamic-range, and memory tests",
 ]

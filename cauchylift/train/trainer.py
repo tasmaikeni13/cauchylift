@@ -12,6 +12,7 @@ from torch.optim import Optimizer
 
 from cauchylift.data import PackedTokenDataset
 from cauchylift.models import Transformer
+from cauchylift.xla import is_tpu_available, sync_tpu
 from .checkpoint import load_checkpoint, save_checkpoint
 from .metrics import (
     MI300X_BF16_PEAK_TFLOPS,
@@ -31,7 +32,7 @@ class TrainingConfig:
     min_lr: float = 1e-4
     warmup_steps: int = 10
     weight_decay: float = 0.0
-    device: str = "cuda" if torch.cuda.is_available() else "cpu"
+    device: str = "xla" if is_tpu_available() else ("cuda" if torch.cuda.is_available() else "cpu")
     precision: str = "bf16"  # "bf16" or "fp32"
     activation_checkpointing: bool = False
     eval_interval: int = 20
@@ -94,8 +95,11 @@ class Trainer:
         with torch.no_grad():
             for _ in range(self.config.eval_steps):
                 x, y, _ = self.val_dataset.next_batch(device=self.config.device)
-                use_bf16 = self.config.precision == "bf16" and self.config.device.startswith("cuda")
-                with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_bf16):
+                is_xla = self.config.device.startswith("xla")
+                is_cuda = self.config.device.startswith("cuda")
+                use_bf16 = self.config.precision == "bf16" and (is_xla or is_cuda)
+                autocast_device = "xla" if is_xla else ("cuda" if is_cuda else "cpu")
+                with torch.autocast(device_type=autocast_device, dtype=torch.bfloat16, enabled=use_bf16):
                     _, loss = self.model(x, y)
                 total_loss += float(loss.item()) if loss is not None else 0.0
 
@@ -111,14 +115,17 @@ class Trainer:
         accum_loss = 0.0
         step_tokens = 0
 
-        use_bf16 = self.config.precision == "bf16" and self.config.device.startswith("cuda")
+        is_xla = self.config.device.startswith("xla")
+        is_cuda = self.config.device.startswith("cuda")
+        use_bf16 = self.config.precision == "bf16" and (is_xla or is_cuda)
+        autocast_device = "xla" if is_xla else ("cuda" if is_cuda else "cpu")
 
         # 1. Forward and backward with gradient accumulation
         for micro_step in range(self.config.gradient_accumulation_steps):
             x, y, tokens_in_batch = self.train_dataset.next_batch(device=self.config.device)
             step_tokens += tokens_in_batch
 
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16, enabled=use_bf16):
+            with torch.autocast(device_type=autocast_device, dtype=torch.bfloat16, enabled=use_bf16):
                 _, loss = self.model(
                     x, y,
                     activation_checkpointing=self.config.activation_checkpointing,
@@ -142,7 +149,6 @@ class Trainer:
                 params_before[id(p)] = p.detach().clone()
 
         # 4. Measure optimizer-only execution time accurately
-        is_cuda = self.config.device.startswith("cuda")
         if is_cuda:
             start_event = torch.cuda.Event(enable_timing=True)
             end_event = torch.cuda.Event(enable_timing=True)
@@ -151,6 +157,11 @@ class Trainer:
             end_event.record()
             torch.cuda.synchronize()
             opt_time_sec = start_event.elapsed_time(end_event) / 1000.0
+        elif is_xla:
+            opt_start = time.perf_counter()
+            self.optimizer.step()
+            sync_tpu()
+            opt_time_sec = time.perf_counter() - opt_start
         else:
             opt_start = time.perf_counter()
             self.optimizer.step()

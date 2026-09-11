@@ -31,44 +31,46 @@ def test_rope_rotation_properties():
     assert (orig_norm - rot_norm).abs().max().item() < 1e-5, "RoPE must preserve vector norms"
 
 
-@pytest.mark.rocm
-def test_flash_attention_parity_with_eager_fp32():
-    """Verify that flash attention on ROCm matches eager FP32 attention on forward and backward."""
-    if not (torch.cuda.is_available() and getattr(torch.version, "hip", None)):
-        pytest.skip("Requires PyTorch ROCm device")
+@pytest.mark.tpu
+def test_attention_parity_on_tpu_with_eager_fp32():
+    """Verify that scaled dot-product attention on TPU matches eager FP32 attention."""
+    from cauchylift.xla import get_tpu_device, is_tpu_available, sync_tpu
+    if not is_tpu_available():
+        pytest.skip("Requires Google Cloud TPU device")
 
+    dev = get_tpu_device()
     B, H, S, D = 2, 4, 64, 32
     torch.manual_seed(12345)
 
-    q_fp32 = torch.randn(B, H, S, D, device="cuda", dtype=torch.float32, requires_grad=True)
-    k_fp32 = torch.randn(B, H, S, D, device="cuda", dtype=torch.float32, requires_grad=True)
-    v_fp32 = torch.randn(B, H, S, D, device="cuda", dtype=torch.float32, requires_grad=True)
+    q_fp32 = torch.randn(B, H, S, D, dtype=torch.float32, requires_grad=True)
+    k_fp32 = torch.randn(B, H, S, D, dtype=torch.float32, requires_grad=True)
+    v_fp32 = torch.randn(B, H, S, D, dtype=torch.float32, requires_grad=True)
 
     # Eager reference forward and backward
     out_eager = eager_causal_attention(q_fp32, k_fp32, v_fp32)
     loss_eager = (out_eager * 2.0).sum()
     loss_eager.backward()
 
-    # Flash attention in BF16
-    q_bf16 = q_fp32.detach().to(torch.bfloat16).requires_grad_(True)
-    k_bf16 = k_fp32.detach().to(torch.bfloat16).requires_grad_(True)
-    v_bf16 = v_fp32.detach().to(torch.bfloat16).requires_grad_(True)
+    # TPU attention in BF16
+    q_bf16 = q_fp32.detach().to(device=dev, dtype=torch.bfloat16).requires_grad_(True)
+    k_bf16 = k_fp32.detach().to(device=dev, dtype=torch.bfloat16).requires_grad_(True)
+    v_bf16 = v_fp32.detach().to(device=dev, dtype=torch.bfloat16).requires_grad_(True)
 
-    with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
-        out_flash = torch.nn.functional.scaled_dot_product_attention(
-            q_bf16, k_bf16, v_bf16, is_causal=True
-        )
-    loss_flash = (out_flash * 2.0).sum()
-    loss_flash.backward()
+    out_tpu = torch.nn.functional.scaled_dot_product_attention(
+        q_bf16, k_bf16, v_bf16, is_causal=True
+    )
+    loss_tpu = (out_tpu * 2.0).sum()
+    loss_tpu.backward()
+    sync_tpu()
 
     # Output and gradient comparison
-    out_diff = (out_eager - out_flash.float()).abs().max().item()
-    gq_diff = (q_fp32.grad - q_bf16.grad.float()).abs().max().item()
-    gk_diff = (k_fp32.grad - k_bf16.grad.float()).abs().max().item()
-    gv_diff = (v_fp32.grad - v_bf16.grad.float()).abs().max().item()
+    out_diff = (out_eager - out_tpu.cpu().float()).abs().max().item()
+    gq_diff = (q_fp32.grad - q_bf16.grad.cpu().float()).abs().max().item()
+    gk_diff = (k_fp32.grad - k_bf16.grad.cpu().float()).abs().max().item()
+    gv_diff = (v_fp32.grad - v_bf16.grad.cpu().float()).abs().max().item()
 
     # BF16 representation tolerance
-    assert out_diff < 0.05, f"Flash output diff {out_diff} exceeds 0.05"
-    assert gq_diff < 0.05, f"Flash grad Q diff {gq_diff} exceeds 0.05"
-    assert gk_diff < 0.05, f"Flash grad K diff {gk_diff} exceeds 0.05"
-    assert gv_diff < 0.05, f"Flash grad V diff {gv_diff} exceeds 0.05"
+    assert out_diff < 0.05, f"TPU output diff {out_diff} exceeds 0.05"
+    assert gq_diff < 0.05, f"TPU grad Q diff {gq_diff} exceeds 0.05"
+    assert gk_diff < 0.05, f"TPU grad K diff {gk_diff} exceeds 0.05"
+    assert gv_diff < 0.05, f"TPU grad V diff {gv_diff} exceeds 0.05"

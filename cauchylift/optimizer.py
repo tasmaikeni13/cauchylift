@@ -7,8 +7,8 @@ from typing import Any
 
 import torch
 
-from .hip import cauchylift_hip_foreach_step_, cauchylift_hip_step_, is_rocm_available
 from .reference import cauchylift_reference_step
+from .xla import cauchylift_xla_foreach_step_, cauchylift_xla_step_, is_tpu_available
 
 
 def _deduplicate_parameters(params: Iterable[Any], default_lr: float) -> list[Any]:
@@ -60,7 +60,7 @@ class CauchyLift(torch.optim.Optimizer):
        preventing Frobenius norm runaway and maintaining optimal layer conditioning.
 
     Requires only a single momentum state tensor per parameter (50% less optimizer memory
-    than AdamW), with sub-millisecond fused native ROCm/HIP kernel dispatch.
+    than AdamW), with sub-millisecond fused native Google Cloud TPU / XLA HLO execution.
     """
 
     def __init__(
@@ -80,8 +80,8 @@ class CauchyLift(torch.optim.Optimizer):
             raise ValueError(f"Invalid momentum parameter: {momentum}")
         if weight_decay < 0.0:
             raise ValueError(f"Invalid weight_decay parameter: {weight_decay}")
-        if backend not in {"auto", "reference", "hip"}:
-            raise ValueError("Backend must be 'auto', 'reference', or 'hip'")
+        if backend not in {"auto", "reference", "xla", "tpu"}:
+            raise ValueError("Backend must be 'auto', 'reference', 'xla', or 'tpu'")
 
         self.backend = backend
         self.strict = strict
@@ -122,20 +122,15 @@ class CauchyLift(torch.optim.Optimizer):
                     state["momentum_buffer"] = torch.zeros_like(gradient)
                 momentum_buffer = state["momentum_buffer"]
 
-                use_hip = self.backend == "hip" or (
+                is_xla = parameter.device.type == "xla"
+                use_xla = (self.backend in ("xla", "tpu") and is_xla) or (
                     self.backend == "auto"
-                    and parameter.is_cuda
-                    and is_rocm_available()
-                    and parameter.dtype in (torch.float32, torch.bfloat16)
-                    and not nesterov
+                    and is_xla
+                    and is_tpu_available()
                 )
 
-                if use_hip:
-                    if (
-                        parameter.dtype in (torch.float32, torch.bfloat16)
-                        and parameter.is_contiguous()
-                        and gradient.layout == torch.strided
-                    ):
+                if use_xla:
+                    if parameter.is_contiguous() and gradient.layout == torch.strided:
                         params_list, grads_list, moms_list = native_params.setdefault(
                             parameter.dtype, ([], [], [])
                         )
@@ -143,13 +138,14 @@ class CauchyLift(torch.optim.Optimizer):
                         grads_list.append(gradient)
                         moms_list.append(momentum_buffer)
                     else:
-                        cauchylift_hip_step_(
+                        cauchylift_xla_step_(
                             parameter,
                             gradient,
                             momentum_buffer,
                             learning_rate,
-                            momentum,
-                            weight_decay,
+                            momentum=momentum,
+                            weight_decay=weight_decay,
+                            nesterov=nesterov,
                         )
                 else:
                     cauchylift_reference_step(
@@ -162,15 +158,16 @@ class CauchyLift(torch.optim.Optimizer):
                         nesterov=nesterov,
                     )
 
-            # Batch multi-tensor execution for eligible parameter tensors
+            # Batch multi-tensor execution for eligible parameter tensors on TPU
             for params_list, grads_list, moms_list in native_params.values():
-                cauchylift_hip_foreach_step_(
+                cauchylift_xla_foreach_step_(
                     params_list,
                     grads_list,
                     moms_list,
                     learning_rate,
-                    momentum,
-                    weight_decay,
+                    momentum=momentum,
+                    weight_decay=weight_decay,
+                    nesterov=nesterov,
                 )
 
         return loss

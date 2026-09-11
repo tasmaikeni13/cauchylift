@@ -1,6 +1,6 @@
 {
   "protocol_version": "1.0",
-  "experiment_name": "cauchylift_125m_1b_tokens",
+  "experiment_name": "cauchylift_125m_3b_tokens",
   "target_model": {
     "name": "125M Decoder Transformer",
     "parameters": 123550000,
@@ -19,15 +19,15 @@
     "subset": "sample/10BT",
     "train_split": "train_tokens_350m.bin",
     "val_split": "val_tokens.bin",
-    "total_token_budget": 1000000000
+    "total_token_budget": 3000000000
   },
   "training": {
     "seq_len": 4096,
     "micro_batch_size": 4,
     "grad_accum_steps": 4,
     "effective_batch_tokens": 65536,
-    "total_optimization_steps": 15259,
-    "warmup_steps": 1526,
+    "total_optimization_steps": 45777,
+    "warmup_steps": 4578,
     "learning_rate_schedule": "cosine_decay_to_0.1",
     "precision": "bfloat16",
     "compiler": "torch.compile"
