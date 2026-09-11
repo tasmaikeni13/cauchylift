@@ -58,20 +58,61 @@ All unit tests across model architecture, attention, reference implementations, 
 
 ---
 
-## 5. 125M Transformer Pretraining on FineWeb-Edu
+## 5. Distributed Multi-Core & MFU Scaling Reproduction (Phase 6)
 
-To reproduce the 125M pretraining run on FineWeb-Edu tokens:
+### A. Verify 8-Chip Multi-Core Orchestration & Zero Drift:
+```bash
+python scripts/verify_8x_tpu_orchestration.py
+```
+Expected output: Bitwise identical parameters across all 8 ranks (`max parameter drift = 0.000000e+00`).
+
+### B. Run Throughput & MFU Scaling Profiler:
+```bash
+python scripts/benchmark_mfu_scaling.py --mode all
+```
+Expected output: Single-chip ~103k tok/s (21.8% MFU), 8-chip distributed ~789k tok/s (20.8% MFU, 95.1% parallel efficiency).
+
+### C. Run Hyperparameter Pilot Sweeps:
+```bash
+python scripts/run_phase6_pilot_sweep.py
+```
+
+---
+
+## 6. Confirmatory 3B-Token Pretraining (Phase 7 Protocols)
+
+Pretraining configurations are frozen in `experiments/protocols/protocol_125m_fineweb.json` and `experiments/protocols/protocol_350m_fineweb.json`.
+
+To run CauchyLift on 125M (3B tokens):
 ```bash
 python scripts/train_transformer.py \
   --data_train data/fineweb_edu/train_tokens_350m.bin \
   --data_val data/fineweb_edu/val_tokens.bin \
-  --total_tokens 100000000 \
-  --seq_len 4096 \
+  --total_tokens 3000000000 \
+  --seq_len 2048 \
   --batch_size 4 \
   --grad_accum 4 \
-  --lr 0.001 \
+  --lr 0.005 \
   --momentum 0.95 \
   --weight_decay 0.01 \
-  --compile \
-  --output_dir runs/cauchylift_125m_repro
+  --optimizer cauchylift \
+  --seed 42 \
+  --output_dir runs/cauchylift_125m_seed42
+```
+
+To run AdamW on 125M (3B tokens):
+```bash
+python scripts/train_transformer.py \
+  --data_train data/fineweb_edu/train_tokens_350m.bin \
+  --data_val data/fineweb_edu/val_tokens.bin \
+  --total_tokens 3000000000 \
+  --seq_len 2048 \
+  --batch_size 4 \
+  --grad_accum 4 \
+  --lr 0.0006 \
+  --momentum 0.95 \
+  --weight_decay 0.01 \
+  --optimizer adamw \
+  --seed 42 \
+  --output_dir runs/adamw_125m_seed42
 ```
