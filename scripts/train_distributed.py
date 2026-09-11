@@ -168,15 +168,28 @@ def _train_rank(index: int, args: argparse.Namespace):
         print(f"Total Budget: {args.total_tokens:,} tokens | Steps: {total_steps:,} | Warmup: {warmup_steps:,}")
         print(f"Effective Batch: {tokens_per_step:,} tokens/step ({args.batch_size} micro-batch x {world_size} chips)")
         print(f"Base LR: {args.lr:.2e} | Min LR: {min_lr:.2e} | Momentum: {args.momentum} | Weight Decay: {args.weight_decay}")
-        print(f"Logging metrics to: {log_file}")
-        print("=" * 80)
+    start_step = 1
+    tokens_seen = 0
+    latest_ckpt = ckpt_dir / "latest.pt"
+    if latest_ckpt.exists():
+        try:
+            checkpoint = torch.load(str(latest_ckpt), map_location="cpu")
+            model.load_state_dict({k: v.to(device=dev, dtype=torch.bfloat16) for k, v in checkpoint["model_state_dict"].items()})
+            start_step = checkpoint["step"] + 1
+            tokens_seen = checkpoint["tokens_seen"]
+            if rank == 0:
+                print(f">>> [RESUMED] Resumed training from checkpoint at step {checkpoint['step']} ({tokens_seen:,} tokens seen)")
+                sys.stdout.flush()
+        except Exception as e:
+            if rank == 0:
+                print(f"Warning: Failed to load checkpoint {latest_ckpt}: {e}. Starting from scratch.")
+                sys.stdout.flush()
 
     model.train()
-    tokens_seen = 0
     t_global_start = time.perf_counter()
     recent_step_times = []
 
-    for step in range(1, total_steps + 1):
+    for step in range(start_step, total_steps + 1):
         step_t0 = time.perf_counter()
         current_lr = get_cosine_lr(step, warmup_steps, total_steps, args.lr, min_lr)
         for pg in optimizer.param_groups:

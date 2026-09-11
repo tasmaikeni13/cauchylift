@@ -21,7 +21,7 @@ SCRIPT = str(pathlib.Path(__file__).parent / "train_distributed.py")
 def run_command(cmd, log_path):
     print(f"\n[LAUNCHING] {' '.join(cmd)}")
     print(f"[LOG FILE]  {log_path}\n")
-    with open(log_path, "w") as log_fp:
+    with open(log_path, "a") as log_fp:
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
@@ -63,7 +63,7 @@ def main():
         "--seed", "42",
         "--log_interval", "50",
         "--eval_interval", "1000",
-        "--checkpoint_interval", "5000",
+        "--checkpoint_interval", "1000",
         "--output_dir", str(cauchylift_out),
     ]
 
@@ -92,7 +92,7 @@ def main():
         "--seed", "42",
         "--log_interval", "50",
         "--eval_interval", "1000",
-        "--checkpoint_interval", "5000",
+        "--checkpoint_interval", "1000",
         "--output_dir", str(adamw_out),
     ]
 
