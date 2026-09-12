@@ -150,4 +150,4 @@ Frozen in immutable protocols with SHA256 verification:
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+Apache 2.0 License. See [LICENSE](LICENSE) for details.
