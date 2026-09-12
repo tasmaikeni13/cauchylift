@@ -16,8 +16,8 @@
   },
   "seeds": [42, 43, 44],
   "decisive_artifacts": {
-    "experiments/protocols/protocol_125m_fineweb.json": "d1a7203bb2c58f8e4cf2b90c3b7017b873675b09ac9e11054a83554323c522ab",
-    "experiments/protocols/protocol_350m_fineweb.json": "e9eaf6386d407eb1e6c56e6f4617d9218695fc6805edfdf695bfbfa5971470e2",
+    "experiments/protocols/protocol_125m_fineweb.json": "0452c6bab5ad087c6479c15a2f3c355a87254dfc715f119886cca16f50c0ff2c",
+    "experiments/protocols/protocol_350m_fineweb.json": "29ee77c877dab6d6c16af2005dad1cd851f8c4ea7b7f0e1e55f691797050b4cc",
     "artifacts/phase6/mfu_scaling.json": "aca532de8db607413270c2094c47630132d4635c65c4ae7df485be0cfc59292e",
     "artifacts/phase6/pilot_sweep_results.json": "4a4e14ee4acfa07a52f658dfcc8fd6c335777f0be2f531543e701350e01c2434"
   },

@@ -17,7 +17,7 @@ import torch
 
 def run_smoke_test() -> bool:
     print("=" * 70)
-    print("CauchyLift Full-Stack Smoke Test (Google Cloud TPU v6e / Trillium)")
+    print("CauchyLift Full-Stack Smoke Test (Google Cloud TPU v4 / v6e)")
     print("=" * 70)
 
     # 1. Imports
@@ -36,6 +36,7 @@ def run_smoke_test() -> bool:
     )
     import torch_xla
     import torch_xla.core.xla_model as xm
+    from torch_xla._internal import tpu
 
     print(f"      CauchyLift version: {cauchylift.__version__}")
     print(f"      PyTorch version:    {torch.__version__}")
@@ -44,7 +45,9 @@ def run_smoke_test() -> bool:
     print(f"      TPU available:      {tpu_ready}")
     if tpu_ready:
         devs = xm.get_xla_supported_devices()
-        print(f"      TPU Devices:        {devs} ({len(devs)} chips)")
+        tpu_type = "TPU v4" if any("v4" in str(x) for x in [tpu.get_tpu_type()]) else "TPU v6e"
+        print(f"      Detected Hardware:  {tpu_type} ({len(devs)} local devices)")
+        print(f"      TPU Devices:        {devs}")
         print(f"      Default TPU Device: {get_tpu_device()}")
 
     # 2. Reference Implementation

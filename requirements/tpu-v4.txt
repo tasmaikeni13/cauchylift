@@ -1,0 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+-f https://storage.googleapis.com/libtpu-releases/index.html
+
+# PyTorch and Torch XLA with libtpu for Google Cloud TPU v4 (v4-8 / v4-16 / v4-32)
+torch==2.9.0+cpu
+torch_xla[tpu]==2.9.0
+libtpu>=0.0.21
+tpu-info>=0.14.0
+pytest>=8.0.0
+numpy>=1.24.0
+tiktoken>=0.7.0
+pyarrow>=15.0.0

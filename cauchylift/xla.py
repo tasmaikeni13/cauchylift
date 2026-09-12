@@ -8,6 +8,22 @@ import torch
 
 from .common import matrixize
 
+def _auto_configure_tpu_env() -> None:
+    """Auto-configure TPU environment variables if running on TPU v4 to prevent stalling."""
+    import os
+    if os.path.exists("/dev/accel0"):
+        os.environ.setdefault("PJRT_DEVICE", "TPU")
+        if "TPU_PROCESS_BOUNDS" not in os.environ and "TPU_PROCESS_ADDRESSES" not in os.environ and "TPU_WORKER_HOSTNAMES" not in os.environ:
+            os.environ.setdefault("TPU_SKIP_MDS_QUERY", "1")
+            os.environ.setdefault("TPU_ACCELERATOR_TYPE", "v4-8")
+            os.environ.setdefault("TPU_PROCESS_BOUNDS", "1,1,1")
+            os.environ.setdefault("TPU_CHIPS_PER_HOST_BOUNDS", "2,2,1")
+            os.environ.setdefault("TPU_WORKER_HOSTNAMES", "10.130.0.10")
+            os.environ.setdefault("TPU_WORKER_ID", "0")
+
+
+_auto_configure_tpu_env()
+
 _HAS_XLA = False
 try:
     import torch_xla
@@ -69,7 +85,8 @@ def cauchylift_direction_xla(
     """Compute the Additive Fiber RMS CauchyLift direction optimized for XLA/TPU HLO compilation.
 
     Fuses row/col energy reductions, additive fiber RMS scaling, and projective
-    Frobenius normalization into a single XLA HLO graph cluster.
+    Frobenius normalization into a single XLA HLO graph cluster with branchless
+    clamping optimized for TPU v4 systolic arrays and vector processing units.
 
     Args:
         tensor: 2D matrix (or matrixized tensor) representing the momentum or velocity.
@@ -89,14 +106,11 @@ def cauchylift_direction_xla(
 
     row_rms = (row_energy / float(n)).sqrt()
     col_rms = (col_energy / float(m)).sqrt()
-    denom = row_rms + col_rms
+    denom = (row_rms + col_rms).clamp_min(1e-12)
+    raw = v_mat / denom
 
-    safe_denom = torch.where(denom > 0, denom, torch.ones_like(denom))
-    raw = torch.where(denom > 0, v_mat / safe_denom, torch.zeros_like(v_mat))
-
-    norm = torch.linalg.vector_norm(raw)
-    safe_norm = torch.where(norm > 0, norm, torch.tensor(1.0, dtype=accumulation_dtype, device=v_mat.device))
-    direction = torch.where(norm > 0, (radius / safe_norm) * raw, torch.zeros_like(v_mat))
+    norm = torch.linalg.vector_norm(raw).clamp_min(1e-12)
+    direction = (radius / norm) * raw
 
     return direction.reshape(orig_shape).to(tensor.dtype)
 

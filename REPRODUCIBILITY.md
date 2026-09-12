@@ -7,7 +7,7 @@ This repository provides end-to-end reproducibility for the mathematical proofs,
 ## 1. Environment & Hardware Specification
 
 * **Operating System:** Linux (Ubuntu 22.04 LTS or compatible)
-* **Target Hardware:** Google Cloud TPU v6e (Trillium) (8 TPU chips, `v6e-8`, 2x4 topology)
+* **Target Hardware:** Google Cloud TPU v4-32 (16 TPU chips across 4 host worker nodes, `v4-32`, 2x2x4 3D Torus topology)
 * **Software Stack:**
   * Torch-XLA 2.9.0 with libtpu
   * Python 3.10+
@@ -16,7 +16,7 @@ This repository provides end-to-end reproducibility for the mathematical proofs,
 
 Install required dependencies:
 ```bash
-pip install -r requirements/tpu-v6e.txt
+pip install -r requirements/tpu-v4.txt
 pip install -e .
 ```
 
@@ -41,7 +41,7 @@ ALL MATHEMATICAL THEOREMS VERIFIED SUCCESSFULLY!
 
 ## 3. Full-Stack Smoke Test Reproduction
 
-Verify that the native Google Cloud TPU / XLA kernels, memory tracking, and Transformer steps execute cleanly on the TPU v6e:
+Verify that the native Google Cloud TPU / XLA kernels, memory tracking, and Transformer steps execute cleanly on the TPU v4:
 ```bash
 python scripts/smoke_test.py
 ```
@@ -60,19 +60,24 @@ All unit tests across model architecture, attention, reference implementations, 
 
 ## 5. Distributed Multi-Core & MFU Scaling Reproduction (Phase 6)
 
-### A. Verify 8-Chip Multi-Core Orchestration & Zero Drift:
+### A. Verify Local TPU Multi-Core Orchestration & Zero Drift:
 ```bash
-python scripts/verify_8x_tpu_orchestration.py
+python scripts/verify_tpu_orchestration.py
 ```
-Expected output: Bitwise identical parameters across all 8 ranks (`max parameter drift = 0.000000e+00`).
+Expected output: Bitwise identical parameters across ranks (`max parameter drift = 0.000000e+00`).
 
-### B. Run Throughput & MFU Scaling Profiler:
+### B. Launch Distributed Job Across All 16 Chips (4 Hosts):
+```bash
+python scripts/launch_v4_32_distributed.py scripts/verify_tpu_orchestration.py
+```
+
+### C. Run Throughput & MFU Scaling Profiler:
 ```bash
 python scripts/benchmark_mfu_scaling.py --mode all
 ```
-Expected output: Single-chip ~103k tok/s (21.8% MFU), 8-chip distributed ~789k tok/s (20.8% MFU, 95.1% parallel efficiency).
+Expected output: Dense BF16 compute throughput and MFU calculation calibrated to TPU v4 peak (275 TFLOPS/chip).
 
-### C. Run Hyperparameter Pilot Sweeps:
+### D. Run Hyperparameter Pilot Sweeps:
 ```bash
 python scripts/run_phase6_pilot_sweep.py
 ```

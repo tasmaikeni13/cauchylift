@@ -112,9 +112,9 @@ class TransformerConfig:
     def __post_init__(self) -> None:
         if self.intermediate_dim is None:
             if self.activation.lower() == "swiglu":
-                # Standard 8/3 * hidden_dim rounded to multiple of 64 or 256
+                # Standard 8/3 * hidden_dim rounded to multiple of 128 for TPU v4 systolic arrays (128x128 MXU)
                 dim = int(8 * self.hidden_dim / 3)
-                self.intermediate_dim = ((dim + 63) // 64) * 64
+                self.intermediate_dim = ((dim + 127) // 128) * 128
             else:
                 self.intermediate_dim = 4 * self.hidden_dim
 

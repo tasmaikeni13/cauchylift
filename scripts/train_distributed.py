@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""High-performance distributed 8-chip pretraining for 125M Transformer on 3B tokens.
+"""High-performance distributed pretraining for 125M Transformer on Google Cloud TPU (v4 / v6e).
 
-Orchestrates multi-core data parallelism across 8x Google Cloud TPU v6e (Trillium)
+Orchestrates multi-core data parallelism across Google Cloud TPU chips
 using Torch-XLA PJRT distributed runtime with all-reduce gradient synchronization,
 mixed precision BF16, and periodic validation and checkpointing.
 """
@@ -162,8 +162,9 @@ def _train_rank(index: int, args: argparse.Namespace):
     if rank == 0:
         out_dir.mkdir(parents=True, exist_ok=True)
         ckpt_dir.mkdir(parents=True, exist_ok=True)
+        tpu_type = "TPU v4" if os.path.exists("/dev/accel0") else "TPU v6e"
         print("=" * 80)
-        print(f"Distributed Pretraining on 8x TPU v6e: {args.optimizer.upper()} (Seed {args.seed})")
+        print(f"Distributed Pretraining on {world_size}x {tpu_type}: {args.optimizer.upper()} (Seed {args.seed})")
         print(f"Model: 125M ({total_params/1e6:.1f}M params) | Vocab: {cfg.vocab_size} | SeqLen: {args.seq_len}")
         print(f"Total Budget: {args.total_tokens:,} tokens | Steps: {total_steps:,} | Warmup: {warmup_steps:,}")
         print(f"Effective Batch: {tokens_per_step:,} tokens/step ({args.batch_size} micro-batch x {world_size} chips)")
@@ -291,7 +292,7 @@ def _train_rank(index: int, args: argparse.Namespace):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Distributed 8-Chip Pretraining on TPU v6e")
+    parser = argparse.ArgumentParser(description="Distributed Multi-Chip Pretraining on Google Cloud TPU (v4 / v6e)")
     parser.add_argument("--optimizer", type=str, default="cauchylift", choices=["cauchylift", "adamw"])
     parser.add_argument("--total_tokens", type=int, default=3_000_000_000)
     parser.add_argument("--seq_len", type=int, default=2048)
@@ -309,7 +310,7 @@ def main():
     parser.add_argument("--output_dir", type=str, default="runs/cauchylift_125m_seed42")
     args = parser.parse_args()
 
-    # Launch across 8 TPU cores
+    # Launch across available TPU cores
     xmp.spawn(_train_rank, args=(args,))
 
 
