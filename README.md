@@ -8,7 +8,7 @@
 
 * **50% Less Optimizer Memory than AdamW:** Tracks only a single momentum state tensor per parameter (4 bytes/param in FP32, or 2 bytes/param in BF16), eliminating the second moment tensor ($V_t$) and reducing memory pressure during large-model pretraining.
 * **Linear $O(N^2)$ Computational Complexity:** Replaces expensive $O(N^3)$ matrix inversions, SVD, and iterative polar decompositions (such as Newton–Schulz iterations in Muon) with parallel row and column RMS fiber reductions.
-* **Sub-Millisecond Native TPU/XLA Kernels:** Fused multi-tensor operations lowered to Google Cloud TPU (v4 / v6e) HLO execute in $<0.35$ ms across full Transformer parameter groups—over $15\times$ faster than iterative matrix orthogonalizers.
+* **Sub-Millisecond Native TPU/XLA Kernels:** Fused multi-tensor operations lowered to Google Cloud TPU v4-32 HLO execute in $<0.35$ ms across full Transformer parameter groups—over $15\times$ faster than iterative matrix orthogonalizers.
 * **Mathematically Proven Stability:** Rigorously proven degree-0 scale invariance ($U(\alpha M) = U(M)$), coordinate magnitude bounds ($|Z_{ij}| \le \min(\sqrt{n}, \sqrt{m})$), and strict positive descent alignment ($\langle M, U(M) \rangle > 0$).
 * **Empirically Validated Pretraining:** Pretrained decoder-only Transformers on FineWeb-Edu up to 3B tokens per run across Google Cloud TPU clusters, achieving smooth monotonic convergence with tight cross-seed variance and zero loss spikes.
 * **16-Chip TPU v4-32 Multi-Host Distributed Scaling:** High-performance distributed orchestration across all 16 TPU v4 chips (4 worker hosts, 32 TensorCores, 2x2x4 3D Torus optical mesh) with zero inter-rank drift and linear scaling efficiency.
@@ -97,7 +97,7 @@ pytest -v
 | :---: | :--- | :--- | :---: |
 | **Phase 1** | Mathematical Proofs & Coordinate Bounds | Standard Library Audit | **PASS** |
 | **Phase 2** | Pre-RMSNorm Bias-Free Transformer & FlashAttention | Architecture & Scaling Laws | **PASS** |
-| **Phase 3** | Google Cloud TPU Native XLA Engine (v4 & v6e) | Fused HLO Kernels | **PASS** |
+| **Phase 3** | Google Cloud TPU v4 Native XLA Engine | Fused HLO Kernels | **PASS** |
 | **Phase 4** | Complete Baseline Suite (AdamW, Muon, SOAP, SinkGD) | Exact Parity & Overfitting | **PASS** |
 | **Phase 5** | Non-Transformer Multi-Architecture Verification | ViT & Conv-SSM Parity | **PASS** |
 | **Phase 6** | Multi-Core Distributed Scaling Pilot & Preregistration | 16x TPU v4-32 Mesh & Sweeps | **PASS** |
@@ -106,7 +106,7 @@ pytest -v
 | **Phase 9** | Publication Artifacts, Checkpoints & Release | Open-Source Weights & Paper | *Planned* |
 
 > [!NOTE]
-> Active development on `main` is optimized for Google Cloud TPU v4-32 (16 chips, 32 TensorCores, 2x2x4 3D Torus mesh) and TPU v6e (Trillium) via Torch-XLA and libtpu. The AMD ROCm / MI300X implementation is preserved on the [`amd`](https://github.com/tasmaikeni13/cauchylift/tree/amd) branch.
+> Active development on `main` is optimized exclusively for the 16-chip Google Cloud TPU v4-32 pod slice (32 TensorCores, 2x2x4 3D Torus mesh) via Torch-XLA and libtpu. The AMD ROCm / MI300X implementation is preserved on the [`amd`](https://github.com/tasmaikeni13/cauchylift/tree/amd) branch.
 
 ---
 

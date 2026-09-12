@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark throughput and MFU scaling on Google Cloud TPU (v4 and v6e)."""
+"""Benchmark throughput and MFU scaling on Google Cloud TPU v4."""
 
 import argparse
 import json
@@ -16,21 +16,10 @@ import torch_xla.runtime as xr
 
 # Hardware peak BF16 TFLOPS specifications
 PEAK_TFLOPS_TPU_V4 = 275.0   # Dense BF16 peak per TPU v4 chip (137.5 TFLOPS per TensorCore)
-PEAK_TFLOPS_TPU_V6E = 460.0  # Dense BF16 peak per TPU v6e chip
 
 
 def get_peak_tflops_per_chip() -> float:
-    """Detect TPU generation and return dense BF16 peak TFLOPS."""
-    try:
-        from torch_xla._internal import tpu
-        tpu_type = tpu.get_tpu_type()
-        if "v4" in tpu_type:
-            return PEAK_TFLOPS_TPU_V4
-        elif "v6" in tpu_type:
-            return PEAK_TFLOPS_TPU_V6E
-    except Exception:
-        pass
-    # Fallback to TPU v4 for this server
+    """Return dense BF16 peak TFLOPS for TPU v4 chip."""
     return PEAK_TFLOPS_TPU_V4
 
 

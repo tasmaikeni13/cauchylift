@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comprehensive smoke test for CauchyLift on Google Cloud TPU (v6e / Trillium).
+"""Comprehensive smoke test for CauchyLift on Google Cloud TPU v4-32.
 
 Validates:
 1. Module imports, PyTorch version, and Torch XLA TPU environment.
@@ -17,7 +17,7 @@ import torch
 
 def run_smoke_test() -> bool:
     print("=" * 70)
-    print("CauchyLift Full-Stack Smoke Test (Google Cloud TPU v4 / v6e)")
+    print("CauchyLift Full-Stack Smoke Test (Google Cloud TPU v4-32)")
     print("=" * 70)
 
     # 1. Imports
@@ -45,7 +45,7 @@ def run_smoke_test() -> bool:
     print(f"      TPU available:      {tpu_ready}")
     if tpu_ready:
         devs = xm.get_xla_supported_devices()
-        tpu_type = "TPU v4" if any("v4" in str(x) for x in [tpu.get_tpu_type()]) else "TPU v6e"
+        tpu_type = "TPU v4"
         print(f"      Detected Hardware:  {tpu_type} ({len(devs)} local devices)")
         print(f"      TPU Devices:        {devs}")
         print(f"      Default TPU Device: {get_tpu_device()}")

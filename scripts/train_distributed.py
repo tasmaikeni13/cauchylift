@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""High-performance distributed pretraining for 125M Transformer on Google Cloud TPU (v4 / v6e).
+"""High-performance distributed pretraining for 125M Transformer on Google Cloud TPU v4-32.
 
 Orchestrates multi-core data parallelism across Google Cloud TPU chips
 using Torch-XLA PJRT distributed runtime with all-reduce gradient synchronization,
@@ -162,7 +162,7 @@ def _train_rank(index: int, args: argparse.Namespace):
     if rank == 0:
         out_dir.mkdir(parents=True, exist_ok=True)
         ckpt_dir.mkdir(parents=True, exist_ok=True)
-        tpu_type = "TPU v4" if os.path.exists("/dev/accel0") else "TPU v6e"
+        tpu_type = "TPU v4"
         print("=" * 80)
         print(f"Distributed Pretraining on {world_size}x {tpu_type}: {args.optimizer.upper()} (Seed {args.seed})")
         print(f"Model: 125M ({total_params/1e6:.1f}M params) | Vocab: {cfg.vocab_size} | SeqLen: {args.seq_len}")
@@ -292,7 +292,7 @@ def _train_rank(index: int, args: argparse.Namespace):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Distributed Multi-Chip Pretraining on Google Cloud TPU (v4 / v6e)")
+    parser = argparse.ArgumentParser(description="Distributed Multi-Chip Pretraining on Google Cloud TPU v4-32")
     parser.add_argument("--optimizer", type=str, default="cauchylift", choices=["cauchylift", "adamw"])
     parser.add_argument("--total_tokens", type=int, default=3_000_000_000)
     parser.add_argument("--seq_len", type=int, default=2048)

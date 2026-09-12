@@ -120,7 +120,7 @@ def run_pilot_arm(optimizer_name: str, base_lr: float, total_steps: int = 150, b
 
 def main():
     print("=" * 75)
-    print("Phase 6 Pilot Sweep: 125M Transformer on FineWeb-Edu (Google Cloud TPU v4 / v6e)")
+    print("Phase 6 Pilot Sweep: 125M Transformer on FineWeb-Edu (Google Cloud TPU v4-32)")
     print("=" * 75)
 
     cauchylift_lrs = [5e-4, 1e-3, 2e-3, 5e-3, 1e-2]

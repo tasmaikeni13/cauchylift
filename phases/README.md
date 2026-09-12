@@ -9,9 +9,9 @@ These nine files are copy-ready prompts for fresh Codex/agent sessions. Run them
 | 3 | PyTorch reference and native TPU/XLA fused multi-tensor kernels | Kernel benchmarks |
 | 4 | High-performance decoder-only Transformer and token data system | Smoke tests |
 | 5 | Small-scale multi-workload screen and baseline verification | Small training sweeps |
-| 6 | Scaling pilot, 8x TPU v6e (Trillium) orchestration, and dual preregistration | Medium sweeps |
-| 7 | Frozen 125M-parameter, 3B-token experiment on 8x TPU v6e | Yes (3B tokens) |
-| 8 | Frozen 350M-parameter, 3B-token flagship experiment on 8x TPU v6e | Yes (3B tokens) |
+| 6 | Scaling pilot, 16x TPU v4-32 orchestration, and dual preregistration | Medium sweeps |
+| 7 | Frozen 125M-parameter, 3B-token experiment on 16x TPU v4-32 | Yes (3B tokens) |
+| 8 | Frozen 350M-parameter, 3B-token flagship experiment on 16x TPU v4-32 | Yes (3B tokens) |
 | 9 | Cross-scale analysis, reproducibility audit, and publishable paper | Rechecks only |
 
 ## Shared State Machine
@@ -44,7 +44,7 @@ Generated checkpoints and dataset caches must stay outside Git. Small logs, conf
 - It operates with linear work in parameter count ($O(N^2)$ fiber reductions, zero matrix inversions or SVD), hardware-regular operations, single-state memory overhead (4 bytes/param, 50% less memory than AdamW), and native sub-millisecond TPU / XLA HLO execution.
 - Keep the primitive and all baselines faithful to their definitions. Give every optimizer the same tuning budget, data order, model, token accounting, schedule family, seed policy, and reporting standard.
 - Do not optimize against the confirmatory test set or hide failed configurations. Register decisions before observing held-out outcomes.
-- On the TPU server, begin with read-only inventory commands. Use the 8x TPU v6e cluster deliberately via Torch-XLA / PJRT, run memory-heavy jobs cleanly, preserve resumable checkpoints, and never alter global drivers without explicit authority.
+- On the TPU server, begin with read-only inventory commands. Use the 16x TPU v4-32 slice deliberately via Torch-XLA / PJRT, run memory-heavy jobs cleanly, preserve resumable checkpoints, and never alter global drivers without explicit authority.
 - Compute reductions and delicate denominator arithmetic in FP32 accumulation. Train in BF16 where supported and verified.
 - Continue autonomously through safe, in-scope work. Pause only for a genuine need for credentials, money, destructive system changes, unavailable hardware, or a material change of research scope.
 - Do not mark a phase PASS because code runs. PASS requires every stated gate and its evidence.

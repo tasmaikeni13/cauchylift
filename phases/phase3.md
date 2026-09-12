@@ -7,7 +7,7 @@ Work autonomously in the CauchyLift repository and complete Phase 3. Read `phase
 Implement, verify, and benchmark the complete CauchyLift optimizer stack:
 1. Pure PyTorch reference implementation (`cauchylift/reference.py`) for validation and CPU fallback.
 2. Production-grade PyTorch optimizer class (`cauchylift/optimizer.py`).
-3. High-performance native fused TPU/XLA multi-tensor kernel (`cauchylift/xla.py`) targeting Google Cloud TPU v6e (Trillium).
+3. High-performance native fused TPU/XLA multi-tensor kernel (`cauchylift/xla.py`) targeting Google Cloud TPU v4-32.
 
 ## Required Work
 

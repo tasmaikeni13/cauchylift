@@ -2,8 +2,8 @@
 """Execute Phase 7 Confirmatory Dual 3B-Token Pretraining (CauchyLift vs. AdamW).
 
 Runs:
-1. CauchyLift: 125M Transformer, 3B tokens, lr=0.005, seed 42 on Google Cloud TPU (v4 / v6e)
-2. AdamW:      125M Transformer, 3B tokens, lr=0.0006, seed 42 on Google Cloud TPU (v4 / v6e)
+1. CauchyLift: 125M Transformer, 3B tokens, lr=0.005, seed 42 on Google Cloud TPU v4-32
+2. AdamW:      125M Transformer, 3B tokens, lr=0.0006, seed 42 on Google Cloud TPU v4-32
 Then computes side-by-side comparison metrics.
 """
 
@@ -36,7 +36,7 @@ def run_command(cmd, log_path):
 def main():
     print("=" * 80)
     print("STARTING PHASE 7 CONFIRMATORY 3B-TOKEN PRETRAINING BENCHMARK")
-    print("Hardware: Google Cloud TPU v4 / v6e")
+    print("Hardware: Google Cloud TPU v4-32")
     print("Models:   125M Decoder Transformer (FineWeb-Edu, Seed 42)")
     print("=" * 80)
 

@@ -60,7 +60,7 @@ class CauchyLift(torch.optim.Optimizer):
        preventing Frobenius norm runaway and maintaining optimal layer conditioning.
 
     Requires only a single momentum state tensor per parameter (50% less optimizer memory
-    than AdamW), with sub-millisecond fused native Google Cloud TPU (v4 / v6e) / XLA HLO execution.
+    than AdamW), with sub-millisecond fused native Google Cloud TPU v4-32 / XLA HLO execution.
     """
 
     def __init__(
