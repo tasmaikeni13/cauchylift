@@ -97,10 +97,9 @@ def _execute_single_run(
     total_tokens: int,
     seq_len: int,
     batch_size: int,
-    grad_accum: int,
     output_dir: pathlib.Path,
 ):
-    tokens_per_opt_step = batch_size * seq_len * world_size * grad_accum
+    tokens_per_opt_step = batch_size * seq_len * world_size
     total_opt_steps = math.ceil(total_tokens / tokens_per_opt_step)
     warmup_steps = max(1, int(0.10 * total_opt_steps))
 
@@ -143,8 +142,7 @@ def _execute_single_run(
         print("\n" + "=" * 80)
         print(f"STARTING RUN: {opt_name.upper()} | SEED {seed}")
         print(f"Target Budget: {total_tokens:,} tokens | Steps: {total_opt_steps:,} | Warmup: {warmup_steps:,}")
-        print(f"Base LR: {base_lr} | Batch/chip: {batch_size} | Grad Accum: {grad_accum}")
-        print(f"Effective Batch Tokens: {tokens_per_opt_step:,}")
+        print(f"Base LR: {base_lr} | Batch/chip: {batch_size} | Effective Batch Tokens: {tokens_per_opt_step:,}")
         print(f"Output Directory: {output_dir.resolve()}")
         print("=" * 80)
         sys.stdout.flush()
@@ -166,20 +164,15 @@ def _execute_single_run(
             pg["lr"] = get_cosine_lr(opt_step, warmup_steps, total_opt_steps, b_lr, m_lr)
 
         opt.zero_grad()
-        accum_loss = 0.0
 
-        for accum_idx in range(grad_accum):
-            x_cpu, y_cpu, _ = dataset.next_batch()
-            x = x_cpu.to(device=dev)
-            y = y_cpu.to(device=dev)
+        x_cpu, y_cpu, _ = dataset.next_batch()
+        x = x_cpu.to(device=dev)
+        y = y_cpu.to(device=dev)
 
-            with torch.autocast(device_type="xla", dtype=torch.bfloat16):
-                _, loss = model(x, y)
-                loss_scaled = loss / float(grad_accum)
+        with torch.autocast(device_type="xla", dtype=torch.bfloat16):
+            _, loss = model(x, y)
 
-            loss_scaled.backward()
-            accum_loss += float(loss.item()) / float(grad_accum)
-
+        loss.backward()
         xm.reduce_gradients(opt)
         opt.step()
         torch_xla.sync()
@@ -188,17 +181,20 @@ def _execute_single_run(
         step_times.append(step_dur)
         tokens_seen += tokens_per_opt_step
 
-        # Periodic logging
-        if opt_step == 1 or opt_step % 20 == 0 or opt_step == total_opt_steps:
-            global_loss = xm.all_reduce("sum", torch.tensor(accum_loss, device=dev)) / float(world_size)
-            global_loss_val = float(global_loss.item())
+        # Uniform step-wise collective all-reduce maintains consistent XLA graph
+        global_loss = xm.all_reduce("sum", loss.to(torch.float32)) / float(world_size)
+        global_loss_val = float(global_loss.item())
 
+        # Periodic logging on rank 0
+        if opt_step == 1 or opt_step % 20 == 0 or opt_step == total_opt_steps:
             steady_times = step_times[-20:]
             avg_step_ms = (sum(steady_times) / max(1, len(steady_times))) * 1000.0
-            tok_per_sec = tokens_per_opt_step / (avg_step_ms / 1000.0)
+            tok_per_sec = tokens_per_opt_step / max(1e-6, avg_step_ms / 1000.0)
             achieved_tflops = (tok_per_sec * flops_per_token) / 1e12
             mfu = (achieved_tflops / (275.0 * world_size)) * 100.0
             elapsed_m = (time.perf_counter() - t_start) / 60.0
+            remaining_steps = total_opt_steps - opt_step
+            eta_m = (remaining_steps * (avg_step_ms / 1000.0)) / 60.0
 
             if rank == 0:
                 print(
@@ -208,7 +204,7 @@ def _execute_single_run(
                     f"Tok/s: {tok_per_sec:,.0f} | "
                     f"MFU: {mfu:4.1f}% | "
                     f"Seen: {tokens_seen/1e9:.3f}B ({tokens_seen/total_tokens*100:4.1f}%) | "
-                    f"Elapsed: {elapsed_m:5.1f}m",
+                    f"Elapsed: {elapsed_m:5.1f}m | ETA: {eta_m:5.1f}m",
                     flush=True,
                 )
 
@@ -221,9 +217,9 @@ def _execute_single_run(
                     vx, vy, _ = val_dataset.next_batch()
                     with torch.autocast(device_type="xla", dtype=torch.bfloat16):
                         _, vloss = model(vx.to(dev), vy.to(dev))
-                    val_losses.append(float(vloss.item()))
-            avg_val = sum(val_losses) / len(val_losses)
-            global_val = float((xm.all_reduce("sum", torch.tensor(avg_val, device=dev)) / float(world_size)).item())
+                    val_losses.append(vloss.to(torch.float32))
+            avg_val_t = sum(val_losses) / float(len(val_losses))
+            global_val = float((xm.all_reduce("sum", avg_val_t) / float(world_size)).item())
             model.train()
 
             if rank == 0:
@@ -238,18 +234,16 @@ def _execute_single_run(
                         master_only=True,
                         global_master=True,
                     )
-            xm.rendezvous(f"val_step_{opt_name}_{seed}_{opt_step}")
 
-        # Checkpointing
+        # Periodic checkpointing
         if opt_step % 2000 == 0 or opt_step == total_opt_steps:
             if rank == 0:
                 xm.save(
-                    {"step": opt_step, "tokens_seen": tokens_seen, "loss": accum_loss, "state_dict": model.state_dict()},
+                    {"step": opt_step, "tokens_seen": tokens_seen, "loss": global_loss_val, "state_dict": model.state_dict()},
                     str(output_dir / "latest.pt"),
                     master_only=True,
                     global_master=True,
                 )
-            xm.rendezvous(f"ckpt_step_{opt_name}_{seed}_{opt_step}")
 
     total_m = (time.perf_counter() - t_start) / 60.0
     if rank == 0:
@@ -323,12 +317,11 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
             base_lr=lr,
             total_tokens=args.total_tokens,
             seq_len=2048,
-            batch_size=4,
-            grad_accum=2,
+            batch_size=8,
             output_dir=output_dir,
         )
 
-        xm.rendezvous(f"run_completed_{idx}")
+        torch_xla.sync()
 
     if rank == 0:
         print("\n" + "=" * 80)
