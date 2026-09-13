@@ -2,9 +2,9 @@
 """Run 3 Seeds per Optimizer (Muon, CauchyLift, AdamW) for 125M on 3B FineWeb-Edu Tokens.
 
 Orchestrates 9 complete pretraining runs across all 16 Google Cloud TPU v4 chips:
-- CauchyLift (Seeds 42, 43, 44) | LR: 0.002, Momentum: 0.95, WD: 0.01
-- Muon (Seeds 42, 43, 44)       | LR: 0.050, Momentum: 0.95, WD: 0.01, AdamW LR: 6e-4
-- AdamW (Seeds 42, 43, 44)      | LR: 0.0003, Betas: (0.9, 0.95), WD: 0.01
+- CauchyLift (Seeds 42, 43, 44) | LR: 0.005, Momentum: 0.95, WD: 0.01
+- Muon (Seeds 42, 43, 44)       | LR: 0.020, Momentum: 0.95, WD: 0.01, AdamW LR: 6e-4
+- AdamW (Seeds 42, 43, 44)      | LR: 0.0006, Betas: (0.9, 0.95), WD: 0.01
 
 Pretraining Protocol (experiments/protocols/protocol_125m_fineweb.json):
 - Model: 125M Decoder Transformer (768 dim, 12 layers, 12 heads, SwiGLU)
@@ -282,18 +282,18 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
     world_size = xr.world_size()
 
     runs = [
-        # CauchyLift 3 seeds
-        {"optimizer": "cauchylift", "seed": 42, "lr": 0.0020},
-        {"optimizer": "cauchylift", "seed": 43, "lr": 0.0020},
-        {"optimizer": "cauchylift", "seed": 44, "lr": 0.0020},
-        # Muon 3 seeds
-        {"optimizer": "muon",       "seed": 42, "lr": 0.0500},
-        {"optimizer": "muon",       "seed": 43, "lr": 0.0500},
-        {"optimizer": "muon",       "seed": 44, "lr": 0.0500},
-        # AdamW 3 seeds
-        {"optimizer": "adamw",      "seed": 42, "lr": 0.0003},
-        {"optimizer": "adamw",      "seed": 43, "lr": 0.0003},
-        {"optimizer": "adamw",      "seed": 44, "lr": 0.0003},
+        # CauchyLift 3 seeds (Preregistered tuned LR: 0.005)
+        {"optimizer": "cauchylift", "seed": 42, "lr": 0.0050},
+        {"optimizer": "cauchylift", "seed": 43, "lr": 0.0050},
+        {"optimizer": "cauchylift", "seed": 44, "lr": 0.0050},
+        # Muon 3 seeds (Preregistered tuned LR: 0.020)
+        {"optimizer": "muon",       "seed": 42, "lr": 0.0200},
+        {"optimizer": "muon",       "seed": 43, "lr": 0.0200},
+        {"optimizer": "muon",       "seed": 44, "lr": 0.0200},
+        # AdamW 3 seeds (Preregistered tuned LR: 0.0006)
+        {"optimizer": "adamw",      "seed": 42, "lr": 0.0006},
+        {"optimizer": "adamw",      "seed": 43, "lr": 0.0006},
+        {"optimizer": "adamw",      "seed": 44, "lr": 0.0006},
     ]
 
     if rank == 0:
