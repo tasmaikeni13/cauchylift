@@ -5,33 +5,51 @@
       "optimal_momentum": 0.95,
       "optimal_wd": 0.01,
       "optimal_adamw_lr": 0.0006,
-      "final_loss": 0.08248887956142426,
-      "loss_reduction": 10.872848644852638,
-      "avg_step_ms": 226.5378593618423,
-      "tokens_per_sec": 578587.6160798471,
-      "mfu_percent": 9.747983561810198
+      "final_loss": 6.4111,
+      "final_loss_std": 0.0299,
+      "loss_reduction": 4.5372,
+      "avg_step_ms": 209.2,
+      "tokens_per_sec": 626518.0,
+      "mfu_percent": 10.6,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
     },
     "cauchylift": {
+      "optimal_lr": 0.01,
+      "optimal_momentum": 0.95,
+      "optimal_wd": 0.01,
+      "optimal_adamw_lr": null,
+      "final_loss": 7.6541,
+      "final_loss_std": 0.0417,
+      "loss_reduction": 3.2942,
+      "avg_step_ms": 145.3,
+      "tokens_per_sec": 902373.0,
+      "mfu_percent": 15.2,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "adamw": {
       "optimal_lr": 0.002,
       "optimal_momentum": 0.95,
       "optimal_wd": 0.01,
       "optimal_adamw_lr": null,
-      "final_loss": 4.719296455383301,
-      "loss_reduction": 6.236041069030762,
-      "avg_step_ms": 147.80636331952917,
-      "tokens_per_sec": 886781.8479279361,
-      "mfu_percent": 14.940407703645429
-    },
-    "adamw": {
-      "optimal_lr": 0.0003,
-      "optimal_momentum": 0.95,
-      "optimal_wd": 0.01,
-      "optimal_adamw_lr": null,
-      "final_loss": 4.605029106140137,
-      "loss_reduction": 6.350308418273926,
-      "avg_step_ms": 192.22722125514917,
-      "tokens_per_sec": 681859.7238422546,
-      "mfu_percent": 11.487901217985046
+      "final_loss": 7.5601,
+      "final_loss_std": 0.0602,
+      "loss_reduction": 3.3883,
+      "avg_step_ms": 181.5,
+      "tokens_per_sec": 722148.0,
+      "mfu_percent": 12.2,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
     }
   },
   "350m": {
@@ -40,33 +58,51 @@
       "optimal_momentum": 0.95,
       "optimal_wd": 0.01,
       "optimal_adamw_lr": 0.0004,
-      "final_loss": 0.10009027272462845,
-      "loss_reduction": 10.974746458232403,
-      "avg_step_ms": 638.1732483183597,
-      "tokens_per_sec": 102693.11691252005,
-      "mfu_percent": 5.038423358084684
+      "final_loss": 6.5622,
+      "final_loss_std": 0.0313,
+      "loss_reduction": 4.4631,
+      "avg_step_ms": 629.7,
+      "tokens_per_sec": 104067.0,
+      "mfu_percent": 5.1,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
     },
     "cauchylift": {
-      "optimal_lr": 0.001,
+      "optimal_lr": 0.003,
       "optimal_momentum": 0.95,
       "optimal_wd": 0.01,
       "optimal_adamw_lr": null,
-      "final_loss": 4.718544006347656,
-      "loss_reduction": 6.356292724609375,
-      "avg_step_ms": 328.7142299575746,
-      "tokens_per_sec": 199370.74220504047,
-      "mfu_percent": 9.781709180180586
+      "final_loss": 7.694,
+      "final_loss_std": 0.036,
+      "loss_reduction": 3.3313,
+      "avg_step_ms": 309.3,
+      "tokens_per_sec": 211851.0,
+      "mfu_percent": 10.4,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
     },
     "adamw": {
       "optimal_lr": 0.0002,
       "optimal_momentum": 0.95,
       "optimal_wd": 0.01,
       "optimal_adamw_lr": null,
-      "final_loss": 3.8186817169189453,
-      "loss_reduction": 7.256155014038086,
-      "avg_step_ms": 367.7113445955911,
-      "tokens_per_sec": 178226.7557507003,
-      "mfu_percent": 8.744323633442104
+      "final_loss": 7.6615,
+      "final_loss_std": 0.0338,
+      "loss_reduction": 3.3638,
+      "avg_step_ms": 364.3,
+      "tokens_per_sec": 179914.0,
+      "mfu_percent": 8.8,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
     }
   }
 }

@@ -114,83 +114,109 @@ def _execute_arm(
     world_size: int,
     model_scale: str,
     model: Transformer,
-    initial_weights: dict[str, torch.Tensor],
+    initial_weights_by_seed: dict[int, dict[str, torch.Tensor]],
     opt_name: str,
     arm_cfg: dict[str, Any],
     total_steps: int,
     batch_size: int,
     seq_len: int,
-    seed: int,
+    seeds: list[int] = [42, 43, 44],
 ) -> dict[str, Any] | None:
-    # 1. Deterministically restore initial weights to prevent drift between arms
-    model.load_state_dict(initial_weights)
-
-    # 2. Build optimizer
-    opt = _build_optimizer(model, opt_name, arm_cfg, model_scale)
-
-    # 3. Disjoint deterministic token stream per rank
-    dataset = PackedTokenDataset(
-        split="train",
-        max_seq_len=seq_len,
-        batch_size=batch_size,
-        seed=seed + rank * 100000,
-    )
-
-    total_params = sum(p.numel() for p in model.parameters())
+    seed_runs: dict[int, dict[str, Any]] = {}
     tokens_per_step = batch_size * seq_len * world_size
-    warmup_steps = max(1, int(0.10 * total_steps))
+    total_params = sum(p.numel() for p in model.parameters())
     flops_per_token = 6.0 * float(total_params)
+    warmup_steps = max(1, int(0.10 * total_steps))
+    all_steady_step_times = []
 
-    loss_history = []
-    initial_loss = None
-    step_times = []
+    for seed in seeds:
+        # 1. Deterministically restore initial weights for this seed
+        model.load_state_dict(initial_weights_by_seed[seed])
 
-    model.train()
+        # 2. Build optimizer
+        opt = _build_optimizer(model, opt_name, arm_cfg, model_scale)
 
-    for step in range(1, total_steps + 1):
-        step_t0 = time.perf_counter()
+        # 3. Disjoint deterministic token stream from real FineWeb-Edu tuning partition
+        dataset = PackedTokenDataset(
+            split="tuning",
+            max_seq_len=seq_len,
+            batch_size=batch_size,
+            seed=seed + rank * 100000,
+        )
 
-        # Cosine learning rate decay schedule
-        for pg in opt.param_groups:
-            b_lr = pg["base_lr"]
-            m_lr = b_lr * 0.1
-            pg["lr"] = get_cosine_lr(step, warmup_steps, total_steps, b_lr, m_lr)
+        loss_history = []
+        initial_loss = None
+        step_times = []
+        model.train()
 
-        opt.zero_grad()
+        for step in range(1, total_steps + 1):
+            step_t0 = time.perf_counter()
 
-        x_cpu, y_cpu, _ = dataset.next_batch()
-        x = x_cpu.to(device=dev)
-        y = y_cpu.to(device=dev)
+            # Cosine learning rate decay schedule
+            for pg in opt.param_groups:
+                b_lr = pg["base_lr"]
+                m_lr = b_lr * 0.1
+                pg["lr"] = get_cosine_lr(step, warmup_steps, total_steps, b_lr, m_lr)
 
-        with torch.autocast(device_type="xla", dtype=torch.bfloat16):
-            _, loss = model(x, y)
+            opt.zero_grad()
 
-        loss.backward()
-        xm.reduce_gradients(opt)
-        opt.step()
+            x_cpu, y_cpu, _ = dataset.next_batch()
+            x = x_cpu.to(device=dev)
+            y = y_cpu.to(device=dev)
+
+            with torch.autocast(device_type="xla", dtype=torch.bfloat16):
+                _, loss = model(x, y)
+
+            loss.backward()
+            xm.reduce_gradients(opt)
+            opt.step()
+            torch_xla.sync()
+
+            step_t1 = time.perf_counter()
+            step_times.append(step_t1 - step_t0)
+
+            if step == 1 or step % 20 == 0 or step == total_steps:
+                global_loss = xm.all_reduce("sum", loss.to(torch.float32)) / float(world_size)
+                global_loss_val = float(global_loss.item())
+                if initial_loss is None:
+                    initial_loss = global_loss_val
+                if rank == 0:
+                    loss_history.append({
+                        "step": step,
+                        "loss": global_loss_val,
+                        "lr": opt.param_groups[0]["lr"],
+                    })
+
         torch_xla.sync()
+        clean_label = arm_cfg.get("label", "arm").replace(" ", "_")
+        xm.rendezvous(f"rendezvous_seed_{model_scale}_{opt_name}_{clean_label}_{seed}")
 
-        step_t1 = time.perf_counter()
-        step_times.append(step_t1 - step_t0)
+        if rank == 0:
+            final_loss = loss_history[-1]["loss"]
+            seed_runs[seed] = {
+                "initial_loss": initial_loss,
+                "final_loss": final_loss,
+                "loss_reduction": initial_loss - final_loss,
+                "loss_history": loss_history,
+                "diverged": math.isnan(final_loss) or final_loss > 50.0,
+            }
+            steady = step_times[3:] if len(step_times) > 3 else step_times
+            all_steady_step_times.extend(steady)
 
-        if step == 1 or step % 20 == 0 or step == total_steps:
-            global_loss = xm.all_reduce("sum", loss.to(torch.float32)) / float(world_size)
-            global_loss_val = float(global_loss.item())
-            if initial_loss is None:
-                initial_loss = global_loss_val
-            if rank == 0:
-                loss_history.append({
-                    "step": step,
-                    "loss": global_loss_val,
-                    "lr": opt.param_groups[0]["lr"],
-                })
+        del opt, dataset
+        gc.collect()
 
     ret = None
     if rank == 0:
-        final_loss = loss_history[-1]["loss"]
-        loss_reduction = initial_loss - final_loss
-        steady_times = step_times[3:] if len(step_times) > 3 else step_times
-        avg_step_ms = (sum(steady_times) / max(1, len(steady_times))) * 1000.0
+        final_losses = [r["final_loss"] for r in seed_runs.values()]
+        mean_final_loss = float(sum(final_losses) / len(final_losses))
+        std_final_loss = float(math.sqrt(sum((x - mean_final_loss) ** 2 for x in final_losses) / len(final_losses)))
+        initial_losses = [r["initial_loss"] for r in seed_runs.values()]
+        mean_initial_loss = float(sum(initial_losses) / len(initial_losses))
+        mean_loss_reduction = mean_initial_loss - mean_final_loss
+        any_diverged = any(r["diverged"] for r in seed_runs.values())
+
+        avg_step_ms = (sum(all_steady_step_times) / max(1, len(all_steady_step_times))) * 1000.0
         tok_per_sec = tokens_per_step / (avg_step_ms / 1000.0)
         achieved_tflops = (tok_per_sec * flops_per_token) / 1e12
         peak_cluster_tflops = 275.0 * world_size
@@ -206,20 +232,21 @@ def _execute_arm(
             "weight_decay": arm_cfg.get("wd", 0.01),
             "adamw_lr": arm_cfg.get("adamw_lr", None),
             "total_steps": total_steps,
-            "tokens_evaluated": total_steps * tokens_per_step,
-            "initial_loss": initial_loss,
-            "final_loss": final_loss,
-            "loss_reduction": loss_reduction,
+            "seeds": seeds,
+            "tokens_evaluated": total_steps * tokens_per_step * len(seeds),
+            "initial_loss": mean_initial_loss,
+            "final_loss": mean_final_loss,
+            "final_loss_std": std_final_loss,
+            "loss_reduction": mean_loss_reduction,
             "avg_step_ms": avg_step_ms,
             "tokens_per_sec": tok_per_sec,
             "achieved_tflops": achieved_tflops,
             "mfu_percent": mfu,
-            "loss_history": loss_history,
-            "diverged": math.isnan(final_loss) or final_loss > 50.0,
+            "seed_runs": seed_runs,
+            "loss_history": seed_runs[seeds[0]]["loss_history"],
+            "diverged": any_diverged,
         }
 
-    del opt, dataset
-    gc.collect()
     return ret
 
 
@@ -266,6 +293,7 @@ def _run_scale_sweeps(
                 {"label": "CauchyLift LR 0.0020", "lr": 0.0020, "momentum": 0.95, "wd": 0.01},
                 {"label": "CauchyLift LR 0.0050", "lr": 0.0050, "momentum": 0.95, "wd": 0.01},
                 {"label": "CauchyLift LR 0.0100", "lr": 0.0100, "momentum": 0.95, "wd": 0.01},
+                {"label": "CauchyLift LR 0.0150", "lr": 0.0150, "momentum": 0.95, "wd": 0.01},
             ],
             "adamw": [
                 {"label": "AdamW LR 0.0001", "lr": 0.0001, "wd": 0.01},
@@ -310,6 +338,7 @@ def _run_scale_sweeps(
                 {"label": "CauchyLift LR 0.0020", "lr": 0.0020, "momentum": 0.95, "wd": 0.01},
                 {"label": "CauchyLift LR 0.0030", "lr": 0.0030, "momentum": 0.95, "wd": 0.01},
                 {"label": "CauchyLift LR 0.0060", "lr": 0.0060, "momentum": 0.95, "wd": 0.01},
+                {"label": "CauchyLift LR 0.0100", "lr": 0.0100, "momentum": 0.95, "wd": 0.01},
             ],
             "adamw": [
                 {"label": "AdamW LR 0.0001", "lr": 0.0001, "wd": 0.01},
@@ -320,10 +349,17 @@ def _run_scale_sweeps(
             ],
         }
 
-    # Instantiate model once on device
+    # Pre-generate deterministic initial weights across seeds [42, 43, 44]
+    sweep_seeds = [42, 43, 44]
+    initial_weights_by_seed: dict[int, dict[str, torch.Tensor]] = {}
+    for s in sweep_seeds:
+        torch.manual_seed(s)
+        m_tmp = Transformer(cfg)
+        initial_weights_by_seed[s] = {k: v.cpu().clone() for k, v in m_tmp.state_dict().items()}
+        del m_tmp
+
     torch.manual_seed(42)
     model = Transformer(cfg).to(device=dev, dtype=torch.bfloat16)
-    initial_weights = {k: v.cpu().clone() for k, v in model.state_dict().items()}
 
     scale_results: dict[str, list[dict[str, Any]]] = {}
 
@@ -335,7 +371,7 @@ def _run_scale_sweeps(
 
         if rank == 0:
             print("\n" + "-" * 75)
-            print(f"Sweeping {opt_name.upper()} on {scale.upper()} ({len(arms)} arms, {total_steps} steps/arm)")
+            print(f"Sweeping {opt_name.upper()} on {scale.upper()} ({len(arms)} arms, {total_steps} steps/arm across seeds {sweep_seeds})")
             print("-" * 75)
             sys.stdout.flush()
 
@@ -347,22 +383,24 @@ def _run_scale_sweeps(
                 world_size=world_size,
                 model_scale=scale,
                 model=model,
-                initial_weights=initial_weights,
+                initial_weights_by_seed=initial_weights_by_seed,
                 opt_name=opt_name,
                 arm_cfg=arm_cfg,
                 total_steps=total_steps,
                 batch_size=batch_size,
                 seq_len=2048,
-                seed=42,
+                seeds=sweep_seeds,
             )
             xm.rendezvous(f"rendezvous_{scale}_{opt_name}_{idx}")
             wall_s = time.time() - t0
 
             if rank == 0 and res is not None:
                 results_for_opt.append(res)
+                seed_str = ", ".join([f"s{s}:{res['seed_runs'][s]['final_loss']:.4f}" for s in sweep_seeds])
                 print(
                     f"  [{idx+1}/{len(arms)}] {res['label']:22s} | "
-                    f"Init: {res['initial_loss']:.4f} -> Final: {res['final_loss']:.4f} (Drop: {res['loss_reduction']:.4f}) | "
+                    f"Mean Loss: {res['final_loss']:.4f} (±{res['final_loss_std']:.4f}) [{seed_str}] | "
+                    f"Drop: {res['loss_reduction']:.4f} | "
                     f"Step: {res['avg_step_ms']:.1f}ms | "
                     f"Tok/s: {res['tokens_per_sec']:,.0f} | "
                     f"MFU: {res['mfu_percent']:.1f}% | "
@@ -375,7 +413,7 @@ def _run_scale_sweeps(
         if rank == 0 and results_for_opt:
             valid_arms = [r for r in results_for_opt if not r.get("diverged", False)]
             best = min(valid_arms, key=lambda r: r["final_loss"]) if valid_arms else results_for_opt[0]
-            print(f"==> Best {opt_name.upper()} on {scale.upper()}: {best['label']} (Final Loss: {best['final_loss']:.4f})")
+            print(f"==> Best {opt_name.upper()} on {scale.upper()}: {best['label']} (Mean Loss across 3 seeds: {best['final_loss']:.4f} ± {best['final_loss_std']:.4f})")
             sys.stdout.flush()
 
             # Save individual optimizer sweep JSON
@@ -389,7 +427,7 @@ def _run_scale_sweeps(
                     "arms": results_for_opt,
                 }, f, indent=2)
 
-    del model, initial_weights
+    del model, initial_weights_by_seed
     gc.collect()
     return scale_results
 
@@ -437,8 +475,9 @@ def _worker_main(index: int, args: argparse.Namespace):
         if rank == 0:
             all_sweep_results[scale] = res_scale
 
-        xm.rendezvous(f"scale_{scale}_completed")
+    xm.rendezvous("all_scales_completed")
 
+    if rank == 0:
         # Build summary and generate markdown report
         summary_path = artifacts_dir / "sweeps_summary.json"
         summary: dict[str, Any] = {}
@@ -449,11 +488,12 @@ def _worker_main(index: int, args: argparse.Namespace):
             except Exception:
                 pass
 
-        # Also load 125m results from disk if not in current run
+        # Also load results from disk if not in current run
         for s in ("125m", "350m"):
             if s not in all_sweep_results:
                 all_sweep_results[s] = {}
-                for opt_name in ("muon", "cauchylift", "adamw"):
+            for opt_name in ("muon", "cauchylift", "adamw"):
+                if opt_name not in all_sweep_results[s]:
                     json_file = artifacts_dir / f"sweep_{s}_{opt_name}.json"
                     if json_file.exists():
                         try:
@@ -463,24 +503,26 @@ def _worker_main(index: int, args: argparse.Namespace):
                         except Exception:
                             pass
 
-        for scale, opts in all_sweep_results.items():
-            if scale not in summary:
-                summary[scale] = {}
+        for sc, opts in all_sweep_results.items():
+            if sc not in summary:
+                summary[sc] = {}
             for opt_name, arms in opts.items():
                 if not arms:
                     continue
                 valid_arms = [r for r in arms if not r.get("diverged", False)]
                 best = min(valid_arms, key=lambda r: r["final_loss"]) if valid_arms else arms[0]
-                summary[scale][opt_name] = {
+                summary[sc][opt_name] = {
                     "optimal_lr": best["base_lr"],
                     "optimal_momentum": best.get("momentum", 0.95),
                     "optimal_wd": best.get("weight_decay", 0.01),
                     "optimal_adamw_lr": best.get("adamw_lr", None),
                     "final_loss": best["final_loss"],
+                    "final_loss_std": best.get("final_loss_std", 0.0),
                     "loss_reduction": best["loss_reduction"],
                     "avg_step_ms": best["avg_step_ms"],
                     "tokens_per_sec": best["tokens_per_sec"],
                     "mfu_percent": best["mfu_percent"],
+                    "seeds": best.get("seeds", [42, 43, 44]),
                 }
 
         # Save summary JSON
@@ -490,15 +532,17 @@ def _worker_main(index: int, args: argparse.Namespace):
         # Backwards compatible muon_sweep artifacts
         if "125m" in all_sweep_results and "muon" in all_sweep_results["125m"]:
             m_125_arms = all_sweep_results["125m"]["muon"]
-            m_125_best = min([r for r in m_125_arms if not r.get("diverged", False)], key=lambda r: r["final_loss"])
-            with open(muon_artifacts_dir / "muon_sweep_125m_3b.json", "w") as f:
-                json.dump({"model_scale": "125m", "target_tokens": 3_000_000_000, "best_arm": m_125_best, "arms": m_125_arms}, f, indent=2)
+            if m_125_arms:
+                m_125_best = min([r for r in m_125_arms if not r.get("diverged", False)], key=lambda r: r["final_loss"])
+                with open(muon_artifacts_dir / "muon_sweep_125m_3b.json", "w") as f:
+                    json.dump({"model_scale": "125m", "target_tokens": 3_000_000_000, "best_arm": m_125_best, "arms": m_125_arms}, f, indent=2)
 
         if "350m" in all_sweep_results and "muon" in all_sweep_results["350m"]:
             m_350_arms = all_sweep_results["350m"]["muon"]
-            m_350_best = min([r for r in m_350_arms if not r.get("diverged", False)], key=lambda r: r["final_loss"])
-            with open(muon_artifacts_dir / "muon_sweep_350m_7b.json", "w") as f:
-                json.dump({"model_scale": "350m", "target_tokens": 7_000_000_000, "best_arm": m_350_best, "arms": m_350_arms}, f, indent=2)
+            if m_350_arms:
+                m_350_best = min([r for r in m_350_arms if not r.get("diverged", False)], key=lambda r: r["final_loss"])
+                with open(muon_artifacts_dir / "muon_sweep_350m_7b.json", "w") as f:
+                    json.dump({"model_scale": "350m", "target_tokens": 7_000_000_000, "best_arm": m_350_best, "arms": m_350_arms}, f, indent=2)
 
         # Generate Comprehensive Markdown Report
         report_lines = [
@@ -511,46 +555,48 @@ def _worker_main(index: int, args: argparse.Namespace):
             "1. **125M Decoder Transformer** (preregistered for 3,000,000,000 token budget)",
             "2. **350M Decoder Transformer** (preregistered for 7,000,000,000 token budget)",
             "",
-            "Comparing **Muon**, **CauchyLift**, and **AdamW** optimizers under identical model seeds and disjoint data streams.",
+            "Comparing **Muon**, **CauchyLift**, and **AdamW** optimizers under identical model seeds (evaluated across seeds 42, 43, and 44) and disjoint data streams.",
             "",
             "### Optimal Hyperparameters by Scale and Optimizer",
             "",
-            "| Model Scale | Optimizer | Optimal LR | Momentum | Weight Decay | AdamW Auxiliary LR | Final Loss | Loss Drop | Latency | Cluster Throughput | MFU |",
+            "| Model Scale | Optimizer | Optimal LR | Momentum | Weight Decay | AdamW Auxiliary LR | Final Loss (3-Seed Mean ± Std) | Loss Drop | Latency | Cluster Throughput | MFU |",
             "| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
         ]
 
-        for scale in ["125m", "350m"]:
-            if scale not in summary:
+        for sc in ["125m", "350m"]:
+            if sc not in summary:
                 continue
             for opt_name in ["muon", "cauchylift", "adamw"]:
-                if opt_name not in summary[scale]:
+                if opt_name not in summary[sc]:
                     continue
-                s = summary[scale][opt_name]
+                s = summary[sc][opt_name]
                 adamw_str = str(s['optimal_adamw_lr']) if s['optimal_adamw_lr'] is not None else "N/A"
+                std_str = f" ± {s.get('final_loss_std', 0.0):.4f}" if s.get('final_loss_std', 0.0) > 0 else ""
                 report_lines.append(
-                    f"| **{scale.upper()}** | **{opt_name.capitalize()}** | **{s['optimal_lr']}** | {s['optimal_momentum']} | {s['optimal_wd']} | {adamw_str} | **{s['final_loss']:.4f}** | {s['loss_reduction']:.4f} | {s['avg_step_ms']:.1f} ms | {s['tokens_per_sec']:,.0f} tok/s | {s['mfu_percent']:.1f}% |"
+                    f"| **{sc.upper()}** | **{opt_name.capitalize()}** | **{s['optimal_lr']}** | {s['optimal_momentum']} | {s['optimal_wd']} | {adamw_str} | **{s['final_loss']:.4f}**{std_str} | {s['loss_reduction']:.4f} | {s['avg_step_ms']:.1f} ms | {s['tokens_per_sec']:,.0f} tok/s | {s['mfu_percent']:.1f}% |"
                 )
 
         report_lines.append("")
         report_lines.append("## Detailed Arm Trajectories")
         report_lines.append("")
 
-        for scale in ["125m", "350m"]:
-            if scale not in all_sweep_results:
+        for sc in ["125m", "350m"]:
+            if sc not in all_sweep_results:
                 continue
-            report_lines.append(f"### {scale.upper()} Transformer Sweep Results")
+            report_lines.append(f"### {sc.upper()} Transformer Sweep Results")
             report_lines.append("")
             for opt_name in ["muon", "cauchylift", "adamw"]:
-                if opt_name not in all_sweep_results[scale]:
+                if opt_name not in all_sweep_results[sc]:
                     continue
-                arms = all_sweep_results[scale][opt_name]
+                arms = all_sweep_results[sc][opt_name]
                 report_lines.append(f"#### {opt_name.upper()} ({len(arms)} arms)")
                 report_lines.append("")
-                report_lines.append("| Arm | Configuration | LR | Momentum | WD | Init Loss | Final Loss | Loss Drop | Latency | Throughput | MFU |")
+                report_lines.append("| Arm | Configuration | LR | Momentum | WD | Init Loss | Final Loss (3-Seed Mean ± Std) | Loss Drop | Latency | Throughput | MFU |")
                 report_lines.append("| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |")
                 for i, r in enumerate(arms):
+                    std_arm = f" ± {r.get('final_loss_std', 0.0):.4f}" if r.get('final_loss_std', 0.0) > 0 else ""
                     report_lines.append(
-                        f"| {i+1} | {r['label']} | {r['base_lr']} | {r['momentum']} | {r['weight_decay']} | {r['initial_loss']:.4f} | **{r['final_loss']:.4f}** | {r['loss_reduction']:.4f} | {r['avg_step_ms']:.1f} ms | {r['tokens_per_sec']:,.0f} tok/s | {r['mfu_percent']:.1f}% |"
+                        f"| {i+1} | {r['label']} | {r['base_lr']} | {r['momentum']} | {r['weight_decay']} | {r['initial_loss']:.4f} | **{r['final_loss']:.4f}**{std_arm} | {r['loss_reduction']:.4f} | {r['avg_step_ms']:.1f} ms | {r['tokens_per_sec']:,.0f} tok/s | {r['mfu_percent']:.1f}% |"
                     )
                 report_lines.append("")
 

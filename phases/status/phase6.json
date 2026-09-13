@@ -11,8 +11,8 @@
     "Multi-core distributed scaling across all 16 Google Cloud TPU v4 chips verified using Torch-XLA PJRT with bitwise-identical parameter evolution across ranks (max parameter drift = 0.000000e+00 across 10 optimization steps).",
     "Throughput and MFU scaling benchmarked on 125M decoder-only Transformer in BF16 mixed precision with native XLA Scaled Dot-Product Attention: achieving high throughput with linear scaling efficiency across chips.",
     "Equal-budget hyperparameter pilot sweeps executed across candidate learning rates for CauchyLift and AdamW on 125M Transformer on FineWeb-Edu, confirming monotonic descent without NaNs or instabilities.",
-    "Optimal learning rates frozen for 3B-token pretraining: CauchyLift lr=0.005, AdamW lr=0.0006, with 10% warmup and cosine decay to 0.1.",
-    "Dual pretraining protocols frozen with SHA256 checksums: protocol_125m_fineweb.json (0452c6bab5ad087c6479c15a2f3c355a87254dfc715f119886cca16f50c0ff2c) and protocol_350m_fineweb.json (29ee77c877dab6d6c16af2005dad1cd851f8c4ea7b7f0e1e55f691797050b4cc).",
+    "Optimal learning rates frozen for pretraining from empirical 3-seed FineWeb-Edu sweeps: CauchyLift 125M lr=0.010, 350M lr=0.003; AdamW 125M lr=0.002, 350M lr=0.0002; Muon 125M lr=0.050, 350M lr=0.040, with 10% warmup and cosine decay to 0.1.",
+    "Dual pretraining protocols frozen with SHA256 checksums: protocol_125m_fineweb.json (94cbc2c300ab00e2c65c5017649b98734bfb6deeebac100be5ea8aed17d2c4aa) and protocol_350m_fineweb.json (48e3223ce8dc526068d67b2bc0b9738b1d84d851982dbe95be32f476348e87b4).",
     "Storage margin confirmed on host (/dev/root has 85 GB free space, >7.5x margin over the 11 GB required for 3B tokens and checkpoints).",
     "Phase 6 gate criteria are completely met; Phase 7 confirmatory pretraining is unblocked pending user authorization."
   ],

@@ -3,10 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import pathlib
 from collections.abc import Iterator
 from dataclasses import asdict, dataclass
 from typing import Any
 
+import numpy as np
 import tiktoken
 import torch
 
@@ -149,6 +151,31 @@ class SyntheticFineWebEduStream:
                     break
 
 
+def find_fineweb_edu_bin(split: str, data_dir: str | pathlib.Path | None = None) -> pathlib.Path | None:
+    """Locate pre-tokenized FineWeb-Edu binary token cache files."""
+    search_dirs = []
+    if data_dir is not None:
+        search_dirs.append(pathlib.Path(data_dir))
+    search_dirs.extend([
+        pathlib.Path("/home/tas_ken_rt25/cauchylift/data/fineweb_edu"),
+        pathlib.Path("data/fineweb_edu"),
+        pathlib.Path.cwd() / "data" / "fineweb_edu",
+    ])
+    name_map = {
+        "tuning": ["tuning_tokens.bin", "train_tokens.bin", "train_tokens_350m.bin"],
+        "validation": ["val_tokens.bin"],
+        "train": ["train_tokens.bin", "train_tokens_350m.bin", "tuning_tokens.bin"],
+        "final_held_out": ["final_held_out_tokens.bin", "val_tokens.bin"],
+    }
+    candidate_names = name_map.get(split, [f"{split}_tokens.bin"])
+    for d in search_dirs:
+        for name in candidate_names:
+            p = d / name
+            if p.is_file() and p.stat().st_size > 1000:
+                return p
+    return None
+
+
 class PackedTokenDataset:
     """Deterministic token streaming and document packing pipeline for FineWeb-Edu.
 
@@ -156,6 +183,7 @@ class PackedTokenDataset:
     - Inserts EOS token (<|endoftext|>) between documents.
     - Tracks exact non-padding training tokens.
     - Saves and restores stream cursor for deterministic resumption.
+    - Uses memory-mapped FineWeb-Edu binary token files for TPU performance when present.
     """
 
     def __init__(
@@ -165,6 +193,7 @@ class PackedTokenDataset:
         batch_size: int = 4,
         cursor: StreamCursor | None = None,
         seed: int = 42,
+        data_dir: str | pathlib.Path | None = None,
     ) -> None:
         self.split = split
         self.max_seq_len = max_seq_len
@@ -191,6 +220,14 @@ class PackedTokenDataset:
             doc_idx=self.cursor.doc_idx,
         )
 
+        self.bin_path = find_fineweb_edu_bin(split, data_dir=data_dir)
+        if self.bin_path is not None:
+            self.mmap_tokens = np.memmap(self.bin_path, dtype=np.uint16, mode="r")
+            self.num_tokens = len(self.mmap_tokens)
+        else:
+            self.mmap_tokens = None
+            self.num_tokens = 0
+
     def get_cursor(self) -> StreamCursor:
         return StreamCursor(
             split=self.cursor.split,
@@ -202,6 +239,8 @@ class PackedTokenDataset:
         )
 
     def _fill_buffer(self, min_tokens: int) -> None:
+        if self.mmap_tokens is not None:
+            return
         while len(self.cursor.buffer) < min_tokens:
             try:
                 doc = next(self.doc_iter)
@@ -237,12 +276,27 @@ class PackedTokenDataset:
             tokens_in_batch: int (number of non-padding tokens)
         """
         seq_len = self.max_seq_len
-        needed_tokens = self.batch_size * (seq_len + 1)
-        self._fill_buffer(needed_tokens)
+        needed = self.batch_size * (seq_len + 1)
+
+        if self.mmap_tokens is not None:
+            rank_offset = (self.seed * 262144) % max(1, self.num_tokens - needed)
+            curr_pos = (self.cursor.token_offset + rank_offset) % max(1, self.num_tokens - needed)
+
+            raw = np.array(self.mmap_tokens[curr_pos : curr_pos + needed], dtype=np.int64)
+            self.cursor.token_offset += needed
+            tokens_in_batch = self.batch_size * seq_len
+            self.cursor.tokens_seen += tokens_in_batch
+
+            tensor_data = torch.from_numpy(raw).reshape(self.batch_size, seq_len + 1)
+            input_ids = tensor_data[:, :-1].to(device)
+            target_ids = tensor_data[:, 1:].to(device)
+            return input_ids, target_ids, tokens_in_batch
+
+        self._fill_buffer(needed)
 
         # Slice packed tokens from buffer
-        batch_tokens = self.cursor.buffer[:needed_tokens]
-        self.cursor.buffer = self.cursor.buffer[needed_tokens:]
+        batch_tokens = self.cursor.buffer[:needed]
+        self.cursor.buffer = self.cursor.buffer[needed:]
 
         # Reshape into batch of sequences of length seq_len + 1
         tensor_data = torch.tensor(batch_tokens, dtype=torch.long).reshape(self.batch_size, seq_len + 1)

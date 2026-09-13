@@ -54,6 +54,7 @@ def cleanup_dangling_tpu_processes() -> None:
             f"fuser -k -9 /dev/accel* 2>/dev/null || true; "
             f"pkill -9 -f multiprocessing.spawn 2>/dev/null || true; "
             f"pkill -9 -f run_muon_sweep 2>/dev/null || true; "
+            f"pkill -9 -f run_scale_sweeps 2>/dev/null || true; "
             f"pkill -9 -f train_distributed 2>/dev/null || true; "
             f"pkill -9 -f train_muon 2>/dev/null || true"
         )
@@ -74,12 +75,15 @@ def sync_codebase_to_workers() -> None:
     for ip in WORKER_IPS[1:]:
         cmd = [
             "rsync",
-            "-az",
+            "-a",
             "-e", f"ssh -i {SSH_KEY} -o StrictHostKeyChecking=no",
             "--exclude", ".git",
             "--exclude", "__pycache__",
             "--exclude", "*.pyc",
             "--exclude", "runs",
+            "--exclude", "*.parquet",
+            "--exclude", "*.bin",
+            "--exclude", "*.tmp",
             f"{repo_dir}/",
             f"{ip}:{repo_dir}/",
         ]
@@ -159,18 +163,17 @@ def sync_runs_back_from_workers() -> None:
     repo_dir = "/home/tas_ken_rt25/cauchylift"
     os.makedirs(f"{repo_dir}/runs", exist_ok=True)
     os.makedirs(f"{repo_dir}/artifacts", exist_ok=True)
+    # Rank 0 runs on Worker 0 (local host). Push newly generated artifacts and runs to other workers.
     for ip in WORKER_IPS[1:]:
         for sub in ("runs", "artifacts"):
-            check_cmd = ["ssh", "-i", SSH_KEY, "-o", "StrictHostKeyChecking=no", ip, f"test -d {repo_dir}/{sub}"]
-            if subprocess.run(check_cmd).returncode == 0:
-                cmd = [
-                    "rsync",
-                    "-az",
-                    "-e", f"ssh -i {SSH_KEY} -o StrictHostKeyChecking=no",
-                    f"{ip}:{repo_dir}/{sub}/",
-                    f"{repo_dir}/{sub}/",
-                ]
-                subprocess.run(cmd, check=False)
+            cmd = [
+                "rsync",
+                "-a",
+                "-e", f"ssh -i {SSH_KEY} -o StrictHostKeyChecking=no",
+                f"{repo_dir}/{sub}/",
+                f"{ip}:{repo_dir}/{sub}/",
+            ]
+            subprocess.run(cmd, check=False)
 
 
 

@@ -131,13 +131,14 @@ On the 125M decoder-only Transformer (`seq_len=2048`, BF16 mixed precision):
 ## Frozen Preregistered Hyperparameters (3B Token Runs)
 
 Frozen in immutable protocols with SHA256 verification:
-* **125M Model Protocol:** [`experiments/protocols/protocol_125m_fineweb.json`](experiments/protocols/protocol_125m_fineweb.json) (`SHA256: 0452c6bab5ad087c6479c15a2f3c355a87254dfc715f119886cca16f50c0ff2c`)
-  * **CauchyLift:** $\text{LR} = 0.005$, $\beta = 0.95$, $\text{weight\_decay} = 0.01$
-  * **AdamW:** $\text{LR} = 0.0006$, $\beta_1 = 0.9$, $\beta_2 = 0.95$, $\text{weight\_decay} = 0.01$
-  * **Muon:** $\text{LR} = 0.02$, $\text{momentum} = 0.95$, $\text{weight\_decay} = 0.01$
-* **350M Model Protocol:** [`experiments/protocols/protocol_350m_fineweb.json`](experiments/protocols/protocol_350m_fineweb.json) (`SHA256: 29ee77c877dab6d6c16af2005dad1cd851f8c4ea7b7f0e1e55f691797050b4cc`)
-  * **CauchyLift:** $\text{LR} = 0.003$, $\beta = 0.95$, $\text{weight\_decay} = 0.01$
-  * **AdamW:** $\text{LR} = 0.0004$, $\beta_1 = 0.9$, $\beta_2 = 0.95$, $\text{weight\_decay} = 0.01$
+* **125M Model Protocol:** [`experiments/protocols/protocol_125m_fineweb.json`](experiments/protocols/protocol_125m_fineweb.json) (`SHA256: 94cbc2c300ab00e2c65c5017649b98734bfb6deeebac100be5ea8aed17d2c4aa`)
+  * **CauchyLift:** $\text{LR} = 0.010$, $\beta = 0.95$, $\text{weight\_decay} = 0.01$
+  * **AdamW:** $\text{LR} = 0.0020$, $\beta_1 = 0.9$, $\beta_2 = 0.95$, $\text{weight\_decay} = 0.01$
+  * **Muon:** $\text{LR} = 0.050$, $\text{momentum} = 0.95$, $\text{weight\_decay} = 0.01$, $\text{adamw\_lr} = 0.0006$
+* **350M Model Protocol:** [`experiments/protocols/protocol_350m_fineweb.json`](experiments/protocols/protocol_350m_fineweb.json) (`SHA256: 48e3223ce8dc526068d67b2bc0b9738b1d84d851982dbe95be32f476348e87b4`)
+  * **CauchyLift:** $\text{LR} = 0.0030$, $\beta = 0.95$, $\text{weight\_decay} = 0.01$
+  * **AdamW:** $\text{LR} = 0.0002$, $\beta_1 = 0.9$, $\beta_2 = 0.95$, $\text{weight\_decay} = 0.01$
+  * **Muon:** $\text{LR} = 0.040$, $\text{momentum} = 0.95$, $\text{weight\_decay} = 0.01$, $\text{adamw\_lr} = 0.0004$
 
 ---
 
