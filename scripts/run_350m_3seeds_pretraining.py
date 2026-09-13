@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Run 3 Seeds per Optimizer (Muon, CauchyLift, AdamW) for 125M on 3B FineWeb-Edu Tokens.
+"""Run 3 Seeds per Optimizer (Muon, CauchyLift, AdamW) for 350M on 7B FineWeb-Edu Tokens.
 
 Orchestrates 9 complete pretraining runs across all 16 Google Cloud TPU v4 chips:
-- CauchyLift (Seeds 42, 43, 44) | LR: 0.005, Momentum: 0.95, WD: 0.01
-- Muon (Seeds 42, 43, 44)       | LR: 0.020, Momentum: 0.95, WD: 0.01, AdamW LR: 6e-4
-- AdamW (Seeds 42, 43, 44)      | LR: 0.0006, Betas: (0.9, 0.95), WD: 0.01
+- CauchyLift (Seeds 42, 43, 44) | LR: 0.003, Momentum: 0.95, WD: 0.01
+- Muon (Seeds 42, 43, 44)       | LR: 0.040, Momentum: 0.95, WD: 0.01, AdamW LR: 4e-4
+- AdamW (Seeds 42, 43, 44)      | LR: 0.0002, Betas: (0.9, 0.95), WD: 0.01
 
-Pretraining Protocol (experiments/protocols/protocol_125m_fineweb.json):
-- Model: 125M Decoder Transformer (768 dim, 12 layers, 12 heads, SwiGLU)
-- Total Tokens: 3,000,000,000 tokens
-- Effective Batch Tokens: 262,144 tokens/step (micro_batch=4, 16 chips, grad_accum=2, seq_len=2048)
-- Optimization Steps: 11,444 steps
-- Warmup Steps: 1,144 steps (10%)
+Pretraining Protocol (experiments/protocols/protocol_350m_fineweb.json):
+- Model: 350M Decoder Transformer (1024 dim, 24 layers, 16 heads, SwiGLU)
+- Total Tokens: 7,000,000,000 tokens
+- Effective Batch Tokens: 262,144 tokens/step (micro_batch=2, 16 chips, grad_accum=4, seq_len=2048)
+- Optimization Steps: 26,703 steps
+- Warmup Steps: 2,670 steps (10%)
 - Schedule: Cosine decay to 0.1x LR
 """
 
@@ -25,6 +25,7 @@ import os
 import pathlib
 import sys
 import time
+import traceback
 from typing import Any
 
 import torch
@@ -50,7 +51,13 @@ def get_cosine_lr(step: int, warmup_steps: int, total_steps: int, base_lr: float
     return min_lr + coeff * (base_lr - min_lr)
 
 
-def _build_optimizer(model: nn.Module, opt_name: str, base_lr: float, wd: float = 0.01) -> torch.optim.Optimizer:
+def _build_optimizer(
+    model: nn.Module,
+    opt_name: str,
+    base_lr: float,
+    wd: float = 0.01,
+    adamw_lr: float = 0.0004,
+) -> torch.optim.Optimizer:
     if opt_name == "cauchylift":
         decay = [p for p in model.parameters() if p.requires_grad and p.ndim >= 2]
         nodecay = [p for p in model.parameters() if p.requires_grad and p.ndim < 2]
@@ -75,7 +82,7 @@ def _build_optimizer(model: nn.Module, opt_name: str, base_lr: float, wd: float 
             nesterov=True,
             ns_steps=5,
             weight_decay=wd,
-            adamw_lr=0.0006,
+            adamw_lr=adamw_lr,
             adamw_weight_decay=wd,
             backend="auto",
         )
@@ -96,19 +103,22 @@ def _execute_single_run(
     base_lr: float,
     total_tokens: int,
     seq_len: int,
-    batch_size: int,
+    micro_batch_size: int,
+    grad_accum_steps: int,
     output_dir: pathlib.Path,
+    adamw_lr: float = 0.0004,
 ):
-    tokens_per_opt_step = batch_size * seq_len * world_size
+    tokens_per_accum_step = micro_batch_size * seq_len * world_size
+    tokens_per_opt_step = tokens_per_accum_step * grad_accum_steps
     total_opt_steps = math.ceil(total_tokens / tokens_per_opt_step)
     warmup_steps = max(1, int(0.10 * total_opt_steps))
 
     cfg = TransformerConfig(
         vocab_size=50257,
-        hidden_dim=768,
-        num_layers=12,
-        num_heads=12,
-        intermediate_dim=2048,
+        hidden_dim=1024,
+        num_layers=24,
+        num_heads=16,
+        intermediate_dim=2816,
         max_seq_len=seq_len,
         activation="swiglu",
         norm_eps=1e-5,
@@ -118,19 +128,19 @@ def _execute_single_run(
 
     torch.manual_seed(seed)
     model = Transformer(cfg).to(device=dev, dtype=torch.bfloat16)
-    opt = _build_optimizer(model, opt_name, base_lr)
+    opt = _build_optimizer(model, opt_name, base_lr, adamw_lr=adamw_lr)
 
     dataset = PackedTokenDataset(
         split="train",
         max_seq_len=seq_len,
-        batch_size=batch_size,
+        batch_size=micro_batch_size,
         seed=seed + rank * 100000,
     )
 
     val_dataset = PackedTokenDataset(
         split="validation",
         max_seq_len=seq_len,
-        batch_size=batch_size,
+        batch_size=micro_batch_size,
         seed=12345 + rank * 100000,
     )
 
@@ -140,9 +150,9 @@ def _execute_single_run(
     if rank == 0:
         output_dir.mkdir(parents=True, exist_ok=True)
         print("\n" + "=" * 80)
-        print(f"STARTING RUN: {opt_name.upper()} | SEED {seed}")
+        print(f"STARTING RUN: {opt_name.upper()} | SEED {seed} (350M Model)")
         print(f"Target Budget: {total_tokens:,} tokens | Steps: {total_opt_steps:,} | Warmup: {warmup_steps:,}")
-        print(f"Base LR: {base_lr} | Batch/chip: {batch_size} | Effective Batch Tokens: {tokens_per_opt_step:,}")
+        print(f"Base LR: {base_lr} | Batch/chip: {micro_batch_size} | Accum Steps: {grad_accum_steps} | Effective Batch Tokens: {tokens_per_opt_step:,}")
         print(f"Output Directory: {output_dir.resolve()}")
         print("=" * 80)
         sys.stdout.flush()
@@ -165,14 +175,19 @@ def _execute_single_run(
 
         opt.zero_grad()
 
-        x_cpu, y_cpu, _ = dataset.next_batch()
-        x = x_cpu.to(device=dev)
-        y = y_cpu.to(device=dev)
+        accum_loss = 0.0
+        for _ in range(grad_accum_steps):
+            x_cpu, y_cpu, _ = dataset.next_batch()
+            x = x_cpu.to(device=dev)
+            y = y_cpu.to(device=dev)
 
-        with torch.autocast(device_type="xla", dtype=torch.bfloat16):
-            _, loss = model(x, y)
+            with torch.autocast(device_type="xla", dtype=torch.bfloat16):
+                _, loss = model(x, y)
+                loss_scaled = loss / float(grad_accum_steps)
 
-        loss.backward()
+            loss_scaled.backward()
+            accum_loss += float(loss.detach().to(torch.float32).item()) / float(grad_accum_steps)
+
         xm.reduce_gradients(opt)
         opt.step()
         torch_xla.sync()
@@ -181,9 +196,8 @@ def _execute_single_run(
         step_times.append(step_dur)
         tokens_seen += tokens_per_opt_step
 
-        # Uniform step-wise collective all-reduce maintains consistent XLA graph
-        global_loss = xm.all_reduce("sum", loss.to(torch.float32)) / float(world_size)
-        global_loss_val = float(global_loss.item())
+        global_loss_t = xm.all_reduce("sum", torch.tensor(accum_loss, device=dev)) / float(world_size)
+        global_loss_val = float(global_loss_t.item())
 
         # Periodic logging on rank 0
         if opt_step == 1 or opt_step % 20 == 0 or opt_step == total_opt_steps:
@@ -276,7 +290,7 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
         rank = xr.global_ordinal()
         world_size = xr.world_size()
 
-        protocol_path = pathlib.Path("experiments/protocols/protocol_125m_fineweb.json")
+        protocol_path = pathlib.Path("experiments/protocols/protocol_350m_fineweb.json")
         with open(protocol_path) as f:
             protocol = json.load(f)
 
@@ -291,11 +305,12 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
                     "optimizer": opt_n,
                     "seed": s,
                     "lr": opt_configs[opt_n]["lr"],
+                    "adamw_lr": opt_configs[opt_n].get("adamw_lr", 0.0004),
                 })
 
         if rank == 0:
             print("=" * 80)
-            print("DISTRIBUTED PRETRAINING: 3 SEEDS x 3 OPTIMIZERS (125M on 3B FineWeb-Edu TOKENS)")
+            print("DISTRIBUTED PRETRAINING: 3 SEEDS x 3 OPTIMIZERS (350M on 7B FineWeb-Edu TOKENS)")
             print(f"Hardware: {world_size}x Google Cloud TPU v4 chips (TPU v4-32 slice, 4 nodes)")
             print(f"Protocol: {protocol_path}")
             print(f"Total Scheduled Runs: {len(runs)}")
@@ -308,7 +323,8 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
             opt_name = run_cfg["optimizer"]
             seed = run_cfg["seed"]
             lr = run_cfg["lr"]
-            output_dir = pathlib.Path(f"runs/125m_{opt_name}_seed{seed}")
+            adamw_lr = run_cfg.get("adamw_lr", 0.0004)
+            output_dir = pathlib.Path(f"runs/350m_{opt_name}_seed{seed}")
 
             if rank == 0:
                 print(f"\n>>> [QUEUE {idx+1}/{len(runs)}] Launching {opt_name.upper()} (Seed {seed}, LR {lr}) on all {world_size} TPU chips...")
@@ -323,15 +339,17 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
                 base_lr=lr,
                 total_tokens=args.total_tokens,
                 seq_len=2048,
-                batch_size=8,
+                micro_batch_size=2,
+                grad_accum_steps=4,
                 output_dir=output_dir,
+                adamw_lr=adamw_lr,
             )
 
             torch_xla.sync()
 
         if rank == 0:
             print("\n" + "=" * 80)
-            print("ALL PRETRAINING RUNS COMPLETED SUCCESSFULLY!")
+            print("ALL 350M PRETRAINING RUNS COMPLETED SUCCESSFULLY!")
             print("=" * 80)
             sys.stdout.flush()
     except Exception as e:
@@ -345,8 +363,8 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run 3 seeds x 3 optimizers for 125M on 3B tokens")
-    parser.add_argument("--total_tokens", type=int, default=3_000_000_000, help="Total token budget per run (default: 3B)")
+    parser = argparse.ArgumentParser(description="Run 3 seeds x 3 optimizers for 350M on 7B tokens")
+    parser.add_argument("--total_tokens", type=int, default=7_000_000_000, help="Total token budget per run (default: 7B)")
     parser.add_argument("--optimizer", type=str, default="all", choices=["cauchylift", "muon", "adamw", "all"])
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44], help="Random seeds to evaluate")
     args = parser.parse_args()
