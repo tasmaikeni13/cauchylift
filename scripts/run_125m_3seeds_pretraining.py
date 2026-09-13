@@ -2,15 +2,15 @@
 """Run 3 Seeds per Optimizer (Muon, CauchyLift, AdamW) for 125M on 3B FineWeb-Edu Tokens.
 
 Orchestrates 9 complete pretraining runs across all 16 Google Cloud TPU v4 chips:
-- CauchyLift (Seeds 42, 43, 44) | LR: 0.005, Momentum: 0.95, WD: 0.01
-- Muon (Seeds 42, 43, 44)       | LR: 0.020, Momentum: 0.95, WD: 0.01, AdamW LR: 6e-4
-- AdamW (Seeds 42, 43, 44)      | LR: 0.0006, Betas: (0.9, 0.95), WD: 0.01
+- CauchyLift (Seeds 42, 43, 44) | LR: 0.010, Momentum: 0.95, WD: 0.01
+- Muon (Seeds 42, 43, 44)       | LR: 0.050, Momentum: 0.95, WD: 0.01, AdamW LR: 6e-4
+- AdamW (Seeds 42, 43, 44)      | LR: 0.002, Betas: (0.9, 0.95), WD: 0.01
 
 Pretraining Protocol (experiments/protocols/protocol_125m_fineweb.json):
 - Model: 125M Decoder Transformer (768 dim, 12 layers, 12 heads, SwiGLU)
 - Total Tokens: 3,000,000,000 tokens
-- Effective Batch Tokens: 262,144 tokens/step (micro_batch=4, 16 chips, grad_accum=2, seq_len=2048)
-- Optimization Steps: 11,444 steps
+- Effective Batch Tokens: 262,144 tokens/step (batch_size=8, 16 chips, seq_len=2048)
+- Optimization Steps: 11,445 steps
 - Warmup Steps: 1,144 steps (10%)
 - Schedule: Cosine decay to 0.1x LR
 """
@@ -25,6 +25,7 @@ import os
 import pathlib
 import sys
 import time
+import traceback
 from typing import Any
 
 import torch
@@ -50,7 +51,13 @@ def get_cosine_lr(step: int, warmup_steps: int, total_steps: int, base_lr: float
     return min_lr + coeff * (base_lr - min_lr)
 
 
-def _build_optimizer(model: nn.Module, opt_name: str, base_lr: float, wd: float = 0.01) -> torch.optim.Optimizer:
+def _build_optimizer(
+    model: nn.Module,
+    opt_name: str,
+    base_lr: float,
+    wd: float = 0.01,
+    adamw_lr: float = 0.0006,
+) -> torch.optim.Optimizer:
     if opt_name == "cauchylift":
         decay = [p for p in model.parameters() if p.requires_grad and p.ndim >= 2]
         nodecay = [p for p in model.parameters() if p.requires_grad and p.ndim < 2]
@@ -75,7 +82,7 @@ def _build_optimizer(model: nn.Module, opt_name: str, base_lr: float, wd: float 
             nesterov=True,
             ns_steps=5,
             weight_decay=wd,
-            adamw_lr=0.0006,
+            adamw_lr=adamw_lr,
             adamw_weight_decay=wd,
             backend="auto",
         )
@@ -98,6 +105,7 @@ def _execute_single_run(
     seq_len: int,
     batch_size: int,
     output_dir: pathlib.Path,
+    adamw_lr: float = 0.0006,
 ):
     tokens_per_opt_step = batch_size * seq_len * world_size
     total_opt_steps = math.ceil(total_tokens / tokens_per_opt_step)
@@ -118,7 +126,7 @@ def _execute_single_run(
 
     torch.manual_seed(seed)
     model = Transformer(cfg).to(device=dev, dtype=torch.bfloat16)
-    opt = _build_optimizer(model, opt_name, base_lr)
+    opt = _build_optimizer(model, opt_name, base_lr, adamw_lr=adamw_lr)
 
     dataset = PackedTokenDataset(
         split="train",
@@ -291,6 +299,7 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
                     "optimizer": opt_n,
                     "seed": s,
                     "lr": opt_configs[opt_n]["lr"],
+                    "adamw_lr": opt_configs[opt_n].get("adamw_lr", 0.0006),
                 })
 
         if rank == 0:
@@ -308,6 +317,7 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
             opt_name = run_cfg["optimizer"]
             seed = run_cfg["seed"]
             lr = run_cfg["lr"]
+            adamw_lr = run_cfg.get("adamw_lr", 0.0006)
             output_dir = pathlib.Path(f"runs/125m_{opt_name}_seed{seed}")
 
             if rank == 0:
@@ -325,6 +335,7 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
                 seq_len=2048,
                 batch_size=8,
                 output_dir=output_dir,
+                adamw_lr=adamw_lr,
             )
 
             torch_xla.sync()
