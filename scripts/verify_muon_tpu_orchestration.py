@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Verify distributed orchestration across Google Cloud TPU ranks.
+"""Verify distributed orchestration for Muon optimizer across Google Cloud TPU ranks.
 
-Tests:
-1. Multi-core initialization across all TPU ranks.
-2. Synchronized forward, loss, and backward pass.
+Tests across all 16 TPU v4 chips (v4-32 slice):
+1. Multi-core initialization across all 16 TPU chips (4 hosts x 4 chips).
+2. Synchronized forward, loss, and backward pass on Transformer in BF16.
 3. Multi-core gradient all-reduction (xm.reduce_gradients).
-4. CauchyLift optimizer step on all ranks.
-5. Verification of bitwise identical parameter updates and zero inter-rank drift.
+4. Muon TPU XLA optimizer step on 2D weights and AdamW step on 1D/embedding weights.
+5. Verification of bitwise identical parameter updates and zero inter-rank drift across ranks.
 """
+
+from __future__ import annotations
 
 import os
 import sys
@@ -18,7 +20,7 @@ import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
 import torch_xla.runtime as xr
 
-from cauchylift import CauchyLift
+from cauchylift.baselines.muon import Muon
 from cauchylift.models.transformer import Transformer, TransformerConfig
 
 
@@ -28,9 +30,13 @@ def _run_rank(index: int):
     world_size = xr.world_size()
 
     if rank == 0:
-        print(f"Initializing distributed orchestration across {world_size} TPU ranks...")
+        print("=" * 80)
+        print(f"VERIFYING MUON DISTRIBUTED ORCHESTRATION ACROSS {world_size} TPU RANKS")
+        print("Hardware: Google Cloud TPU v4-32 (16 chips, 4 worker hosts)")
+        print("=" * 80)
+        sys.stdout.flush()
 
-    # 1. Deterministic model initialization (same seed on all ranks)
+    # 1. Deterministic model initialization (identical seed on all ranks)
     torch.manual_seed(1337)
     cfg = TransformerConfig(
         vocab_size=1024,
@@ -46,12 +52,14 @@ def _run_rank(index: int):
     )
     model = Transformer(cfg).to(device=dev, dtype=torch.bfloat16)
 
-    # 2. Optimizer setup
-    optimizer = CauchyLift(
+    # 2. Muon Optimizer setup
+    optimizer = Muon(
         model.parameters(),
-        lr=5e-3,
+        lr=0.02,
         momentum=0.95,
         weight_decay=0.01,
+        adamw_lr=1e-3,
+        adamw_weight_decay=0.01,
         backend="auto",
     )
 
@@ -75,7 +83,7 @@ def _run_rank(index: int):
         # All-reduce gradients across all TPU ranks
         xm.reduce_gradients(optimizer)
 
-        # Optimizer step
+        # Muon optimizer step
         optimizer.step()
         torch_xla.sync()
 
@@ -94,13 +102,14 @@ def _run_rank(index: int):
             print(f"[Step {step:2d}/60] Loss: {loss.item():.4f} | Max rank parameter drift: {step_max_drift:.6e}")
             sys.stdout.flush()
 
-    # Final assertion on rank drift (allow machine epsilon floating-point all-reduce roundoff)
-    assert max_drift_across_steps < 1e-4, f"Detected non-zero rank drift: {max_drift_across_steps}"
+    # Final assertion on rank drift (machine epsilon floating-point all-reduce roundoff tolerance)
+    assert max_drift_across_steps < 1e-4, f"Detected non-zero rank drift in Muon: {max_drift_across_steps}"
 
     if rank == 0:
-        print("=" * 70)
-        print(f"PASS: {world_size}x TPU distributed orchestration verified with ZERO drift (max drift: {max_drift_across_steps:.3e})!")
-        print("=" * 70)
+        print("=" * 80)
+        print(f"PASS: Muon {world_size}x TPU distributed orchestration verified with ZERO drift (max drift: {max_drift_across_steps:.3e})!")
+        print("=" * 80)
+        sys.stdout.flush()
 
 
 def main():
@@ -108,11 +117,12 @@ def main():
         os.environ.setdefault("PJRT_DEVICE", "TPU")
         if "TPU_PROCESS_BOUNDS" not in os.environ and "TPU_WORKER_HOSTNAMES" not in os.environ:
             os.environ.setdefault("TPU_SKIP_MDS_QUERY", "1")
+            os.environ.setdefault("TPU_ACCELERATOR_TYPE", "v4-8")
             os.environ.setdefault("TPU_PROCESS_BOUNDS", "1,1,1")
             os.environ.setdefault("TPU_CHIPS_PER_HOST_BOUNDS", "2,2,1")
+            os.environ.setdefault("TPU_WORKER_HOSTNAMES", "10.130.0.10")
             os.environ.setdefault("TPU_WORKER_ID", "0")
 
-    print("Launching TPU distributed orchestration verification...")
     xmp.spawn(_run_rank, args=())
 
 

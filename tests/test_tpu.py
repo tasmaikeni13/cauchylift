@@ -127,3 +127,82 @@ def test_hlo_inspection_on_tpu():
     assert len(hlo) > 0
     assert "HloModule" in hlo or "ENTRY" in hlo
     sync_tpu()
+
+
+def test_muon_newton_schulz_on_tpu():
+    """Verify that TPU-optimized Newton-Schulz orthogonalization produces orthogonal matrices on TPU."""
+    from cauchylift.xla import muon_newton_schulz_xla
+    torch.manual_seed(42)
+    dev = get_tpu_device()
+
+    # Test both square and rectangular matrices
+    for shape in [(32, 32), (32, 64), (64, 32)]:
+        G = torch.randn(shape, device=dev, dtype=torch.bfloat16)
+        X = muon_newton_schulz_xla(G, steps=5)
+        sync_tpu()
+
+        assert X.shape == shape
+        assert X.dtype == torch.bfloat16
+        assert torch.isfinite(X).all()
+
+        # For square 32x32, check polar orthogonality (Gram matrix close to scaled identity)
+        if shape == (32, 32):
+            X_cpu = X.cpu().float()
+            Gram = torch.mm(X_cpu, X_cpu.T)
+            I = torch.eye(32)
+            diff = (Gram - I).abs().max().item()
+            assert diff < 0.6, f"Muon TPU Newton-Schulz Gram deviated: {diff}"
+
+
+def test_muon_xla_step_on_tpu():
+    """Verify in-place Muon step execution on TPU with momentum and weight decay."""
+    from cauchylift.xla import muon_xla_step_
+    torch.manual_seed(123)
+    dev = get_tpu_device()
+
+    p = torch.randn(64, 128, device=dev, dtype=torch.bfloat16)
+    g = torch.randn(64, 128, device=dev, dtype=torch.bfloat16)
+    buf = torch.zeros_like(p)
+
+    p_orig = p.clone()
+    muon_xla_step_(p, g, buf, learning_rate=0.02, momentum=0.95, weight_decay=0.01, nesterov=True)
+    sync_tpu()
+
+    assert torch.isfinite(p).all()
+    assert torch.isfinite(buf).all()
+    # Ensure parameter actually updated
+    delta = (p - p_orig).abs().max().item()
+    assert delta > 1e-4, f"Parameter did not update: delta={delta}"
+
+
+def test_muon_optimizer_full_step_on_tpu():
+    """Verify full Muon optimizer step across 2D weights and 1D norms on TPU."""
+    from cauchylift.baselines.muon import Muon
+    torch.manual_seed(42)
+    dev = get_tpu_device()
+
+    class TinyBlock(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.linear1 = torch.nn.Linear(32, 64, bias=False)
+            self.linear2 = torch.nn.Linear(64, 32, bias=False)
+            self.norm = torch.nn.LayerNorm(32)
+
+        def forward(self, x):
+            return self.norm(self.linear2(torch.relu(self.linear1(x))))
+
+    model = TinyBlock().to(device=dev, dtype=torch.bfloat16)
+    opt = Muon(model.parameters(), lr=0.02, adamw_lr=1e-3, backend="auto")
+
+    x = torch.randn(4, 32, device=dev, dtype=torch.bfloat16)
+    out = model(x)
+    loss = out.sum()
+    loss.backward()
+
+    opt.step()
+    opt.zero_grad()
+    sync_tpu()
+
+    for p in model.parameters():
+        assert torch.isfinite(p).all(), "Non-finite parameter encountered after Muon step on TPU"
+

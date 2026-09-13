@@ -180,3 +180,151 @@ def cauchylift_xla_foreach_step_(
 
     if mark_step and _HAS_XLA:
         xm.mark_step()
+
+
+def muon_newton_schulz_xla(
+    G: torch.Tensor,
+    steps: int = 5,
+    eps: float = 1e-7,
+) -> torch.Tensor:
+    """Newton-Schulz quintic iteration for matrix polar orthogonalization optimized for TPU v4 XLA.
+
+    Coefficients: a = 3.4445, b = -4.7750, c = 2.0315.
+    Approximates the nearest semi-orthogonal matrix (polar factor) to G.
+    Executes native BF16 matrix multiplications on TPU v4 systolic MXUs,
+    with FP32 accumulation for the initial Frobenius normalization to prevent overflow.
+    Transposes tall matrices (m > n) to ensure the Gram matrix is of minimal dimension min(m, n) x min(m, n).
+    """
+    assert G.ndim == 2, f"Expected 2D matrix, got {G.ndim}D"
+    orig_shape = G.shape
+    orig_dtype = G.dtype
+    m, n = orig_shape
+
+    # 1. Numerically stable Frobenius normalization in FP32
+    norm = torch.linalg.vector_norm(G.to(torch.float32)).clamp_min(eps)
+    X = (G.to(torch.float32) / norm).to(torch.bfloat16)
+
+    # 2. Minimal dimension transposition: if m > n, transpose so m <= n
+    transposed = False
+    if m > n:
+        X = X.T
+        m, n = n, m
+        transposed = True
+
+    # 3. Quintic Newton-Schulz iterations on TPU TensorCores
+    a, b, c = 3.4445, -4.7750, 2.0315
+    for _ in range(steps):
+        # A = X @ X.T has shape [m, m] where m <= n
+        A = torch.matmul(X, X.T)
+        A2 = torch.matmul(A, A)
+        B = b * A + c * A2
+        X = a * X + torch.matmul(B, X)
+
+    # 4. Transpose back if needed
+    if transposed:
+        X = X.T
+
+    # 5. Aspect ratio scaling: sqrt(max(1.0, orig_m / orig_n))
+    scale = math.sqrt(max(1.0, orig_shape[0] / orig_shape[1]))
+    X = X * scale
+
+    return X.to(dtype=orig_dtype)
+
+
+@torch.no_grad()
+def muon_xla_step_(
+    parameter: torch.Tensor,
+    gradient: torch.Tensor,
+    momentum_buffer: torch.Tensor,
+    learning_rate: float,
+    momentum: float = 0.95,
+    weight_decay: float = 0.01,
+    nesterov: bool = True,
+    ns_steps: int = 5,
+) -> torch.Tensor:
+    """Execute a single in-place fused Muon optimization step on TPU v4.
+
+    1. Updates momentum buffer: M_t = beta * M_{t-1} + G_t
+    2. Computes velocity: V_t = G_t + beta * M_t if Nesterov else M_t
+    3. Computes orthogonal polar factor via TPU-optimized Newton-Schulz 5
+    4. Decoupled weight decay: W = W * (1 - lr * weight_decay)
+    5. In-place parameter update: W = W - lr * U
+    """
+    # 1. Update historical momentum buffer
+    momentum_buffer.mul_(momentum).add_(gradient)
+
+    v = gradient + momentum * momentum_buffer if nesterov else momentum_buffer
+
+    # 2. Compute Newton-Schulz orthogonalized direction on TPU
+    direction = muon_newton_schulz_xla(v, steps=ns_steps)
+
+    # 3. Decoupled weight decay
+    if weight_decay != 0.0:
+        parameter.mul_(1.0 - learning_rate * weight_decay)
+
+    # 4. Parameter update
+    parameter.add_(direction.to(parameter.dtype), alpha=-learning_rate)
+    return parameter
+
+
+@torch.no_grad()
+def muon_xla_foreach_step_(
+    parameters: list[torch.Tensor],
+    gradients: list[torch.Tensor],
+    momentum_buffers: list[torch.Tensor],
+    learning_rate: float,
+    momentum: float = 0.95,
+    weight_decay: float = 0.01,
+    nesterov: bool = True,
+    ns_steps: int = 5,
+    mark_step: bool = False,
+) -> None:
+    """Execute multi-tensor foreach Muon steps across a parameter group on TPU."""
+    if not parameters or len(parameters) != len(gradients) or len(parameters) != len(momentum_buffers):
+        raise ValueError("Parameters, gradients, and momentum_buffers must be nonempty equal-length lists")
+
+    for p, g, m in zip(parameters, gradients, momentum_buffers):
+        muon_xla_step_(
+            p, g, m,
+            learning_rate=learning_rate,
+            momentum=momentum,
+            weight_decay=weight_decay,
+            nesterov=nesterov,
+            ns_steps=ns_steps,
+        )
+
+    if mark_step and _HAS_XLA:
+        xm.mark_step()
+
+
+@torch.no_grad()
+def adamw_xla_step_(
+    parameter: torch.Tensor,
+    gradient: torch.Tensor,
+    exp_avg: torch.Tensor,
+    exp_avg_sq: torch.Tensor,
+    step: int,
+    learning_rate: float,
+    beta1: float = 0.9,
+    beta2: float = 0.95,
+    eps: float = 1e-8,
+    weight_decay: float = 0.01,
+) -> torch.Tensor:
+    """Execute single-parameter AdamW update optimized for XLA on TPU (for 1D / embedding parameters)."""
+    g_fp32 = gradient.to(torch.float32)
+
+    exp_avg.mul_(beta1).add_(g_fp32, alpha=1.0 - beta1)
+    exp_avg_sq.mul_(beta2).addcmul_(g_fp32, g_fp32, value=1.0 - beta2)
+
+    bias_correction1 = 1.0 - beta1 ** step
+    bias_correction2 = 1.0 - beta2 ** step
+
+    denom = (exp_avg_sq.sqrt() / math.sqrt(bias_correction2)).add_(eps)
+    step_size = learning_rate / bias_correction1
+
+    if weight_decay != 0.0:
+        parameter.mul_(1.0 - learning_rate * weight_decay)
+
+    parameter.addcdiv_(exp_avg.to(parameter.dtype), denom.to(parameter.dtype), value=-step_size)
+    return parameter
+

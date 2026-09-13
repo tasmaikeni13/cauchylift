@@ -1,0 +1,259 @@
+{
+  "model_scale": "350m",
+  "optimizer": "adamw",
+  "token_budget": 7000000000,
+  "best_arm": {
+    "optimizer": "adamw",
+    "label": "AdamW LR 0.0002",
+    "model_scale": "350m",
+    "parameters": 359794688,
+    "base_lr": 0.0002,
+    "momentum": 0.95,
+    "weight_decay": 0.01,
+    "adamw_lr": null,
+    "total_steps": 50,
+    "tokens_evaluated": 3276800,
+    "initial_loss": 11.074836730957031,
+    "final_loss": 3.8186817169189453,
+    "loss_reduction": 7.256155014038086,
+    "avg_step_ms": 367.7113445955911,
+    "tokens_per_sec": 178226.7557507003,
+    "achieved_tflops": 384.75023987145255,
+    "mfu_percent": 8.744323633442104,
+    "loss_history": [
+      {
+        "step": 1,
+        "loss": 11.074836730957031,
+        "lr": 4e-05
+      },
+      {
+        "step": 20,
+        "loss": 5.362379550933838,
+        "lr": 0.000155
+      },
+      {
+        "step": 40,
+        "loss": 4.231302261352539,
+        "lr": 4.1056000119291995e-05
+      },
+      {
+        "step": 50,
+        "loss": 3.8186817169189453,
+        "lr": 2e-05
+      }
+    ],
+    "diverged": false
+  },
+  "arms": [
+    {
+      "optimizer": "adamw",
+      "label": "AdamW LR 0.0001",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.0001,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 5.090221405029297,
+      "loss_reduction": 5.984615325927734,
+      "avg_step_ms": 1025.258737276748,
+      "tokens_per_sec": 63921.4255067693,
+      "achieved_tflops": 137.9915360803398,
+      "mfu_percent": 3.1361712745531776,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 2e-05
+        },
+        {
+          "step": 20,
+          "loss": 6.9869279861450195,
+          "lr": 7.75e-05
+        },
+        {
+          "step": 40,
+          "loss": 5.511502265930176,
+          "lr": 2.0528000059645997e-05
+        },
+        {
+          "step": 50,
+          "loss": 5.090221405029297,
+          "lr": 1e-05
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "adamw",
+      "label": "AdamW LR 0.0002",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.0002,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 3.8186817169189453,
+      "loss_reduction": 7.256155014038086,
+      "avg_step_ms": 367.7113445955911,
+      "tokens_per_sec": 178226.7557507003,
+      "achieved_tflops": 384.75023987145255,
+      "mfu_percent": 8.744323633442104,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 4e-05
+        },
+        {
+          "step": 20,
+          "loss": 5.362379550933838,
+          "lr": 0.000155
+        },
+        {
+          "step": 40,
+          "loss": 4.231302261352539,
+          "lr": 4.1056000119291995e-05
+        },
+        {
+          "step": 50,
+          "loss": 3.8186817169189453,
+          "lr": 2e-05
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "adamw",
+      "label": "AdamW LR 0.0004",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.0004,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 4.66727352142334,
+      "loss_reduction": 6.407563209533691,
+      "avg_step_ms": 384.16732814855885,
+      "tokens_per_sec": 170592.3309924393,
+      "achieved_tflops": 368.26928702770454,
+      "mfu_percent": 8.369756523356921,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 8e-05
+        },
+        {
+          "step": 20,
+          "loss": 4.736212730407715,
+          "lr": 0.00031
+        },
+        {
+          "step": 40,
+          "loss": 4.683469772338867,
+          "lr": 8.211200023858399e-05
+        },
+        {
+          "step": 50,
+          "loss": 4.66727352142334,
+          "lr": 4e-05
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "adamw",
+      "label": "AdamW LR 0.0008",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.0008,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 4.712655067443848,
+      "loss_reduction": 6.362181663513184,
+      "avg_step_ms": 368.2639250210412,
+      "tokens_per_sec": 177959.32630722795,
+      "achieved_tflops": 384.17292171239563,
+      "mfu_percent": 8.73120276619081,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.00016
+        },
+        {
+          "step": 20,
+          "loss": 4.7190351486206055,
+          "lr": 0.00062
+        },
+        {
+          "step": 40,
+          "loss": 4.712180137634277,
+          "lr": 0.00016422400047716798
+        },
+        {
+          "step": 50,
+          "loss": 4.712655067443848,
+          "lr": 8e-05
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "adamw",
+      "label": "AdamW LR 0.0015",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.0015,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 4.7142815589904785,
+      "loss_reduction": 6.360555171966553,
+      "avg_step_ms": 366.5302465106311,
+      "tokens_per_sec": 178801.06928119273,
+      "achieved_tflops": 385.99004961655874,
+      "mfu_percent": 8.772501127649063,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.00030000000000000003
+        },
+        {
+          "step": 20,
+          "loss": 4.7215256690979,
+          "lr": 0.0011625
+        },
+        {
+          "step": 40,
+          "loss": 4.713964462280273,
+          "lr": 0.00030792000089468997
+        },
+        {
+          "step": 50,
+          "loss": 4.7142815589904785,
+          "lr": 0.00015000000000000001
+        }
+      ],
+      "diverged": false
+    }
+  ]
+}

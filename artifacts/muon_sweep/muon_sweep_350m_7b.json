@@ -1,0 +1,427 @@
+{
+  "model_scale": "350m",
+  "optimizer": "muon",
+  "token_budget": 7000000000,
+  "best_arm": {
+    "optimizer": "muon",
+    "label": "Muon LR 0.040",
+    "model_scale": "350m",
+    "parameters": 359794688,
+    "base_lr": 0.04,
+    "momentum": 0.95,
+    "weight_decay": 0.01,
+    "adamw_lr": 0.0004,
+    "total_steps": 50,
+    "tokens_evaluated": 3276800,
+    "initial_loss": 11.074836730957031,
+    "final_loss": 0.10009027272462845,
+    "loss_reduction": 10.974746458232403,
+    "avg_step_ms": 638.1732483183597,
+    "tokens_per_sec": 102693.11691252005,
+    "achieved_tflops": 221.69062775572607,
+    "mfu_percent": 5.038423358084684,
+    "loss_history": [
+      {
+        "step": 1,
+        "loss": 11.074836730957031,
+        "lr": 0.008
+      },
+      {
+        "step": 20,
+        "loss": 0.5481043457984924,
+        "lr": 0.031000000000000003
+      },
+      {
+        "step": 40,
+        "loss": 0.1283828616142273,
+        "lr": 0.008211200023858398
+      },
+      {
+        "step": 50,
+        "loss": 0.10009027272462845,
+        "lr": 0.004
+      }
+    ],
+    "diverged": false
+  },
+  "arms": [
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.003",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.003,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.5603341460227966,
+      "loss_reduction": 10.514502584934235,
+      "avg_step_ms": 1087.1479527018853,
+      "tokens_per_sec": 60282.503257375036,
+      "achieved_tflops": 130.1359467080774,
+      "mfu_percent": 2.9576351524563047,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.0006000000000000001
+        },
+        {
+          "step": 20,
+          "loss": 2.425435781478882,
+          "lr": 0.002325
+        },
+        {
+          "step": 40,
+          "loss": 0.5846947431564331,
+          "lr": 0.0006158400017893799
+        },
+        {
+          "step": 50,
+          "loss": 0.5603341460227966,
+          "lr": 0.00030000000000000003
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.008",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.008,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.25393563508987427,
+      "loss_reduction": 10.820901095867157,
+      "avg_step_ms": 658.5025180213555,
+      "tokens_per_sec": 99522.77813138846,
+      "achieved_tflops": 214.84660144005682,
+      "mfu_percent": 4.882877305455837,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.0016
+        },
+        {
+          "step": 20,
+          "loss": 0.5926134586334229,
+          "lr": 0.006200000000000001
+        },
+        {
+          "step": 40,
+          "loss": 0.34023424983024597,
+          "lr": 0.0016422400047716797
+        },
+        {
+          "step": 50,
+          "loss": 0.25393563508987427,
+          "lr": 0.0008
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.015",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.15591108798980713,
+      "loss_reduction": 10.918925642967224,
+      "avg_step_ms": 638.9046177022503,
+      "tokens_per_sec": 102575.56164751627,
+      "achieved_tflops": 221.43685319635728,
+      "mfu_percent": 5.032655754462665,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.003
+        },
+        {
+          "step": 20,
+          "loss": 0.5710799098014832,
+          "lr": 0.011625
+        },
+        {
+          "step": 40,
+          "loss": 0.2265976518392563,
+          "lr": 0.0030792000089468995
+        },
+        {
+          "step": 50,
+          "loss": 0.15591108798980713,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.025",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.025,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.1358586847782135,
+      "loss_reduction": 10.938978046178818,
+      "avg_step_ms": 646.7836102764271,
+      "tokens_per_sec": 101326.00603777012,
+      "achieved_tflops": 218.73935237187368,
+      "mfu_percent": 4.971348917542583,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.005
+        },
+        {
+          "step": 20,
+          "loss": 0.5842592120170593,
+          "lr": 0.019375000000000003
+        },
+        {
+          "step": 40,
+          "loss": 0.18338674306869507,
+          "lr": 0.0051320000149114985
+        },
+        {
+          "step": 50,
+          "loss": 0.1358586847782135,
+          "lr": 0.0025000000000000005
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.040",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.04,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.10009027272462845,
+      "loss_reduction": 10.974746458232403,
+      "avg_step_ms": 638.1732483183597,
+      "tokens_per_sec": 102693.11691252005,
+      "achieved_tflops": 221.69062775572607,
+      "mfu_percent": 5.038423358084684,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.008
+        },
+        {
+          "step": 20,
+          "loss": 0.5481043457984924,
+          "lr": 0.031000000000000003
+        },
+        {
+          "step": 40,
+          "loss": 0.1283828616142273,
+          "lr": 0.008211200023858398
+        },
+        {
+          "step": 50,
+          "loss": 0.10009027272462845,
+          "lr": 0.004
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "momentum_0.90",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.9,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.1328774094581604,
+      "loss_reduction": 10.94195932149887,
+      "avg_step_ms": 1451.7736047233252,
+      "tokens_per_sec": 45142.02475288126,
+      "achieved_tflops": 97.45116426990714,
+      "mfu_percent": 2.2147991879524347,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.003
+        },
+        {
+          "step": 20,
+          "loss": 0.5968504548072815,
+          "lr": 0.011625
+        },
+        {
+          "step": 40,
+          "loss": 0.18983298540115356,
+          "lr": 0.0030792000089468995
+        },
+        {
+          "step": 50,
+          "loss": 0.1328774094581604,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "adamw_lr_2e-4",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0002,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.15954813361167908,
+      "loss_reduction": 10.915288597345352,
+      "avg_step_ms": 637.3414787018927,
+      "tokens_per_sec": 102827.13771192274,
+      "achieved_tflops": 221.97994758596565,
+      "mfu_percent": 5.044998808771947,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.003
+        },
+        {
+          "step": 20,
+          "loss": 0.7224928140640259,
+          "lr": 0.011625
+        },
+        {
+          "step": 40,
+          "loss": 0.2119431495666504,
+          "lr": 0.0030792000089468995
+        },
+        {
+          "step": 50,
+          "loss": 0.15954813361167908,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "adamw_lr_8e-4",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0008,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.1817568838596344,
+      "loss_reduction": 10.893079847097397,
+      "avg_step_ms": 641.0859664679168,
+      "tokens_per_sec": 102226.53969649755,
+      "achieved_tflops": 220.68339573252572,
+      "mfu_percent": 5.015531721193767,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.003
+        },
+        {
+          "step": 20,
+          "loss": 0.5589000582695007,
+          "lr": 0.011625
+        },
+        {
+          "step": 40,
+          "loss": 0.2784077823162079,
+          "lr": 0.0030792000089468995
+        },
+        {
+          "step": 50,
+          "loss": 0.1817568838596344,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "wd_0.00",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.0,
+      "adamw_lr": 0.0004,
+      "total_steps": 50,
+      "tokens_evaluated": 3276800,
+      "initial_loss": 11.074836730957031,
+      "final_loss": 0.1535346806049347,
+      "loss_reduction": 10.921302050352097,
+      "avg_step_ms": 1272.253146552991,
+      "tokens_per_sec": 51511.760986845664,
+      "achieved_tflops": 111.20194783555625,
+      "mfu_percent": 2.527316996262642,
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.074836730957031,
+          "lr": 0.003
+        },
+        {
+          "step": 20,
+          "loss": 0.5680065155029297,
+          "lr": 0.011625
+        },
+        {
+          "step": 40,
+          "loss": 0.22402310371398926,
+          "lr": 0.0030792000089468995
+        },
+        {
+          "step": 50,
+          "loss": 0.1535346806049347,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    }
+  ]
+}

@@ -46,6 +46,28 @@ def check_ssh_connectivity() -> bool:
     return True
 
 
+def cleanup_dangling_tpu_processes() -> None:
+    print("\n[CLEANUP] Ensuring all /dev/accel devices are free across all worker hosts...")
+    launcher_pid = os.getpid()
+    for ip in WORKER_IPS:
+        clean_cmd = (
+            f"fuser -k -9 /dev/accel* 2>/dev/null || true; "
+            f"pkill -9 -f multiprocessing.spawn 2>/dev/null || true; "
+            f"pkill -9 -f run_muon_sweep 2>/dev/null || true; "
+            f"pkill -9 -f train_distributed 2>/dev/null || true; "
+            f"pkill -9 -f train_muon 2>/dev/null || true"
+        )
+        cmd = [
+            "ssh",
+            "-i", SSH_KEY,
+            "-o", "StrictHostKeyChecking=no",
+            ip,
+            clean_cmd,
+        ]
+        subprocess.run(cmd, capture_output=True)
+    print("  [OK] All TPU devices cleared.")
+
+
 def sync_codebase_to_workers() -> None:
     print("\n[SYNC] Syncing repository files to workers 1, 2, 3...")
     repo_dir = "/home/tas_ken_rt25/cauchylift"
@@ -65,7 +87,7 @@ def sync_codebase_to_workers() -> None:
         print(f"  [SYNCED] {ip}:{repo_dir}")
 
 
-def launch_distributed_command(command_args: list[str]) -> int:
+def launch_distributed_command(command_args: list[str], log_path: pathlib.Path | str | None = None) -> int:
     workers_str = ",".join(WORKER_IPS)
     processes = []
 
@@ -73,37 +95,55 @@ def launch_distributed_command(command_args: list[str]) -> int:
     print("LAUNCHING TPU V4-32 DISTRIBUTED RUN ACROSS ALL 16 CHIPS")
     print(f"Hosts: {len(WORKER_IPS)} nodes (4 chips per node = 16 chips total)")
     print(f"Command: {' '.join(command_args)}")
+    if log_path:
+        print(f"Log file: {log_path}")
     print("=" * 80 + "\n")
+    sys.stdout.flush()
 
-    for rank, ip in enumerate(WORKER_IPS):
-        env_vars = (
-            f"TPU_ACCELERATOR_TYPE=v4-32 "
-            f"TPU_PROCESS_BOUNDS=1,1,4 "
-            f"TPU_CHIPS_PER_HOST_BOUNDS=2,2,1 "
-            f"TPU_WORKER_HOSTNAMES={workers_str} "
-            f"TPU_WORKER_ID={rank} "
-            f"PYTHONPATH=/home/tas_ken_rt25/cauchylift "
-        )
-        remote_cmd = (
-            f"cd /home/tas_ken_rt25/cauchylift && "
-            f"{env_vars} /home/tas_ken_rt25/venv/bin/python {' '.join(command_args)}"
-        )
-        ssh_cmd = [
-            "ssh",
-            "-i", SSH_KEY,
-            "-o", "StrictHostKeyChecking=no",
-            ip,
-            remote_cmd,
-        ]
-        p = subprocess.Popen(
-            ssh_cmd,
-            stdout=sys.stdout if rank == 0 else subprocess.DEVNULL,
-            stderr=sys.stderr if rank == 0 else subprocess.DEVNULL,
-        )
-        processes.append((rank, ip, p))
+    log_fp = open(log_path, "a", buffering=1) if log_path else None
+    try:
+        for rank, ip in enumerate(WORKER_IPS):
+            env_vars = (
+                f"PYTHONUNBUFFERED=1 "
+                f"PJRT_DEVICE=TPU "
+                f"TPU_ACCELERATOR_TYPE=v4-32 "
+                f"TPU_WORKER_HOSTNAMES={workers_str} "
+                f"TPU_WORKER_ID={rank} "
+                f"TPU_RUNTIME_AGGREGATE_NODE_METRIC=0 "
+                f"TPU_RUNTIME_METRICS_PORTS=0 "
+                f"TPU_RUNTIME_PRIMARY_METRIC_PORT=0 "
+                f"EMIT_MEGASCALE_METRICS=0 "
+                f"PYTHONPATH=/home/tas_ken_rt25/cauchylift "
+            )
+            remote_cmd = (
+                f"cd /home/tas_ken_rt25/cauchylift && "
+                f"{env_vars} /home/tas_ken_rt25/venv/bin/python -u {' '.join(command_args)}"
+            )
+            ssh_cmd = [
+                "ssh",
+                "-i", SSH_KEY,
+                "-o", "StrictHostKeyChecking=no",
+                ip,
+                remote_cmd,
+            ]
+            p_out = log_fp if log_fp else sys.stdout
+            p_err = log_fp if log_fp else sys.stderr
+            p = subprocess.Popen(
+                ssh_cmd,
+                stdout=p_out,
+                stderr=p_err,
+            )
+            processes.append((rank, ip, p))
 
-    # Wait for all workers to finish
-    exit_codes = [p.wait() for _, _, p in processes]
+        # Wait for all workers to finish
+        exit_codes = [p.wait() for _, _, p in processes]
+    finally:
+        if log_fp:
+            log_fp.flush()
+            log_fp.close()
+
+    sync_runs_back_from_workers()
+
     all_success = all(code == 0 for code in exit_codes)
     if all_success:
         print("\n" + "=" * 80)
@@ -113,6 +153,25 @@ def launch_distributed_command(command_args: list[str]) -> int:
     else:
         print(f"\n[ERROR] Worker exit codes: {exit_codes}")
         return 1
+
+
+def sync_runs_back_from_workers() -> None:
+    repo_dir = "/home/tas_ken_rt25/cauchylift"
+    os.makedirs(f"{repo_dir}/runs", exist_ok=True)
+    os.makedirs(f"{repo_dir}/artifacts", exist_ok=True)
+    for ip in WORKER_IPS[1:]:
+        for sub in ("runs", "artifacts"):
+            check_cmd = ["ssh", "-i", SSH_KEY, "-o", "StrictHostKeyChecking=no", ip, f"test -d {repo_dir}/{sub}"]
+            if subprocess.run(check_cmd).returncode == 0:
+                cmd = [
+                    "rsync",
+                    "-az",
+                    "-e", f"ssh -i {SSH_KEY} -o StrictHostKeyChecking=no",
+                    f"{ip}:{repo_dir}/{sub}/",
+                    f"{repo_dir}/{sub}/",
+                ]
+                subprocess.run(cmd, check=False)
+
 
 
 def main():
@@ -131,6 +190,7 @@ def main():
     if args.sync:
         sync_codebase_to_workers()
 
+    cleanup_dangling_tpu_processes()
     sys.exit(launch_distributed_command(cmd))
 
 

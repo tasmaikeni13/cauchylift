@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""High-performance distributed pretraining for 125M Transformer on Google Cloud TPU v4-32.
+"""High-performance distributed pretraining for Transformer models using Muon on Google Cloud TPU v4-32.
 
-Orchestrates multi-core data parallelism across Google Cloud TPU chips
-using Torch-XLA PJRT distributed runtime with all-reduce gradient synchronization,
-mixed precision BF16, and periodic validation and checkpointing.
+Features:
+- Configurable model scale: 125M (12 layers, 768 dim) and 350M (24 layers, 1024 dim).
+- Muon optimizer with Newton-Schulz 5 orthogonalization on 2D matrices and AdamW on 1D/embedding parameters.
+- Multi-core TPU data parallelism across 16 TPU v4 chips (4 hosts x 4 chips) with Torch-XLA PJRT.
+- All-reduce gradient synchronization (xm.reduce_gradients) with bitwise identical rank updates.
+- Scaled Dot-Product Attention in BF16 mixed precision.
+- Continuous FineWeb-Edu token streaming via PackedTokenDataset.
+- Cosine decay learning rate schedule with 10% warmup.
+- Structured JSONL telemetry (loss, throughput, latency, MFU) and atomic checkpointing.
 """
 
 from __future__ import annotations
@@ -24,7 +30,6 @@ import torch_xla.core.xla_model as xm
 import torch_xla.distributed.xla_multiprocessing as xmp
 import torch_xla.runtime as xr
 
-from cauchylift import CauchyLift
 from cauchylift.baselines.muon import Muon
 from cauchylift.data import PackedTokenDataset
 from cauchylift.models.transformer import Transformer, TransformerConfig
@@ -41,61 +46,10 @@ def get_cosine_lr(step: int, warmup_steps: int, total_steps: int, base_lr: float
     return min_lr + coeff * (base_lr - min_lr)
 
 
-def build_optimizer(
-    model: nn.Module,
-    optimizer_name: str,
-    lr: float,
-    momentum: float,
-    weight_decay: float,
-    adamw_lr: float = 6e-4,
-    ns_steps: int = 5,
-) -> torch.optim.Optimizer:
-    decay_params = []
-    nodecay_params = []
-    for p in model.parameters():
-        if p.requires_grad:
-            if p.ndim >= 2:
-                decay_params.append(p)
-            else:
-                nodecay_params.append(p)
-
-    param_groups = [
-        {"params": decay_params, "weight_decay": weight_decay},
-        {"params": nodecay_params, "weight_decay": 0.0},
-    ]
-
-    opt_lower = optimizer_name.lower()
-    if opt_lower == "cauchylift":
-        return CauchyLift(
-            param_groups,
-            lr=lr,
-            momentum=momentum,
-            weight_decay=weight_decay,
-            backend="auto",
-        )
-    elif opt_lower == "adamw":
-        return torch.optim.AdamW(
-            param_groups,
-            lr=lr,
-            betas=(0.9, 0.95),
-            eps=1e-8,
-            weight_decay=weight_decay,
-            fused=False,
-        )
-    elif opt_lower == "muon":
-        return Muon(
-            model.parameters(),
-            lr=lr,
-            momentum=momentum,
-            weight_decay=weight_decay,
-            adamw_lr=adamw_lr,
-            adamw_weight_decay=weight_decay,
-            ns_steps=ns_steps,
-            backend="auto",
-        )
-    else:
-        raise ValueError(f"Unsupported optimizer: {optimizer_name}")
-
+def compute_model_flops(num_params: int, seq_len: int, num_layers: int, hidden_dim: int) -> float:
+    """Compute theoretical FLOPs per token forward+backward pass: 6 * N + 12 * L * H * Q."""
+    # Standard approximation: 6 * N flops per token
+    return 6.0 * float(num_params)
 
 
 @torch.no_grad()
@@ -106,6 +60,7 @@ def evaluate(
     dev: torch.device,
     world_size: int,
 ) -> tuple[float, float]:
+    """Evaluate model on validation split and aggregate loss across all TPU chips."""
     model.eval()
     total_local = torch.tensor(0.0, device=dev, dtype=torch.float32)
     for _ in range(eval_batches):
@@ -130,7 +85,8 @@ def _train_rank(index: int, args: argparse.Namespace):
     rank = xr.global_ordinal()
     world_size = xr.world_size()
 
-    model_scale = getattr(args, "model_scale", "125m").lower()
+    # 1. Select Model Architecture
+    model_scale = args.model_scale.lower()
     if model_scale == "350m":
         cfg = TransformerConfig(
             vocab_size=50257,
@@ -144,7 +100,7 @@ def _train_rank(index: int, args: argparse.Namespace):
             tied_embeddings=True,
             attention_backend="flash",
         )
-    else:
+    elif model_scale == "125m":
         cfg = TransformerConfig(
             vocab_size=50257,
             hidden_dim=768,
@@ -157,6 +113,8 @@ def _train_rank(index: int, args: argparse.Namespace):
             tied_embeddings=True,
             attention_backend="flash",
         )
+    else:
+        raise ValueError(f"Unknown model_scale: {model_scale}. Choose '125m' or '350m'.")
 
     # Deterministic model weights initialization across all ranks
     torch.manual_seed(args.seed)
@@ -167,19 +125,22 @@ def _train_rank(index: int, args: argparse.Namespace):
     total_steps = math.ceil(args.total_tokens / tokens_per_step)
     warmup_steps = int(args.warmup_fraction * total_steps)
 
-    optimizer = build_optimizer(
-        model,
-        args.optimizer,
-        args.lr,
-        args.momentum,
-        args.weight_decay,
-        adamw_lr=getattr(args, "adamw_lr", 6e-4),
-        ns_steps=getattr(args, "ns_steps", 5),
+    # 2. Setup Muon Optimizer
+    optimizer = Muon(
+        model.parameters(),
+        lr=args.lr,
+        momentum=args.momentum,
+        nesterov=args.nesterov,
+        ns_steps=args.ns_steps,
+        weight_decay=args.weight_decay,
+        adamw_lr=args.adamw_lr,
+        adamw_weight_decay=args.weight_decay,
+        backend="auto",
     )
     for pg in optimizer.param_groups:
         pg.setdefault("base_lr", pg["lr"])
 
-    # Disjoint token streams per rank
+    # 3. Disjoint Token Streams per Rank
     train_dataset = PackedTokenDataset(
         split="train",
         max_seq_len=args.seq_len,
@@ -200,18 +161,22 @@ def _train_rank(index: int, args: argparse.Namespace):
     if rank == 0:
         out_dir.mkdir(parents=True, exist_ok=True)
         ckpt_dir.mkdir(parents=True, exist_ok=True)
-        tpu_type = "TPU v4"
         print("=" * 80)
-        print(f"Distributed Pretraining on {world_size}x {tpu_type}: {args.optimizer.upper()} (Seed {args.seed})")
-        print(f"Model: {model_scale.upper()} ({total_params/1e6:.1f}M params) | Vocab: {cfg.vocab_size} | SeqLen: {args.seq_len}")
+        print(f"MUON DISTRIBUTED PRETRAINING ON {world_size}x GOOGLE CLOUD TPU v4 (Seed {args.seed})")
+        print(f"Model Architecture: {model_scale.upper()} ({total_params/1e6:.2f}M parameters)")
+        print(f"Layers: {cfg.num_layers} | Hidden: {cfg.hidden_dim} | Heads: {cfg.num_heads} | Vocab: {cfg.vocab_size}")
         print(f"Total Budget: {args.total_tokens:,} tokens | Steps: {total_steps:,} | Warmup: {warmup_steps:,}")
         print(f"Effective Batch: {tokens_per_step:,} tokens/step ({args.batch_size} micro-batch x {world_size} chips)")
-        print(f"Base LR: {args.lr:.2e} | Momentum: {args.momentum} | Weight Decay: {args.weight_decay}")
-        if args.optimizer.lower() == "muon":
-            print(f"Muon AdamW LR: {getattr(args, 'adamw_lr', 6e-4):.2e} | NS Steps: {getattr(args, 'ns_steps', 5)}")
+        print(f"Muon LR: {args.lr:.2e} | Momentum: {args.momentum} | Weight Decay: {args.weight_decay}")
+        print(f"AdamW Auxiliary LR: {args.adamw_lr:.2e} | NS Steps: {args.ns_steps} | Nesterov: {args.nesterov}")
+        print("=" * 80)
+        sys.stdout.flush()
+
     start_step = 1
     tokens_seen = 0
     best_val_loss = float("inf")
+
+    # Resumption support
     best_ckpt = ckpt_dir / "best.pt"
     if best_ckpt.exists():
         try:
@@ -239,16 +204,18 @@ def _train_rank(index: int, args: argparse.Namespace):
     model.train()
     t_global_start = time.perf_counter()
     recent_step_times = []
+    flops_per_token = compute_model_flops(total_params, args.seq_len, cfg.num_layers, cfg.hidden_dim)
 
     for step in range(start_step, total_steps + 1):
         step_t0 = time.perf_counter()
+
+        # Update per-group learning rate with cosine decay
         for pg in optimizer.param_groups:
             base_lr = pg["base_lr"]
             min_lr = base_lr * 0.1
             pg["lr"] = get_cosine_lr(step, warmup_steps, total_steps, base_lr, min_lr)
 
         optimizer.zero_grad()
-
 
         x_cpu, y_cpu, _ = train_dataset.next_batch()
         x = x_cpu.to(device=dev)
@@ -258,7 +225,11 @@ def _train_rank(index: int, args: argparse.Namespace):
             _, loss = model(x, y)
 
         loss.backward()
+
+        # All-reduce gradients across all TPU ranks
         xm.reduce_gradients(optimizer)
+
+        # Muon step on TPU
         optimizer.step()
         torch_xla.sync()
 
@@ -269,22 +240,28 @@ def _train_rank(index: int, args: argparse.Namespace):
             recent_step_times.pop(0)
 
         # Periodic logging on rank 0
-        if rank == 0 and (step % args.log_interval == 0 or step == total_steps):
+        if rank == 0 and (step % args.log_interval == 0 or step == total_steps or step <= 5):
             loss_val = float(loss.item())
             avg_duration = sum(recent_step_times) / len(recent_step_times)
             tok_per_sec = tokens_per_step / max(avg_duration, 1e-6)
-            elapsed_s = time.perf_counter() - t_global_start
-            remaining_steps = total_steps - step
-            eta_s = remaining_steps * avg_duration
-            eta_min = eta_s / 60.0
+            # TPU v4 peak FLOPs per chip: 275 TFLOPs
+            achieved_tflops = (tok_per_sec * flops_per_token) / 1e12
+            peak_cluster_tflops = 275.0 * world_size
+            mfu = (achieved_tflops / peak_cluster_tflops) * 100.0
+            elapsed_min = (time.perf_counter() - t_global_start) / 60.0
+
+            muon_lr_now = optimizer.param_groups[0]["lr"]
+            adamw_lr_now = optimizer.param_groups[1]["lr"] if len(optimizer.param_groups) > 1 else muon_lr_now
 
             print(
-                f"[Step {step:5d}/{total_steps:5d}] "
+                f"[Step {step:5d}/{total_steps}] "
                 f"Loss: {loss_val:.4f} | "
-                f"LR: {current_lr:.2e} | "
-                f"Speed: {tok_per_sec:,.0f} tok/s ({avg_duration*1000:.1f} ms) | "
-                f"Progress: {100.0 * tokens_seen / args.total_tokens:5.1f}% | "
-                f"ETA: {eta_min:.1f}m"
+                f"Tokens: {tokens_seen:,} ({tokens_seen/args.total_tokens*100:.1f}%) | "
+                f"MuonLR: {muon_lr_now:.2e} | "
+                f"Throughput: {tok_per_sec:,.0f} tok/s | "
+                f"Latency: {avg_duration*1000:.1f}ms | "
+                f"MFU: {mfu:.1f}% | "
+                f"Elapsed: {elapsed_min:.1f}m"
             )
             sys.stdout.flush()
 
@@ -293,18 +270,23 @@ def _train_rank(index: int, args: argparse.Namespace):
                     "step": step,
                     "tokens_seen": tokens_seen,
                     "train_loss": loss_val,
-                    "lr": current_lr,
-                    "step_time_ms": avg_duration * 1000.0,
+                    "muon_lr": muon_lr_now,
+                    "adamw_lr": adamw_lr_now,
+                    "step_duration_s": avg_duration,
                     "tokens_per_sec": tok_per_sec,
-                    "elapsed_s": elapsed_s,
-                    "eta_minutes": eta_min,
+                    "achieved_tflops": achieved_tflops,
+                    "mfu_percent": mfu,
+                    "elapsed_min": elapsed_min,
+                    "timestamp": time.time(),
                 }) + "\n")
 
-        # Periodic evaluation
+        # Periodic validation
         if step % args.eval_interval == 0 or step == total_steps:
             val_loss, ppl = evaluate(model, val_dataset, args.eval_batches, dev, world_size)
             if rank == 0:
-                print(f">>> [EVAL @ Step {step:5d}] Val Loss: {val_loss:.4f} | Perplexity: {ppl:.2f}")
+                print("-" * 80)
+                print(f">>> [EVAL step {step:5d}] Validation Loss: {val_loss:.4f} | Perplexity: {ppl:.2f}")
+                print("-" * 80)
                 sys.stdout.flush()
                 with open(log_file, "a") as f:
                     f.write(json.dumps({
@@ -335,7 +317,7 @@ def _train_rank(index: int, args: argparse.Namespace):
                     print(f">>> [CHECKPOINT] Saved new best model (val_loss: {val_loss:.4f}) to {best_path}")
                     sys.stdout.flush()
 
-        # Periodic checkpointing (only saves latest.pt to conserve storage)
+        # Periodic checkpointing
         if step % args.checkpoint_interval == 0 or step == total_steps:
             latest_path = ckpt_dir / "latest.pt"
             ckpt_data = {
@@ -357,37 +339,35 @@ def _train_rank(index: int, args: argparse.Namespace):
     if rank == 0:
         total_time_min = (time.perf_counter() - t_global_start) / 60.0
         print("=" * 80)
-        print(f"Pretraining Complete for {args.optimizer.upper()}!")
-        print(f"Total Tokens: {tokens_seen:,} | Total Time: {total_time_min:.2f} minutes")
+        print("PRETRAINING COMPLETE FOR MUON!")
+        print(f"Model Scale: {model_scale.upper()} ({total_params/1e6:.2f}M params)")
+        print(f"Total Tokens: {tokens_seen:,} | Total Time: {total_time_min:.2f} minutes | Best Val Loss: {best_val_loss:.4f}")
         print("=" * 80)
+        sys.stdout.flush()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Distributed Multi-Chip Pretraining on Google Cloud TPU v4-32")
-    parser.add_argument("--optimizer", type=str, default="cauchylift", choices=["cauchylift", "adamw", "muon"])
+    parser = argparse.ArgumentParser(description="Distributed Pretraining for Transformer using Muon on Google Cloud TPU v4-32")
     parser.add_argument("--model_scale", type=str, default="125m", choices=["125m", "350m"])
     parser.add_argument("--total_tokens", type=int, default=3_000_000_000)
     parser.add_argument("--seq_len", type=int, default=2048)
     parser.add_argument("--batch_size", type=int, default=4)
-    parser.add_argument("--grad_accum", type=int, default=4)
-    parser.add_argument("--lr", type=float, default=0.005)
+    parser.add_argument("--lr", type=float, default=0.02, help="Muon learning rate for 2D internal matrices")
     parser.add_argument("--momentum", type=float, default=0.95)
+    parser.add_argument("--nesterov", action="store_true", default=True)
+    parser.add_argument("--ns_steps", type=int, default=5, help="Newton-Schulz quintic iteration steps")
     parser.add_argument("--weight_decay", type=float, default=0.01)
-    parser.add_argument("--adamw_lr", type=float, default=6e-4)
-    parser.add_argument("--ns_steps", type=int, default=5)
+    parser.add_argument("--adamw_lr", type=float, default=6e-4, help="AdamW learning rate for 1D and embedding weights")
     parser.add_argument("--warmup_fraction", type=float, default=0.10)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--log_interval", type=int, default=20)
     parser.add_argument("--eval_interval", type=int, default=500)
     parser.add_argument("--eval_batches", type=int, default=10)
     parser.add_argument("--checkpoint_interval", type=int, default=2000)
-    parser.add_argument("--output_dir", type=str, default="runs/cauchylift_125m_seed42")
+    parser.add_argument("--output_dir", type=str, default="runs/muon_125m_seed42")
     args = parser.parse_args()
 
-
-    # Launch across available TPU cores
     xmp.spawn(_train_rank, args=(args,))
-    os._exit(0)
 
 
 if __name__ == "__main__":
