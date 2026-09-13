@@ -210,6 +210,7 @@ class PackedTokenDataset:
                 self.cursor.shard_idx = 0
                 self.cursor.doc_idx = 0
                 self.doc_iter = self.stream.iter_documents(0, 0)
+                doc = next(self.doc_iter)
             # Compute next unread document pointer
             next_doc = doc["doc_idx"] + 1
             next_shard = doc["shard_idx"]

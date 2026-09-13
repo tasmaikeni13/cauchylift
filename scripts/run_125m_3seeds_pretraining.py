@@ -271,63 +271,72 @@ def _execute_single_run(
 
 
 def _pretrain_all_main(index: int, args: argparse.Namespace):
-    dev = xm.xla_device()
-    rank = xr.global_ordinal()
-    world_size = xr.world_size()
+    try:
+        dev = xm.xla_device()
+        rank = xr.global_ordinal()
+        world_size = xr.world_size()
 
-    runs = [
-        # CauchyLift 3 seeds (Preregistered tuned LR: 0.005)
-        {"optimizer": "cauchylift", "seed": 42, "lr": 0.0050},
-        {"optimizer": "cauchylift", "seed": 43, "lr": 0.0050},
-        {"optimizer": "cauchylift", "seed": 44, "lr": 0.0050},
-        # Muon 3 seeds (Preregistered tuned LR: 0.020)
-        {"optimizer": "muon",       "seed": 42, "lr": 0.0200},
-        {"optimizer": "muon",       "seed": 43, "lr": 0.0200},
-        {"optimizer": "muon",       "seed": 44, "lr": 0.0200},
-        # AdamW 3 seeds (Preregistered tuned LR: 0.0006)
-        {"optimizer": "adamw",      "seed": 42, "lr": 0.0006},
-        {"optimizer": "adamw",      "seed": 43, "lr": 0.0006},
-        {"optimizer": "adamw",      "seed": 44, "lr": 0.0006},
-    ]
-
-    if rank == 0:
-        print("=" * 80)
-        print("DISTRIBUTED PRETRAINING: 3 SEEDS x 3 OPTIMIZERS (125M on 3B FineWeb-Edu TOKENS)")
-        print(f"Hardware: {world_size}x Google Cloud TPU v4 chips (TPU v4-32 slice, 4 nodes)")
-        print(f"Total Scheduled Runs: {len(runs)}")
-        print("=" * 80)
-        sys.stdout.flush()
-
-    for idx, run_cfg in enumerate(runs):
-        opt_name = run_cfg["optimizer"]
-        seed = run_cfg["seed"]
-        lr = run_cfg["lr"]
-        output_dir = pathlib.Path(f"runs/125m_{opt_name}_seed{seed}")
+        runs = [
+            # CauchyLift 3 seeds (Preregistered tuned LR: 0.005)
+            {"optimizer": "cauchylift", "seed": 42, "lr": 0.0050},
+            {"optimizer": "cauchylift", "seed": 43, "lr": 0.0050},
+            {"optimizer": "cauchylift", "seed": 44, "lr": 0.0050},
+            # Muon 3 seeds (Preregistered tuned LR: 0.020)
+            {"optimizer": "muon",       "seed": 42, "lr": 0.0200},
+            {"optimizer": "muon",       "seed": 43, "lr": 0.0200},
+            {"optimizer": "muon",       "seed": 44, "lr": 0.0200},
+            # AdamW 3 seeds (Preregistered tuned LR: 0.0006)
+            {"optimizer": "adamw",      "seed": 42, "lr": 0.0006},
+            {"optimizer": "adamw",      "seed": 43, "lr": 0.0006},
+            {"optimizer": "adamw",      "seed": 44, "lr": 0.0006},
+        ]
 
         if rank == 0:
-            print(f"\n>>> [QUEUE {idx+1}/{len(runs)}] Launching {opt_name.upper()} (Seed {seed}) on all {world_size} TPU chips...")
+            print("=" * 80)
+            print("DISTRIBUTED PRETRAINING: 3 SEEDS x 3 OPTIMIZERS (125M on 3B FineWeb-Edu TOKENS)")
+            print(f"Hardware: {world_size}x Google Cloud TPU v4 chips (TPU v4-32 slice, 4 nodes)")
+            print(f"Total Scheduled Runs: {len(runs)}")
+            print("=" * 80)
             sys.stdout.flush()
 
-        _execute_single_run(
-            dev=dev,
-            rank=rank,
-            world_size=world_size,
-            opt_name=opt_name,
-            seed=seed,
-            base_lr=lr,
-            total_tokens=args.total_tokens,
-            seq_len=2048,
-            batch_size=8,
-            output_dir=output_dir,
-        )
+        for idx, run_cfg in enumerate(runs):
+            opt_name = run_cfg["optimizer"]
+            seed = run_cfg["seed"]
+            lr = run_cfg["lr"]
+            output_dir = pathlib.Path(f"runs/125m_{opt_name}_seed{seed}")
 
-        torch_xla.sync()
+            if rank == 0:
+                print(f"\n>>> [QUEUE {idx+1}/{len(runs)}] Launching {opt_name.upper()} (Seed {seed}) on all {world_size} TPU chips...")
+                sys.stdout.flush()
 
-    if rank == 0:
-        print("\n" + "=" * 80)
-        print("ALL 9 PRETRAINING RUNS COMPLETED SUCCESSFULLY!")
-        print("=" * 80)
-        sys.stdout.flush()
+            _execute_single_run(
+                dev=dev,
+                rank=rank,
+                world_size=world_size,
+                opt_name=opt_name,
+                seed=seed,
+                base_lr=lr,
+                total_tokens=args.total_tokens,
+                seq_len=2048,
+                batch_size=8,
+                output_dir=output_dir,
+            )
+
+            torch_xla.sync()
+
+        if rank == 0:
+            print("\n" + "=" * 80)
+            print("ALL 9 PRETRAINING RUNS COMPLETED SUCCESSFULLY!")
+            print("=" * 80)
+            sys.stdout.flush()
+    except Exception as e:
+        rank = xr.global_ordinal() if xr is not None else index
+        err_msg = f"\n[CRITICAL ERROR ON RANK {rank}]: {e}\n{traceback.format_exc()}\n"
+        print(err_msg, file=sys.stderr, flush=True)
+        print(err_msg, file=sys.stdout, flush=True)
+        with open(f"/tmp/tpu_rank_{rank}_error.log", "w") as f:
+            f.write(err_msg)
+        os._exit(1)
 
 
 def main():
