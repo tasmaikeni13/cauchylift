@@ -11,7 +11,9 @@ from cauchylift.xla import (
     is_tpu_available,
     muon_newton_schulz_xla,
     muon_xla_step_,
+    muon_xla_foreach_step_,
     adamw_xla_step_,
+    adamw_xla_foreach_step_,
     sync_tpu,
 )
 
@@ -138,7 +140,6 @@ class Muon(Optimizer):
             adamw_betas=adamw_betas,
             adamw_eps=adamw_eps,
             adamw_weight_decay=adamw_weight_decay,
-            is_muon=True,
         )
         super().__init__(param_groups, defaults)
 
@@ -166,56 +167,64 @@ class Muon(Optimizer):
         for group in self.param_groups:
             group_is_muon = group.get("is_muon", None)
 
+            xla_muon_p: list[torch.Tensor] = []
+            xla_muon_g: list[torch.Tensor] = []
+            xla_muon_b: list[torch.Tensor] = []
+
+            xla_adamw_p: list[torch.Tensor] = []
+            xla_adamw_g: list[torch.Tensor] = []
+            xla_adamw_ea: list[torch.Tensor] = []
+            xla_adamw_eas: list[torch.Tensor] = []
+            adamw_max_step = 0
+
+            lr_muon = float(group["lr"])
+            momentum = float(group.get("momentum", 0.95))
+            nesterov = bool(group.get("nesterov", True))
+            ns_steps = int(group.get("ns_steps", 5))
+            weight_decay = float(group.get("weight_decay", 0.0))
+
+            adamw_lr_val = float(group.get("adamw_lr", lr_muon if group_is_muon is False else self.defaults.get("adamw_lr", 6e-4)))
+            beta1, beta2 = group.get("adamw_betas", group.get("betas", (0.9, 0.95)))
+            eps = float(group.get("adamw_eps", group.get("eps", 1e-8)))
+            adamw_wd = float(group.get("adamw_weight_decay", weight_decay))
+
             for p in group["params"]:
                 if p.grad is None:
                     continue
                 grad = p.grad
+                if grad.layout != torch.strided:
+                    grad = grad.to_dense()
                 state = self.state[p]
 
-                # Determine whether this individual parameter uses Muon or AdamW
-                if group_is_muon is not None:
-                    is_muon_param = group_is_muon
+                # Parameter eligibility for Muon Newton-Schulz: MUST be 2D internal matrix
+                is_2d_internal = (p.ndim == 2 and min(p.shape) > 1 and max(p.shape) < 10000)
+                if group_is_muon is True:
+                    is_muon_param = (p.ndim == 2)
+                elif group_is_muon is False:
+                    is_muon_param = False
                 else:
-                    is_muon_param = p.ndim == 2 and min(p.shape) > 1 and max(p.shape) < 10000
+                    is_muon_param = is_2d_internal
 
                 if is_muon_param:
                     # ================= Muon 2D Update =================
-                    lr = group["lr"]
-                    momentum = group.get("momentum", 0.95)
-                    nesterov = group.get("nesterov", True)
-                    ns_steps = group.get("ns_steps", 5)
-                    weight_decay = group.get("weight_decay", 0.0)
-
                     if "momentum_buffer" not in state:
                         state["momentum_buffer"] = torch.zeros_like(grad)
                     buf = state["momentum_buffer"]
 
                     if use_xla and p.device.type == "xla":
-                        muon_xla_step_(
-                            p,
-                            grad,
-                            buf,
-                            learning_rate=lr,
-                            momentum=momentum,
-                            weight_decay=weight_decay,
-                            nesterov=nesterov,
-                            ns_steps=ns_steps,
-                        )
+                        xla_muon_p.append(p)
+                        xla_muon_g.append(grad)
+                        xla_muon_b.append(buf)
                     else:
                         buf.mul_(momentum).add_(grad)
                         v = grad + momentum * buf if nesterov else buf
                         update = zeropower_via_newtonschulz5(v, steps=ns_steps)
                         if weight_decay != 0.0:
-                            p.mul_(1.0 - lr * weight_decay)
-                        p.add_(update, alpha=-lr)
+                            p.mul_(1.0 - lr_muon * weight_decay)
+                        p.add_(update, alpha=-lr_muon)
 
                 else:
                     # ================= AdamW 1D/Embedding Update =================
-                    lr = group.get("adamw_lr", group.get("lr", 6e-4))
-                    beta1, beta2 = group.get("adamw_betas", group.get("betas", (0.9, 0.95)))
-                    eps = group.get("adamw_eps", group.get("eps", 1e-8))
-                    weight_decay = group.get("adamw_weight_decay", group.get("weight_decay", 0.01))
-
                     if "step" not in state:
                         state["step"] = 0
                         state["exp_avg"] = torch.zeros_like(p, dtype=torch.float32)
@@ -227,18 +236,11 @@ class Muon(Optimizer):
                     exp_avg_sq = state["exp_avg_sq"]
 
                     if use_xla and p.device.type == "xla":
-                        adamw_xla_step_(
-                            p,
-                            grad,
-                            exp_avg,
-                            exp_avg_sq,
-                            step=step_count,
-                            learning_rate=lr,
-                            beta1=beta1,
-                            beta2=beta2,
-                            eps=eps,
-                            weight_decay=weight_decay,
-                        )
+                        xla_adamw_p.append(p)
+                        xla_adamw_g.append(grad)
+                        xla_adamw_ea.append(exp_avg)
+                        xla_adamw_eas.append(exp_avg_sq)
+                        adamw_max_step = max(adamw_max_step, step_count)
                     else:
                         g_fp32 = grad.to(torch.float32)
                         exp_avg.mul_(beta1).add_(g_fp32, alpha=1.0 - beta1)
@@ -248,11 +250,38 @@ class Muon(Optimizer):
                         bias_correction2 = 1.0 - beta2 ** step_count
 
                         denom = (exp_avg_sq.sqrt() / math.sqrt(bias_correction2)).add_(eps)
-                        step_size = lr / bias_correction1
+                        step_size = adamw_lr_val / bias_correction1
 
-                        if weight_decay != 0.0:
-                            p.mul_(1.0 - lr * weight_decay)
+                        if adamw_wd != 0.0:
+                            p.mul_(1.0 - adamw_lr_val * adamw_wd)
 
-                        p.addcdiv_(exp_avg.to(p.dtype), denom.to(p.dtype), value=-step_size)
+                        update = exp_avg / denom
+                        p.add_(update.to(p.dtype), alpha=-step_size)
+
+            # Batch multi-tensor execution for eligible parameter tensors on TPU
+            if xla_muon_p:
+                muon_xla_foreach_step_(
+                    xla_muon_p,
+                    xla_muon_g,
+                    xla_muon_b,
+                    learning_rate=lr_muon,
+                    momentum=momentum,
+                    weight_decay=weight_decay,
+                    nesterov=nesterov,
+                    ns_steps=ns_steps,
+                )
+            if xla_adamw_p:
+                adamw_xla_foreach_step_(
+                    xla_adamw_p,
+                    xla_adamw_g,
+                    xla_adamw_ea,
+                    xla_adamw_eas,
+                    step=adamw_max_step,
+                    learning_rate=adamw_lr_val,
+                    beta1=beta1,
+                    beta2=beta2,
+                    eps=eps,
+                    weight_decay=adamw_wd,
+                )
 
         return loss

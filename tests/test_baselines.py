@@ -5,6 +5,7 @@ import pytest
 import torch
 
 from cauchylift.baselines import (
+    AdamW,
     Muon,
     NormalizedGD,
     SOAP,
@@ -94,3 +95,70 @@ def test_all_optimizers_step_on_toy_model():
 
         for p in model.parameters():
             assert torch.isfinite(p).all(), f"Optimizer {opt_name} produced non-finite parameter values"
+
+
+def test_adamw_matches_torch_adamw():
+    """Verify AdamW baseline numerically matches PyTorch AdamW across steps."""
+    torch.manual_seed(42)
+    p_baseline = torch.randn(16, 32)
+    p_torch = p_baseline.clone()
+
+    p_baseline = torch.nn.Parameter(p_baseline)
+    p_torch = torch.nn.Parameter(p_torch)
+
+    lr = 1e-3
+    betas = (0.9, 0.95)
+    eps = 1e-8
+    wd = 0.01
+
+    opt_baseline = AdamW([p_baseline], lr=lr, betas=betas, eps=eps, weight_decay=wd, backend="reference")
+    opt_torch = torch.optim.AdamW([p_torch], lr=lr, betas=betas, eps=eps, weight_decay=wd)
+
+    for _ in range(10):
+        grad = torch.randn(16, 32)
+        p_baseline.grad = grad.clone()
+        p_torch.grad = grad.clone()
+
+        opt_baseline.step()
+        opt_torch.step()
+
+        torch.testing.assert_close(p_baseline, p_torch, atol=1e-6, rtol=1e-5)
+
+
+def test_muon_with_custom_param_groups():
+    """Verify Muon handles custom param_groups containing both 2D and 1D params without error."""
+    torch.manual_seed(123)
+    p2d = torch.nn.Parameter(torch.randn(32, 64))
+    p1d = torch.nn.Parameter(torch.randn(64))
+
+    param_groups = [
+        {"params": [p2d], "weight_decay": 0.01},
+        {"params": [p1d], "weight_decay": 0.0},
+    ]
+
+    opt = Muon(param_groups, lr=0.02, adamw_lr=6e-4, backend="reference")
+    p2d.grad = torch.randn_like(p2d)
+    p1d.grad = torch.randn_like(p1d)
+
+    opt.step()
+    assert torch.isfinite(p2d).all()
+    assert torch.isfinite(p1d).all()
+
+
+def test_muon_adamw_learning_rate_separation():
+    """Verify Muon applies adamw_lr to 1D params and lr to 2D params."""
+    torch.manual_seed(456)
+    p2d = torch.nn.Parameter(torch.zeros(16, 16))
+    p1d = torch.nn.Parameter(torch.zeros(16))
+
+    opt = Muon([p2d, p1d], lr=0.02, adamw_lr=6e-4, weight_decay=0.0, backend="reference")
+    p2d.grad = torch.ones_like(p2d)
+    p1d.grad = torch.ones_like(p1d)
+
+    opt.step()
+    # 1D step with unit gradient under AdamW with initial buffer produces exactly adamw_lr step
+    delta_1d = p1d.abs().max().item()
+    assert math.isclose(delta_1d, 6e-4, rel_tol=1e-4), f"Expected delta_1d close to 6e-4, got {delta_1d}"
+    assert opt.param_groups[0]["lr"] == 0.02
+    assert opt.param_groups[1]["lr"] == 6e-4
+

@@ -99,3 +99,43 @@ def test_optimizer_state_and_checkpoint_resumption():
     torch.testing.assert_close(
         opt1.state[p2]["momentum_buffer"], opt2.state[p2]["momentum_buffer"]
     )
+
+
+def test_theorem1_degree0_scale_invariance():
+    """Theorem 1: U(alpha * M) = U(M) for any alpha > 0."""
+    torch.manual_seed(42)
+    M = torch.randn(32, 64)
+    u_base = cauchylift_direction(M)
+
+    for alpha in [1e-3, 0.1, 2.0, 50.0, 1000.0]:
+        u_scaled = cauchylift_direction(alpha * M)
+        torch.testing.assert_close(u_scaled, u_base, atol=1e-6, rtol=1e-5)
+
+
+def test_theorem2_coordinate_magnitude_bounds():
+    """Theorem 2: |Z_ij(M)| <= min(sqrt(n), sqrt(m))."""
+    torch.manual_seed(1337)
+    for shape in [(16, 64), (64, 16), (32, 32), (1, 100), (100, 1)]:
+        M = torch.randn(shape)
+        m, n = shape
+        bound = min(math.sqrt(m), math.sqrt(n))
+
+        squares = M.square()
+        row_rms = (squares.sum(dim=1, keepdim=True) / n).sqrt()
+        col_rms = (squares.sum(dim=0, keepdim=True) / m).sqrt()
+        denom = row_rms + col_rms
+        Z = M / denom
+
+        max_val = float(Z.abs().max().item())
+        assert max_val <= bound + 1e-6, f"Coordinate bound violated: {max_val} > {bound} for shape {shape}"
+
+
+def test_theorem3_strict_descent_alignment():
+    """Theorem 3: <M, U(M)>_F > 0 for any non-zero matrix M."""
+    torch.manual_seed(999)
+    for shape in [(16, 64), (64, 16), (32, 32), (1, 100), (100, 1)]:
+        M = torch.randn(shape)
+        u = cauchylift_direction(M)
+        dot_product = float((M * u).sum().item())
+        assert dot_product > 0.0, f"Inner product not strictly positive: {dot_product} for shape {shape}"
+

@@ -202,7 +202,7 @@ def muon_newton_schulz_xla(
 
     # 1. Numerically stable Frobenius normalization in FP32
     norm = torch.linalg.vector_norm(G.to(torch.float32)).clamp_min(eps)
-    X = (G.to(torch.float32) / norm).to(torch.bfloat16)
+    X = (G.to(torch.float32) / norm).to(torch.bfloat16 if G.dtype == torch.bfloat16 else torch.float32)
 
     # 2. Minimal dimension transposition: if m > n, transpose so m <= n
     transposed = False
@@ -303,7 +303,7 @@ def adamw_xla_step_(
     gradient: torch.Tensor,
     exp_avg: torch.Tensor,
     exp_avg_sq: torch.Tensor,
-    step: int,
+    step: int | torch.Tensor,
     learning_rate: float,
     beta1: float = 0.9,
     beta2: float = 0.95,
@@ -316,15 +316,56 @@ def adamw_xla_step_(
     exp_avg.mul_(beta1).add_(g_fp32, alpha=1.0 - beta1)
     exp_avg_sq.mul_(beta2).addcmul_(g_fp32, g_fp32, value=1.0 - beta2)
 
-    bias_correction1 = 1.0 - beta1 ** step
-    bias_correction2 = 1.0 - beta2 ** step
-
-    denom = (exp_avg_sq.sqrt() / math.sqrt(bias_correction2)).add_(eps)
-    step_size = learning_rate / bias_correction1
+    step_val = int(step.item()) if isinstance(step, torch.Tensor) and step.numel() == 1 and step.device.type == "cpu" else step
+    if isinstance(step_val, (int, float)):
+        bias_correction1 = 1.0 - beta1 ** step_val
+        bias_correction2 = 1.0 - beta2 ** step_val
+        denom = (exp_avg_sq.sqrt() / math.sqrt(bias_correction2)).add_(eps)
+        step_size = learning_rate / bias_correction1
+    else:
+        bias_correction1 = 1.0 - beta1 ** step_val
+        bias_correction2 = 1.0 - beta2 ** step_val
+        denom = (exp_avg_sq.sqrt() / bias_correction2.sqrt()).add_(eps)
+        step_size = learning_rate / bias_correction1
 
     if weight_decay != 0.0:
         parameter.mul_(1.0 - learning_rate * weight_decay)
 
-    parameter.addcdiv_(exp_avg.to(parameter.dtype), denom.to(parameter.dtype), value=-step_size)
+    update = exp_avg / denom
+    parameter.add_(update.to(parameter.dtype), alpha=-step_size)
     return parameter
+
+
+@torch.no_grad()
+def adamw_xla_foreach_step_(
+    parameters: list[torch.Tensor],
+    gradients: list[torch.Tensor],
+    exp_avgs: list[torch.Tensor],
+    exp_avg_sqs: list[torch.Tensor],
+    step: int | torch.Tensor,
+    learning_rate: float,
+    beta1: float = 0.9,
+    beta2: float = 0.95,
+    eps: float = 1e-8,
+    weight_decay: float = 0.01,
+    mark_step: bool = False,
+) -> None:
+    """Execute multi-tensor foreach AdamW steps across a parameter group on TPU."""
+    if not parameters or len(parameters) != len(gradients) or len(parameters) != len(exp_avgs) or len(parameters) != len(exp_avg_sqs):
+        raise ValueError("Parameters, gradients, exp_avgs, and exp_avg_sqs must be nonempty equal-length lists")
+
+    for p, g, ea, eas in zip(parameters, gradients, exp_avgs, exp_avg_sqs):
+        adamw_xla_step_(
+            p, g, ea, eas,
+            step=step,
+            learning_rate=learning_rate,
+            beta1=beta1,
+            beta2=beta2,
+            eps=eps,
+            weight_decay=weight_decay,
+        )
+
+    if mark_step and _HAS_XLA:
+        xm.mark_step()
+
 

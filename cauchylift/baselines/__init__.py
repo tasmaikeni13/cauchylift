@@ -1,3 +1,4 @@
+from .adamw import AdamW
 from .controls import NormalizedGD, SignDescent
 from .factory import create_optimizer
 from .muon import Muon
@@ -5,6 +6,7 @@ from .sinkgd import SinkGD
 from .soap import SOAP
 
 __all__ = [
+    "AdamW",
     "Muon",
     "NormalizedGD",
     "SOAP",

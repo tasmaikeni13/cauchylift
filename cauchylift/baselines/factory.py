@@ -5,9 +5,10 @@ from typing import Any
 
 import torch
 import torch.nn as nn
-from torch.optim import AdamW, Optimizer
+from torch.optim import Optimizer
 
 from cauchylift.optimizer import CauchyLift
+from .adamw import AdamW
 from .controls import NormalizedGD, SignDescent
 from .muon import Muon
 from .sinkgd import SinkGD
@@ -27,7 +28,7 @@ def create_optimizer(
     - 'cauchylift' (auto backend, native TPU/XLA on TPU, reference on CPU)
     - 'cauchylift_tpu' / 'cauchylift_xla' (strict=False native fast path on TPU)
     - 'cauchylift_reference' (FP32 reference path)
-    - 'adamw' (standard AdamW)
+    - 'adamw' (AdamW with native TPU/XLA kernel support)
     - 'muon' (Muon with Newton-Schulz 5)
     - 'soap' (SOAP with Shampoo preconditioning in eigenbasis)
     - 'sinkgd' (SinkGD with 5-round Sinkhorn normalization)
@@ -41,23 +42,40 @@ def create_optimizer(
         params = list(model_or_params)
 
     if name_clean in ("cauchylift", "cauchylift_auto"):
-        # CauchyLift does not accept weight decay in primitive
-        return CauchyLift(params, lr=lr, backend="auto", strict=True)
+        return CauchyLift(
+            params,
+            lr=lr,
+            weight_decay=weight_decay,
+            momentum=kwargs.get("momentum", 0.95),
+            nesterov=kwargs.get("nesterov", False),
+            backend="auto",
+            strict=True,
+        )
     elif name_clean in ("cauchylift_tpu", "cauchylift_xla", "cauchylift_hip", "cauchylift_fast"):
-        return CauchyLift(params, lr=lr, backend="xla", strict=False)
+        return CauchyLift(
+            params,
+            lr=lr,
+            weight_decay=weight_decay,
+            momentum=kwargs.get("momentum", 0.95),
+            nesterov=kwargs.get("nesterov", False),
+            backend="xla",
+            strict=False,
+        )
     elif name_clean == "cauchylift_reference":
-        return CauchyLift(params, lr=lr, backend="reference", strict=True)
+        return CauchyLift(
+            params,
+            lr=lr,
+            weight_decay=weight_decay,
+            momentum=kwargs.get("momentum", 0.95),
+            nesterov=kwargs.get("nesterov", False),
+            backend="reference",
+            strict=True,
+        )
     elif name_clean == "adamw":
         betas = kwargs.get("betas", (0.9, 0.95))
         eps = kwargs.get("eps", 1e-8)
-        # Attempt fused AdamW if on CUDA/ROCm
-        fused = kwargs.get("fused", None)
-        if fused is None:
-            fused = torch.cuda.is_available() and any(p.is_cuda for p in params)
-        try:
-            return AdamW(params, lr=lr, betas=betas, eps=eps, weight_decay=weight_decay, fused=fused)
-        except Exception:
-            return AdamW(params, lr=lr, betas=betas, eps=eps, weight_decay=weight_decay, fused=False)
+        backend = kwargs.get("backend", "auto")
+        return AdamW(params, lr=lr, betas=betas, eps=eps, weight_decay=weight_decay, backend=backend)
     elif name_clean == "muon":
         return Muon(params, lr=lr, weight_decay=weight_decay, **kwargs)
     elif name_clean == "soap":
