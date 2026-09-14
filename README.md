@@ -136,17 +136,55 @@ On the 125M decoder-only Transformer (`seq_len=2048`, BF16 mixed precision):
 
 ---
 
-## Frozen Preregistered Hyperparameters (3B Token Runs)
+## Empirical Hyperparameter Sweep Results (16x TPU v4-32 Slice)
 
-Frozen in immutable protocols with SHA256 verification:
-* **125M Model Protocol:** [`experiments/protocols/protocol_125m_fineweb.json`](experiments/protocols/protocol_125m_fineweb.json) (`SHA256: 94cbc2c300ab00e2c65c5017649b98734bfb6deeebac100be5ea8aed17d2c4aa`)
-  * **CauchyLift:** $\text{LR} = 0.010$, $\beta = 0.95$, $\text{weight\_decay} = 0.01$
-  * **AdamW:** $\text{LR} = 0.0020$, $\beta_1 = 0.9$, $\beta_2 = 0.95$, $\text{weight\_decay} = 0.01$
-  * **Muon:** $\text{LR} = 0.050$, $\text{momentum} = 0.95$, $\text{weight\_decay} = 0.01$, $\text{adamw\_lr} = 0.0006$
-* **350M Model Protocol:** [`experiments/protocols/protocol_350m_fineweb.json`](experiments/protocols/protocol_350m_fineweb.json) (`SHA256: 48e3223ce8dc526068d67b2bc0b9738b1d84d851982dbe95be32f476348e87b4`)
-  * **CauchyLift:** $\text{LR} = 0.0030$, $\beta = 0.95$, $\text{weight\_decay} = 0.01$
-  * **AdamW:** $\text{LR} = 0.0002$, $\beta_1 = 0.9$, $\beta_2 = 0.95$, $\text{weight\_decay} = 0.01$
-  * **Muon:** $\text{LR} = 0.040$, $\text{momentum} = 0.95$, $\text{weight\_decay} = 0.01$, $\text{adamw\_lr} = 0.0004$
+A 24-arm systematic hyperparameter sweep was executed across all 16 Google Cloud TPU v4 chips on real FineWeb-Edu tokens (150M tokens per arm, 573 macro-steps @ 262,144 tokens/step) across 3 independent random seeds (`42`, `43`, `44`).
+
+Full reports and data:
+* **Markdown Report:** [`artifacts/sweeps/hp_sweep_report.md`](artifacts/sweeps/hp_sweep_report.md)
+* **Structured JSON Data:** [`artifacts/sweeps/hp_sweep_results.json`](artifacts/sweeps/hp_sweep_results.json)
+
+### Optimal Hyperparameters Found (Mean Val Loss ± Cross-Seed Std Dev)
+
+| Optimizer | Optimal Learning Rate | Cross-Seed Val Loss ($\mu \pm \sigma$) | Perplexity | Throughput (16 Chips) | Hardware MFU |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **AdamW Baseline** | **`0.0020`** | **`4.7713 ± 0.0460`** | **118.16** | 1,063,519 tok/s | 17.9% |
+| **CauchyLift (Canonical)** | **`0.0010`** | **`5.6019 ± 0.0465`** | **271.14** | 1,079,770 tok/s | 18.2% |
+
+### Commands to Run the Full 3B Pretraining Comparison (3 Seeds Each)
+
+#### 1. CauchyLift Optimal 3B Pretraining (`LR = 0.0010`, `adamw_lr = 0.0006`)
+```bash
+python scripts/launch_v4_32_distributed.py scripts/train_distributed.py \
+    --optimizer cauchylift \
+    --lr 0.0010 \
+    --adamw_lr 0.0006 \
+    --seed 42 \
+    --total_tokens 3000000000 \
+    --output_dir runs/125m_cauchylift_lr0.0010_seed42
+```
+*(Repeat for `--seed 43` and `--seed 44`)*
+
+#### 2. AdamW Baseline Optimal 3B Pretraining (`LR = 0.0020`)
+```bash
+python scripts/launch_v4_32_distributed.py scripts/train_distributed.py \
+    --optimizer adamw \
+    --lr 0.0020 \
+    --adamw_lr 0.0020 \
+    --seed 42 \
+    --total_tokens 3000000000 \
+    --output_dir runs/125m_adamw_lr0.0020_seed42
+```
+*(Repeat for `--seed 43` and `--seed 44`)*
+
+---
+
+## Frozen Preregistered Hyperparameters (Historical Protocols)
+
+Historical protocols for scaling:
+* **125M Model Protocol:** [`experiments/protocols/protocol_125m_fineweb.json`](experiments/protocols/protocol_125m_fineweb.json)
+* **350M Model Protocol:** [`experiments/protocols/protocol_350m_fineweb.json`](experiments/protocols/protocol_350m_fineweb.json)
+
 
 ---
 
