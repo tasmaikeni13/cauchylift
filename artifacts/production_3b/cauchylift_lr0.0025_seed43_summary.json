@@ -1,0 +1,12 @@
+{
+  "optimizer": "cauchylift",
+  "seed": 43,
+  "base_lr": 0.0025,
+  "total_tokens": 3000238080,
+  "total_steps": 11445,
+  "best_val_loss": 3.185110092163086,
+  "final_train_loss": 3.160717248916626,
+  "tokens_per_sec": 1050128.6935735138,
+  "mfu": 17.69245825221247,
+  "elapsed_minutes": 62.10598896516652
+}

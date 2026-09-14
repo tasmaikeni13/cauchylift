@@ -81,7 +81,7 @@ def test_optimizer_state_and_checkpoint_resumption():
     p1.grad = torch.randn(2, 3)
     p2.grad = torch.randn(4)
 
-    opt1 = CauchyLift([p1, p2], lr=0.01, backend="reference")
+    opt1 = CauchyLift([p1, p2], lr=0.01, backend="reference", canonical_routing=False)
     opt1.step()
 
     summary = opt1.persistent_tensor_summary()
@@ -90,7 +90,7 @@ def test_optimizer_state_and_checkpoint_resumption():
 
     checkpoint = opt1.state_dict()
 
-    opt2 = CauchyLift([p1, p2], lr=0.01, backend="reference")
+    opt2 = CauchyLift([p1, p2], lr=0.01, backend="reference", canonical_routing=False)
     opt2.load_state_dict(checkpoint)
 
     torch.testing.assert_close(
@@ -99,6 +99,33 @@ def test_optimizer_state_and_checkpoint_resumption():
     torch.testing.assert_close(
         opt1.state[p2]["momentum_buffer"], opt2.state[p2]["momentum_buffer"]
     )
+
+
+def test_canonical_parameter_routing():
+    """Verify CauchyLift canonical parameter routing between 2D matrices and 1D/embedding tensors."""
+    p_2d = torch.nn.Parameter(torch.ones(16, 16))
+    p_1d = torch.nn.Parameter(torch.ones(16))
+    p_embed = torch.nn.Parameter(torch.ones(50257, 768))
+
+    p_2d.grad = torch.ones_like(p_2d)
+    p_1d.grad = torch.ones_like(p_1d)
+    p_embed.grad = torch.ones_like(p_embed)
+
+    opt = CauchyLift([p_2d, p_1d, p_embed], lr=0.01, adamw_lr=6e-4, backend="reference")
+    opt.step()
+
+    # 2D hidden matrix receives CauchyLift update (1 state tensor)
+    assert "momentum_buffer" in opt.state[p_2d]
+    assert "exp_avg" not in opt.state[p_2d]
+
+    # 1D parameter receives AdamW update (2 state tensors)
+    assert "exp_avg" in opt.state[p_1d]
+    assert "exp_avg_sq" in opt.state[p_1d]
+
+    # Embedding table receives AdamW update (2 state tensors)
+    assert "exp_avg" in opt.state[p_embed]
+    assert "exp_avg_sq" in opt.state[p_embed]
+
 
 
 def test_theorem1_degree0_scale_invariance():

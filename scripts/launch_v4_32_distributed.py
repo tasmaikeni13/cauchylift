@@ -163,17 +163,20 @@ def sync_runs_back_from_workers() -> None:
     repo_dir = "/home/tas_ken_rt25/cauchylift"
     os.makedirs(f"{repo_dir}/runs", exist_ok=True)
     os.makedirs(f"{repo_dir}/artifacts", exist_ok=True)
-    # Rank 0 runs on Worker 0 (local host). Push newly generated artifacts and runs to other workers.
-    for ip in WORKER_IPS[1:]:
+    # GlobalRank 0 runs on Worker 1 (10.130.0.13). Pull newly generated runs and artifacts to local host.
+    for ip in ["10.130.0.13", "10.130.0.12", "10.130.0.11"]:
         for sub in ("runs", "artifacts"):
             cmd = [
                 "rsync",
-                "-a",
+                "-au",
                 "-e", f"ssh -i {SSH_KEY} -o StrictHostKeyChecking=no",
-                f"{repo_dir}/{sub}/",
                 f"{ip}:{repo_dir}/{sub}/",
+                f"{repo_dir}/{sub}/",
             ]
-            subprocess.run(cmd, check=False)
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode != 0:
+                print(f"[SYNC WARNING] rsync from {ip}:{repo_dir}/{sub}/ exited with code {res.returncode}: {res.stderr.strip()}")
+
 
 
 

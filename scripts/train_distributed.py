@@ -71,6 +71,7 @@ def build_optimizer(
             lr=lr,
             momentum=momentum,
             weight_decay=weight_decay,
+            adamw_lr=adamw_lr,
             backend="auto",
         )
     elif opt_lower == "adamw":
@@ -240,15 +241,17 @@ def _train_rank(index: int, args: argparse.Namespace):
     t_global_start = time.perf_counter()
     recent_step_times = []
 
+    flops_per_token = 6.0 * float(total_params)
+
     for step in range(start_step, total_steps + 1):
         step_t0 = time.perf_counter()
         for pg in optimizer.param_groups:
             base_lr = pg["base_lr"]
             min_lr = base_lr * 0.1
             pg["lr"] = get_cosine_lr(step, warmup_steps, total_steps, base_lr, min_lr)
+        current_lr = optimizer.param_groups[0]["lr"]
 
         optimizer.zero_grad()
-
 
         x_cpu, y_cpu, _ = train_dataset.next_batch()
         x = x_cpu.to(device=dev)
@@ -273,6 +276,8 @@ def _train_rank(index: int, args: argparse.Namespace):
             loss_val = float(loss.item())
             avg_duration = sum(recent_step_times) / len(recent_step_times)
             tok_per_sec = tokens_per_step / max(avg_duration, 1e-6)
+            achieved_tflops = (tok_per_sec * flops_per_token) / 1e12
+            mfu = (achieved_tflops / (275.0 * world_size)) * 100.0
             elapsed_s = time.perf_counter() - t_global_start
             remaining_steps = total_steps - step
             eta_s = remaining_steps * avg_duration
@@ -283,6 +288,7 @@ def _train_rank(index: int, args: argparse.Namespace):
                 f"Loss: {loss_val:.4f} | "
                 f"LR: {current_lr:.2e} | "
                 f"Speed: {tok_per_sec:,.0f} tok/s ({avg_duration*1000:.1f} ms) | "
+                f"MFU: {mfu:4.1f}% | "
                 f"Progress: {100.0 * tokens_seen / args.total_tokens:5.1f}% | "
                 f"ETA: {eta_min:.1f}m"
             )
@@ -296,6 +302,7 @@ def _train_rank(index: int, args: argparse.Namespace):
                     "lr": current_lr,
                     "step_time_ms": avg_duration * 1000.0,
                     "tokens_per_sec": tok_per_sec,
+                    "mfu": mfu,
                     "elapsed_s": elapsed_s,
                     "eta_minutes": eta_min,
                 }) + "\n")
@@ -356,10 +363,32 @@ def _train_rank(index: int, args: argparse.Namespace):
     xm.rendezvous("pretraining_complete")
     if rank == 0:
         total_time_min = (time.perf_counter() - t_global_start) / 60.0
+        avg_step_ms = sum(recent_step_times) / max(1, len(recent_step_times)) * 1000.0
+        steady_tok_s = tokens_per_step / max(1e-6, avg_step_ms / 1000.0)
+        mean_mfu = ((steady_tok_s * flops_per_token) / 1e12) / (275.0 * world_size) * 100.0
+
+        run_summary = {
+            "optimizer": args.optimizer,
+            "seed": args.seed,
+            "base_lr": args.lr,
+            "total_tokens": tokens_seen,
+            "total_steps": total_steps,
+            "best_val_loss": best_val_loss,
+            "final_train_loss": loss_val,
+            "tokens_per_sec": steady_tok_s,
+            "mfu": mean_mfu,
+            "elapsed_minutes": total_time_min,
+        }
+        with open(out_dir / "run_summary.json", "w") as f:
+            json.dump(run_summary, f, indent=2)
+
         print("=" * 80)
         print(f"Pretraining Complete for {args.optimizer.upper()}!")
         print(f"Total Tokens: {tokens_seen:,} | Total Time: {total_time_min:.2f} minutes")
+        print(f"Best Val Loss: {best_val_loss:.4f} | Speed: {steady_tok_s:,.0f} tok/s | MFU: {mean_mfu:4.1f}%")
+        print(f"Saved run summary to {out_dir / 'run_summary.json'}")
         print("=" * 80)
+        sys.stdout.flush()
 
 
 def main():
@@ -368,8 +397,8 @@ def main():
     parser.add_argument("--model_scale", type=str, default="125m", choices=["125m", "350m"])
     parser.add_argument("--total_tokens", type=int, default=3_000_000_000)
     parser.add_argument("--seq_len", type=int, default=2048)
-    parser.add_argument("--batch_size", type=int, default=4)
-    parser.add_argument("--grad_accum", type=int, default=4)
+    parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--grad_accum", type=int, default=1)
     parser.add_argument("--lr", type=float, default=0.005)
     parser.add_argument("--momentum", type=float, default=0.95)
     parser.add_argument("--weight_decay", type=float, default=0.01)

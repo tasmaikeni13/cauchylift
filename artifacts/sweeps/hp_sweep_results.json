@@ -1,0 +1,534 @@
+{
+  "optimal_cauchylift": {
+    "optimizer": "cauchylift",
+    "lr": 0.001,
+    "completed_seeds": 3,
+    "seeds": [
+      42,
+      44,
+      43
+    ],
+    "mean_val_loss": 5.601908206939697,
+    "std_val_loss": 0.046531807911429524,
+    "mean_perplexity": 271.14023316897294,
+    "mean_tokens_per_sec": 1079770.320498792,
+    "mean_mfu": 18.19185727836281,
+    "individual_runs": [
+      {
+        "optimizer": "cauchylift",
+        "seed": 42,
+        "base_lr": 0.001,
+        "total_tokens": 150208512,
+        "total_steps": 573,
+        "best_val_loss": 5.578093528747559,
+        "final_train_loss": 5.186275005340576,
+        "tokens_per_sec": 1033367.5303465815,
+        "mfu": 17.410067929516025,
+        "elapsed_minutes": 7.652120104849746
+      },
+      {
+        "optimizer": "cauchylift",
+        "seed": 44,
+        "base_lr": 0.001,
+        "total_tokens": 150208512,
+        "total_steps": 573,
+        "best_val_loss": 5.655527114868164,
+        "final_train_loss": 5.358760356903076,
+        "tokens_per_sec": 1100571.92098947,
+        "mfu": 18.542320464934868,
+        "elapsed_minutes": 7.684875476483527
+      },
+      {
+        "optimizer": "cauchylift",
+        "seed": 43,
+        "base_lr": 0.001,
+        "total_tokens": 150208512,
+        "total_steps": 573,
+        "best_val_loss": 5.572103977203369,
+        "final_train_loss": 5.203634262084961,
+        "tokens_per_sec": 1105371.5101603246,
+        "mfu": 18.62318344063754,
+        "elapsed_minutes": 7.440467429900309
+      }
+    ]
+  },
+  "optimal_adamw": {
+    "optimizer": "adamw",
+    "lr": 0.002,
+    "completed_seeds": 3,
+    "seeds": [
+      44,
+      42,
+      43
+    ],
+    "mean_val_loss": 4.771295547485352,
+    "std_val_loss": 0.045980431387023256,
+    "mean_perplexity": 118.15546354109729,
+    "mean_tokens_per_sec": 1063519.103172531,
+    "mean_mfu": 17.918058470795632,
+    "individual_runs": [
+      {
+        "optimizer": "adamw",
+        "seed": 44,
+        "base_lr": 0.002,
+        "total_tokens": 150208512,
+        "total_steps": 573,
+        "best_val_loss": 4.726945877075195,
+        "final_train_loss": 4.4010725021362305,
+        "tokens_per_sec": 1081993.4781594593,
+        "mfu": 18.229312805804494,
+        "elapsed_minutes": 6.537763886583464
+      },
+      {
+        "optimizer": "adamw",
+        "seed": 42,
+        "base_lr": 0.002,
+        "total_tokens": 150208512,
+        "total_steps": 573,
+        "best_val_loss": 4.768191337585449,
+        "final_train_loss": 4.354216575622559,
+        "tokens_per_sec": 1025045.5836587086,
+        "mfu": 17.269860643253526,
+        "elapsed_minutes": 6.361119308466732
+      },
+      {
+        "optimizer": "adamw",
+        "seed": 43,
+        "base_lr": 0.002,
+        "total_tokens": 150208512,
+        "total_steps": 573,
+        "best_val_loss": 4.81874942779541,
+        "final_train_loss": 4.15413761138916,
+        "tokens_per_sec": 1083518.2476994246,
+        "mfu": 18.255001963328873,
+        "elapsed_minutes": 6.2850021405834315
+      }
+    ]
+  },
+  "all_configurations": [
+    {
+      "optimizer": "cauchylift",
+      "lr": 0.01,
+      "completed_seeds": 3,
+      "seeds": [
+        44,
+        43,
+        42
+      ],
+      "mean_val_loss": 6.449225743611653,
+      "std_val_loss": 0.05547012256346848,
+      "mean_perplexity": 632.8657915648693,
+      "mean_tokens_per_sec": 1104243.896832974,
+      "mean_mfu": 18.604185529390204,
+      "individual_runs": [
+        {
+          "optimizer": "cauchylift",
+          "seed": 44,
+          "base_lr": 0.01,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 6.403030872344971,
+          "final_train_loss": 6.105942726135254,
+          "tokens_per_sec": 1102437.5395072957,
+          "mfu": 18.573752210342054,
+          "elapsed_minutes": 6.501266790983209
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 43,
+          "base_lr": 0.01,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 6.433898448944092,
+          "final_train_loss": 6.399062633514404,
+          "tokens_per_sec": 1105704.3021158942,
+          "mfu": 18.62879028465258,
+          "elapsed_minutes": 6.4164925629830885
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 42,
+          "base_lr": 0.01,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 6.510747909545898,
+          "final_train_loss": 6.281069278717041,
+          "tokens_per_sec": 1104589.8488757324,
+          "mfu": 18.610014093175984,
+          "elapsed_minutes": 6.403444495850029
+        }
+      ]
+    },
+    {
+      "optimizer": "adamw",
+      "lr": 0.0006,
+      "completed_seeds": 3,
+      "seeds": [
+        44,
+        43,
+        42
+      ],
+      "mean_val_loss": 5.161223888397217,
+      "std_val_loss": 0.05337439264834039,
+      "mean_perplexity": 174.54492032241433,
+      "mean_tokens_per_sec": 1041589.2469926522,
+      "mean_mfu": 17.548586550531066,
+      "individual_runs": [
+        {
+          "optimizer": "adamw",
+          "seed": 44,
+          "base_lr": 0.0006,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.1230998039245605,
+          "final_train_loss": 4.79900598526001,
+          "tokens_per_sec": 1019121.1156962271,
+          "mfu": 17.170045827475008,
+          "elapsed_minutes": 6.2838218170669276
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 43,
+          "base_lr": 0.0006,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.138348579406738,
+          "final_train_loss": 4.621910095214844,
+          "tokens_per_sec": 1085054.5674675216,
+          "mfu": 18.280885717887195,
+          "elapsed_minutes": 6.2243653482170584
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 42,
+          "base_lr": 0.0006,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.222223281860352,
+          "final_train_loss": 4.866274833679199,
+          "tokens_per_sec": 1020592.057814208,
+          "mfu": 17.194828106230993,
+          "elapsed_minutes": 6.338303126916677
+        }
+      ]
+    },
+    {
+      "optimizer": "adamw",
+      "lr": 0.002,
+      "completed_seeds": 3,
+      "seeds": [
+        44,
+        42,
+        43
+      ],
+      "mean_val_loss": 4.771295547485352,
+      "std_val_loss": 0.045980431387023256,
+      "mean_perplexity": 118.15546354109729,
+      "mean_tokens_per_sec": 1063519.103172531,
+      "mean_mfu": 17.918058470795632,
+      "individual_runs": [
+        {
+          "optimizer": "adamw",
+          "seed": 44,
+          "base_lr": 0.002,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 4.726945877075195,
+          "final_train_loss": 4.4010725021362305,
+          "tokens_per_sec": 1081993.4781594593,
+          "mfu": 18.229312805804494,
+          "elapsed_minutes": 6.537763886583464
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 42,
+          "base_lr": 0.002,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 4.768191337585449,
+          "final_train_loss": 4.354216575622559,
+          "tokens_per_sec": 1025045.5836587086,
+          "mfu": 17.269860643253526,
+          "elapsed_minutes": 6.361119308466732
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 43,
+          "base_lr": 0.002,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 4.81874942779541,
+          "final_train_loss": 4.15413761138916,
+          "tokens_per_sec": 1083518.2476994246,
+          "mfu": 18.255001963328873,
+          "elapsed_minutes": 6.2850021405834315
+        }
+      ]
+    },
+    {
+      "optimizer": "adamw",
+      "lr": 0.001,
+      "completed_seeds": 3,
+      "seeds": [
+        44,
+        42,
+        43
+      ],
+      "mean_val_loss": 4.928498427073161,
+      "std_val_loss": 0.02312301574669508,
+      "mean_perplexity": 138.19641316166914,
+      "mean_tokens_per_sec": 1095096.4303730594,
+      "mean_mfu": 18.45006997246278,
+      "individual_runs": [
+        {
+          "optimizer": "adamw",
+          "seed": 44,
+          "base_lr": 0.001,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 4.9022040367126465,
+          "final_train_loss": 4.566946983337402,
+          "tokens_per_sec": 1101788.9168591662,
+          "mfu": 18.562824283894848,
+          "elapsed_minutes": 6.345075416916613
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 42,
+          "base_lr": 0.001,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 4.945661544799805,
+          "final_train_loss": 4.546230316162109,
+          "tokens_per_sec": 1081640.1691638185,
+          "mfu": 18.223360292847026,
+          "elapsed_minutes": 6.5396280401168045
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 43,
+          "base_lr": 0.001,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 4.937629699707031,
+          "final_train_loss": 4.321554183959961,
+          "tokens_per_sec": 1101860.2050961936,
+          "mfu": 18.564025340646463,
+          "elapsed_minutes": 6.433554568033045
+        }
+      ]
+    },
+    {
+      "optimizer": "cauchylift",
+      "lr": 0.001,
+      "completed_seeds": 3,
+      "seeds": [
+        42,
+        44,
+        43
+      ],
+      "mean_val_loss": 5.601908206939697,
+      "std_val_loss": 0.046531807911429524,
+      "mean_perplexity": 271.14023316897294,
+      "mean_tokens_per_sec": 1079770.320498792,
+      "mean_mfu": 18.19185727836281,
+      "individual_runs": [
+        {
+          "optimizer": "cauchylift",
+          "seed": 42,
+          "base_lr": 0.001,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.578093528747559,
+          "final_train_loss": 5.186275005340576,
+          "tokens_per_sec": 1033367.5303465815,
+          "mfu": 17.410067929516025,
+          "elapsed_minutes": 7.652120104849746
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 44,
+          "base_lr": 0.001,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.655527114868164,
+          "final_train_loss": 5.358760356903076,
+          "tokens_per_sec": 1100571.92098947,
+          "mfu": 18.542320464934868,
+          "elapsed_minutes": 7.684875476483527
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 43,
+          "base_lr": 0.001,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.572103977203369,
+          "final_train_loss": 5.203634262084961,
+          "tokens_per_sec": 1105371.5101603246,
+          "mfu": 18.62318344063754,
+          "elapsed_minutes": 7.440467429900309
+        }
+      ]
+    },
+    {
+      "optimizer": "adamw",
+      "lr": 0.0003,
+      "completed_seeds": 3,
+      "seeds": [
+        43,
+        44,
+        42
+      ],
+      "mean_val_loss": 5.513140042622884,
+      "std_val_loss": 0.027732466379291984,
+      "mean_perplexity": 247.99226415048204,
+      "mean_tokens_per_sec": 1067377.184706285,
+      "mean_mfu": 17.983059024429963,
+      "individual_runs": [
+        {
+          "optimizer": "adamw",
+          "seed": 43,
+          "base_lr": 0.0003,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.492308139801025,
+          "final_train_loss": 5.2268147468566895,
+          "tokens_per_sec": 1099451.4530881322,
+          "mfu": 18.523442939076673,
+          "elapsed_minutes": 6.210109480199753
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 44,
+          "base_lr": 0.0003,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.502493858337402,
+          "final_train_loss": 5.1937456130981445,
+          "tokens_per_sec": 1081790.89241523,
+          "mfu": 18.225899662401968,
+          "elapsed_minutes": 6.385474367316541
+        },
+        {
+          "optimizer": "adamw",
+          "seed": 42,
+          "base_lr": 0.0003,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.544618129730225,
+          "final_train_loss": 5.217165470123291,
+          "tokens_per_sec": 1020889.2086154928,
+          "mfu": 17.199834471811247,
+          "elapsed_minutes": 6.338419058716681
+        }
+      ]
+    },
+    {
+      "optimizer": "cauchylift",
+      "lr": 0.0025,
+      "completed_seeds": 3,
+      "seeds": [
+        42,
+        44,
+        43
+      ],
+      "mean_val_loss": 5.755834738413493,
+      "std_val_loss": 0.027058079994262015,
+      "mean_perplexity": 316.10608159025077,
+      "mean_tokens_per_sec": 1098790.978012805,
+      "mean_mfu": 18.51231532417731,
+      "individual_runs": [
+        {
+          "optimizer": "cauchylift",
+          "seed": 42,
+          "base_lr": 0.0025,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.764069557189941,
+          "final_train_loss": 5.4150495529174805,
+          "tokens_per_sec": 1106100.0594980263,
+          "mfu": 18.635457963580148,
+          "elapsed_minutes": 7.495019143199897
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 44,
+          "base_lr": 0.0025,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.77781867980957,
+          "final_train_loss": 5.478271961212158,
+          "tokens_per_sec": 1091676.1259163239,
+          "mfu": 18.392445041174852,
+          "elapsed_minutes": 7.435317995866838
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 43,
+          "base_lr": 0.0025,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 5.725615978240967,
+          "final_train_loss": 5.389312744140625,
+          "tokens_per_sec": 1098596.748624065,
+          "mfu": 18.509042967776935,
+          "elapsed_minutes": 7.561653469166776
+        }
+      ]
+    },
+    {
+      "optimizer": "cauchylift",
+      "lr": 0.005,
+      "completed_seeds": 3,
+      "seeds": [
+        44,
+        42,
+        43
+      ],
+      "mean_val_loss": 6.162694136301677,
+      "std_val_loss": 0.08060045491738405,
+      "mean_perplexity": 475.7494018038365,
+      "mean_tokens_per_sec": 201319.30332287215,
+      "mean_mfu": 3.391806538762166,
+      "individual_runs": [
+        {
+          "optimizer": "cauchylift",
+          "seed": 44,
+          "base_lr": 0.005,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 6.110664367675781,
+          "final_train_loss": 5.799858093261719,
+          "tokens_per_sec": 196872.47344783167,
+          "mfu": 3.316886814731849,
+          "elapsed_minutes": 7.459887936466839
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 42,
+          "base_lr": 0.005,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 6.255537986755371,
+          "final_train_loss": 6.017780303955078,
+          "tokens_per_sec": 204457.44356203108,
+          "mfu": 3.4446775968626464,
+          "elapsed_minutes": 7.396224227683463
+        },
+        {
+          "optimizer": "cauchylift",
+          "seed": 43,
+          "base_lr": 0.005,
+          "total_tokens": 150208512,
+          "total_steps": 573,
+          "best_val_loss": 6.121880054473877,
+          "final_train_loss": 5.940869331359863,
+          "tokens_per_sec": 202627.99295875375,
+          "mfu": 3.413855204692002,
+          "elapsed_minutes": 7.431208998483393
+        }
+      ]
+    }
+  ]
+}

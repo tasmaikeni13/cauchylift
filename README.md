@@ -17,7 +17,10 @@
 
 ## The CauchyLift Algorithmic Formulation
 
-For a parameter matrix $W \in \mathbb{R}^{m \times n}$ and stochastic gradient $G_t$:
+CauchyLift operates via a unified **canonical parameter decomposition** tailored to the mathematical structure of modern Transformer architectures:
+
+### 1. 2D Hidden Linear Transformations (Core CauchyLift Operator)
+For internal dense transformation matrices $W \in \mathbb{R}^{m \times n}$ (such as attention projections $W_q, W_k, W_v, W_o$ and MLP layers $W_{\text{gate}}, W_{\text{up}}, W_{\text{down}}$):
 
 1. **Directional Velocity Filtering (Historical Momentum):**
    $$M_t = \beta M_{t-1} + (1 - \beta) G_t \quad (\beta = 0.95)$$
@@ -29,11 +32,16 @@ For a parameter matrix $W \in \mathbb{R}^{m \times n}$ and stochastic gradient $
 
 3. **Longest-Fiber Radius Normalization:**
    $$U(M_t) = \sqrt{\max(m, n)} \frac{Z(M_t)}{\|Z(M_t)\|_F}$$
-   Ensures uniform step authority across rectangular matrices and vocabulary embeddings.
+   Preserves the matrix spectral radius and operator gain across layers with $O(N^2)$ complexity.
 
 4. **Decoupled Weight Decay & Parameter Update:**
    $$W_{t+1} = W_t (1 - \eta_t \lambda) - \eta_t U(M_t)$$
    Actively prevents parameter norm runaway in scale-invariant Pre-RMSNorm Transformer architectures.
+
+### 2. 1D Parameters & Sparse Embedding Dictionaries (Canonical AdamW Routing)
+* **1D Calibration Scalars (RMSNorm/LayerNorm gains, biases):** Represent coordinate-wise affine scalings that do not possess a 2D bilinear transformation structure.
+* **Token Lookup & Unembedding Tables ($E \in \mathbb{R}^{V \times d}$):** Follow heavy-tailed Zipfian power-law distributions ($f_k \propto 1/k^\alpha$) with extreme disparity between common and rare tokens. A shared fiber norm would suppress rare tokens or distort common tokens.
+* **Native Handling:** CauchyLift automatically routes all 1D parameters and token lookup/head matrices to coordinate-wise AdamW updates with individual adaptive second-moment tracking. This is the default, native behavior of CauchyLift.
 
 ---
 

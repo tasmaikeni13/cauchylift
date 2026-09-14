@@ -48,6 +48,7 @@ def create_optimizer(
             weight_decay=weight_decay,
             momentum=kwargs.get("momentum", 0.95),
             nesterov=kwargs.get("nesterov", False),
+            adamw_lr=kwargs.get("adamw_lr", 6e-4),
             backend="auto",
             strict=True,
         )
@@ -58,6 +59,7 @@ def create_optimizer(
             weight_decay=weight_decay,
             momentum=kwargs.get("momentum", 0.95),
             nesterov=kwargs.get("nesterov", False),
+            adamw_lr=kwargs.get("adamw_lr", 6e-4),
             backend="xla",
             strict=False,
         )
@@ -68,6 +70,7 @@ def create_optimizer(
             weight_decay=weight_decay,
             momentum=kwargs.get("momentum", 0.95),
             nesterov=kwargs.get("nesterov", False),
+            adamw_lr=kwargs.get("adamw_lr", 6e-4),
             backend="reference",
             strict=True,
         )

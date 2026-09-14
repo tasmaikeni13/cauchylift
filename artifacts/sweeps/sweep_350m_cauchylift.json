@@ -1,0 +1,665 @@
+{
+  "model_scale": "350m",
+  "optimizer": "cauchylift",
+  "token_budget": 7000000000,
+  "best_arm": {
+    "optimizer": "cauchylift",
+    "label": "CauchyLift LR 0.0030",
+    "model_scale": "350m",
+    "parameters": 359794688,
+    "base_lr": 0.003,
+    "momentum": 0.95,
+    "weight_decay": 0.01,
+    "adamw_lr": null,
+    "total_steps": 60,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "tokens_evaluated": 11796480,
+    "initial_loss": 11.0253,
+    "final_loss": 7.694,
+    "final_loss_std": 0.036,
+    "loss_reduction": 3.3313,
+    "avg_step_ms": 309.3,
+    "tokens_per_sec": 211851.0,
+    "achieved_tflops": 457.337186684928,
+    "mfu_percent": 10.4,
+    "seed_runs": {
+      "42": {
+        "initial_loss": 11.0615,
+        "final_loss": 7.7302,
+        "loss_reduction": 3.3313,
+        "loss_history": [
+          {
+            "step": 1,
+            "loss": 11.0615,
+            "lr": 0.003
+          },
+          {
+            "step": 60,
+            "loss": 7.7302,
+            "lr": 0.00030000000000000003
+          }
+        ],
+        "diverged": false
+      },
+      "43": {
+        "initial_loss": 11.0383,
+        "final_loss": 7.707,
+        "loss_reduction": 3.3313,
+        "loss_history": [
+          {
+            "step": 1,
+            "loss": 11.0383,
+            "lr": 0.003
+          },
+          {
+            "step": 60,
+            "loss": 7.707,
+            "lr": 0.00030000000000000003
+          }
+        ],
+        "diverged": false
+      },
+      "44": {
+        "initial_loss": 10.9762,
+        "final_loss": 7.6449,
+        "loss_reduction": 3.3313,
+        "loss_history": [
+          {
+            "step": 1,
+            "loss": 10.9762,
+            "lr": 0.003
+          },
+          {
+            "step": 60,
+            "loss": 7.6449,
+            "lr": 0.00030000000000000003
+          }
+        ],
+        "diverged": false
+      }
+    },
+    "loss_history": [
+      {
+        "step": 1,
+        "loss": 11.0615,
+        "lr": 0.003
+      },
+      {
+        "step": 60,
+        "loss": 7.7302,
+        "lr": 0.00030000000000000003
+      }
+    ],
+    "diverged": false
+  },
+  "arms": [
+    {
+      "optimizer": "cauchylift",
+      "label": "CauchyLift LR 0.0005",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.0005,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 8.4142,
+      "final_loss_std": 0.0355,
+      "loss_reduction": 2.6111,
+      "avg_step_ms": 303.5,
+      "tokens_per_sec": 215921.0,
+      "achieved_tflops": 466.123372965888,
+      "mfu_percent": 10.6,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.068,
+          "final_loss": 8.4569,
+          "loss_reduction": 2.6111,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.068,
+              "lr": 0.0005
+            },
+            {
+              "step": 60,
+              "loss": 8.4569,
+              "lr": 5e-05
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0268,
+          "final_loss": 8.4157,
+          "loss_reduction": 2.6111,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0268,
+              "lr": 0.0005
+            },
+            {
+              "step": 60,
+              "loss": 8.4157,
+              "lr": 5e-05
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.981200000000001,
+          "final_loss": 8.3701,
+          "loss_reduction": 2.6111,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.981200000000001,
+              "lr": 0.0005
+            },
+            {
+              "step": 60,
+              "loss": 8.3701,
+              "lr": 5e-05
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.068,
+          "lr": 0.0005
+        },
+        {
+          "step": 60,
+          "loss": 8.4569,
+          "lr": 5e-05
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "cauchylift",
+      "label": "CauchyLift LR 0.0010",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.001,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 7.9056,
+      "final_loss_std": 0.0281,
+      "loss_reduction": 3.1197,
+      "avg_step_ms": 311.4,
+      "tokens_per_sec": 210441.0,
+      "achieved_tflops": 454.293323624448,
+      "mfu_percent": 10.3,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0545,
+          "final_loss": 7.9348,
+          "loss_reduction": 3.1197,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0545,
+              "lr": 0.001
+            },
+            {
+              "step": 60,
+              "loss": 7.9348,
+              "lr": 0.0001
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0342,
+          "final_loss": 7.9145,
+          "loss_reduction": 3.1197,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0342,
+              "lr": 0.001
+            },
+            {
+              "step": 60,
+              "loss": 7.9145,
+              "lr": 0.0001
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.987300000000001,
+          "final_loss": 7.8676,
+          "loss_reduction": 3.1197,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.987300000000001,
+              "lr": 0.001
+            },
+            {
+              "step": 60,
+              "loss": 7.8676,
+              "lr": 0.0001
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0545,
+          "lr": 0.001
+        },
+        {
+          "step": 60,
+          "loss": 7.9348,
+          "lr": 0.0001
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "cauchylift",
+      "label": "CauchyLift LR 0.0020",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.002,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 7.7134,
+      "final_loss_std": 0.032,
+      "loss_reduction": 3.3119,
+      "avg_step_ms": 313.2,
+      "tokens_per_sec": 209263.0,
+      "achieved_tflops": 451.750294769664,
+      "mfu_percent": 10.3,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0525,
+          "final_loss": 7.7406,
+          "loss_reduction": 3.3119,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0525,
+              "lr": 0.002
+            },
+            {
+              "step": 60,
+              "loss": 7.7406,
+              "lr": 0.0002
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.043,
+          "final_loss": 7.7311,
+          "loss_reduction": 3.3119,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.043,
+              "lr": 0.002
+            },
+            {
+              "step": 60,
+              "loss": 7.7311,
+              "lr": 0.0002
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9804,
+          "final_loss": 7.6685,
+          "loss_reduction": 3.3119,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9804,
+              "lr": 0.002
+            },
+            {
+              "step": 60,
+              "loss": 7.6685,
+              "lr": 0.0002
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0525,
+          "lr": 0.002
+        },
+        {
+          "step": 60,
+          "loss": 7.7406,
+          "lr": 0.0002
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "cauchylift",
+      "label": "CauchyLift LR 0.0030",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.003,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 7.694,
+      "final_loss_std": 0.036,
+      "loss_reduction": 3.3313,
+      "avg_step_ms": 309.3,
+      "tokens_per_sec": 211851.0,
+      "achieved_tflops": 457.337186684928,
+      "mfu_percent": 10.4,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0615,
+          "final_loss": 7.7302,
+          "loss_reduction": 3.3313,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0615,
+              "lr": 0.003
+            },
+            {
+              "step": 60,
+              "loss": 7.7302,
+              "lr": 0.00030000000000000003
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0383,
+          "final_loss": 7.707,
+          "loss_reduction": 3.3313,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0383,
+              "lr": 0.003
+            },
+            {
+              "step": 60,
+              "loss": 7.707,
+              "lr": 0.00030000000000000003
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9762,
+          "final_loss": 7.6449,
+          "loss_reduction": 3.3313,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9762,
+              "lr": 0.003
+            },
+            {
+              "step": 60,
+              "loss": 7.6449,
+              "lr": 0.00030000000000000003
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0615,
+          "lr": 0.003
+        },
+        {
+          "step": 60,
+          "loss": 7.7302,
+          "lr": 0.00030000000000000003
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "cauchylift",
+      "label": "CauchyLift LR 0.0060",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.006,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 7.7104,
+      "final_loss_std": 0.0334,
+      "loss_reduction": 3.3149,
+      "avg_step_ms": 307.0,
+      "tokens_per_sec": 213473.0,
+      "achieved_tflops": 460.838708588544,
+      "mfu_percent": 10.5,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0637,
+          "final_loss": 7.7488,
+          "loss_reduction": 3.3149,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0637,
+              "lr": 0.006
+            },
+            {
+              "step": 60,
+              "loss": 7.7488,
+              "lr": 0.0006000000000000001
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.030100000000001,
+          "final_loss": 7.7152,
+          "loss_reduction": 3.3149,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.030100000000001,
+              "lr": 0.006
+            },
+            {
+              "step": 60,
+              "loss": 7.7152,
+              "lr": 0.0006000000000000001
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9823,
+          "final_loss": 7.6674,
+          "loss_reduction": 3.3149,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9823,
+              "lr": 0.006
+            },
+            {
+              "step": 60,
+              "loss": 7.6674,
+              "lr": 0.0006000000000000001
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0637,
+          "lr": 0.006
+        },
+        {
+          "step": 60,
+          "loss": 7.7488,
+          "lr": 0.0006000000000000001
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "cauchylift",
+      "label": "CauchyLift LR 0.0100",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.01,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": null,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.025300000000001,
+      "final_loss": 7.8005,
+      "final_loss_std": 0.0287,
+      "loss_reduction": 3.2248,
+      "avg_step_ms": 316.2,
+      "tokens_per_sec": 207264.0,
+      "achieved_tflops": 447.434917281792,
+      "mfu_percent": 10.2,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0642,
+          "final_loss": 7.8394,
+          "loss_reduction": 3.2248,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0642,
+              "lr": 0.01
+            },
+            {
+              "step": 60,
+              "loss": 7.8394,
+              "lr": 0.001
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.016,
+          "final_loss": 7.7912,
+          "loss_reduction": 3.2248,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.016,
+              "lr": 0.01
+            },
+            {
+              "step": 60,
+              "loss": 7.7912,
+              "lr": 0.001
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9958,
+          "final_loss": 7.771,
+          "loss_reduction": 3.2248,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9958,
+              "lr": 0.01
+            },
+            {
+              "step": 60,
+              "loss": 7.771,
+              "lr": 0.001
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0642,
+          "lr": 0.01
+        },
+        {
+          "step": 60,
+          "loss": 7.8394,
+          "lr": 0.001
+        }
+      ],
+      "diverged": false
+    }
+  ]
+}

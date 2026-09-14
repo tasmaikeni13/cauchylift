@@ -1,14 +1,25 @@
-"""CauchyLift: Curvature-Adaptive Matrix Optimizer with Historical Momentum and Decoupled Weight Decay."""
+"""CauchyLift: Curvature-Adaptive Matrix Optimizer with Parameter Routing and Hardware-Fused Acceleration."""
 
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable
 from typing import Any
 
 import torch
 
 from .reference import cauchylift_reference_step
-from .xla import cauchylift_xla_foreach_step_, cauchylift_xla_step_, is_tpu_available
+from .xla import (
+    adamw_xla_foreach_step_,
+    cauchylift_xla_foreach_step_,
+    cauchylift_xla_step_,
+    is_tpu_available,
+)
+
+
+def is_2d_hidden_matrix(param: torch.Tensor) -> bool:
+    """Determine if parameter is a dense 2D internal linear transformation operator."""
+    return param.ndim == 2 and min(param.shape) > 1 and max(param.shape) < 10000
 
 
 def _deduplicate_parameters(params: Iterable[Any], default_lr: float) -> list[Any]:
@@ -45,11 +56,16 @@ def _deduplicate_parameters(params: Iterable[Any], default_lr: float) -> list[An
 
 
 class CauchyLift(torch.optim.Optimizer):
-    """Curvature-adaptive matrix optimizer for deep neural network pretraining.
+    """Canonical Curvature-Adaptive Matrix Optimizer for Deep Learning and Pretraining.
 
     CauchyLift combines:
-    1. Historical momentum buffer filtering (beta = 0.95) to suppress high-frequency
-       stochastic gradient noise across minibatches.
+    1. Canonical Parameter Routing:
+       - 2D Hidden Linear Matrices: Updated via core CauchyLift (historical momentum
+         low-pass filter, Additive Fiber RMS curvature denominator, longest-fiber
+         Frobenius sphere projection, decoupled weight decay).
+       - 1D Parameters & Embeddings: Automatically routed to coordinate-wise AdamW
+         updates (RMSNorm/LayerNorm scales, biases, token lookup and head tables).
+         This is the default, native behavior of CauchyLift.
     2. Additive Fiber RMS Cauchy lifting:
            D_{ij} = RMS(M_{i,:}) + RMS(M_{:,j})
            Z_{ij} = M_{ij} / D_{ij}
@@ -58,9 +74,10 @@ class CauchyLift(torch.optim.Optimizer):
     3. Decoupled weight decay:
            W_{t+1} = W_t * (1 - lr * weight_decay) - lr * U
        preventing Frobenius norm runaway and maintaining optimal layer conditioning.
-
-    Requires only a single momentum state tensor per parameter (50% less optimizer memory
-    than AdamW), with sub-millisecond fused native Google Cloud TPU v4-32 / XLA HLO execution.
+    4. Hardware-Fused Multi-Tensor TPU Execution:
+       Native Google Cloud TPU v4 (Torch-XLA / PJRT) systolic execution with FP32
+       vector register accumulation for reductions, BF16 MXU matrix ops, and zero
+       host-device synchronization overhead inside training step loops.
     """
 
     def __init__(
@@ -70,8 +87,13 @@ class CauchyLift(torch.optim.Optimizer):
         momentum: float = 0.95,
         weight_decay: float = 0.01,
         *,
+        adamw_lr: float = 6e-4,
+        adamw_betas: tuple[float, float] = (0.9, 0.95),
+        adamw_eps: float = 1e-8,
+        adamw_weight_decay: float = 0.0,
         nesterov: bool = False,
         backend: str = "auto",
+        canonical_routing: bool = True,
         strict: bool = True,
     ) -> None:
         if lr < 0:
@@ -83,16 +105,117 @@ class CauchyLift(torch.optim.Optimizer):
         if backend not in {"auto", "reference", "xla", "tpu"}:
             raise ValueError("Backend must be 'auto', 'reference', 'xla', or 'tpu'")
 
-        self.backend = backend
+        self.backend = backend.lower()
         self.strict = strict
-        params = _deduplicate_parameters(params, lr)
+        self.canonical_routing = canonical_routing
+
+        param_list = list(params)
+        if len(param_list) > 0 and isinstance(param_list[0], dict):
+            # Param groups provided
+            if canonical_routing:
+                expanded_groups = []
+                for grp in param_list:
+                    if grp.get("is_cauchylift") is not None:
+                        expanded_groups.append(grp)
+                        continue
+                    cl_p = []
+                    adam_p = []
+                    for p in grp["params"]:
+                        if is_2d_hidden_matrix(p):
+                            cl_p.append(p)
+                        else:
+                            adam_p.append(p)
+                    if cl_p and adam_p:
+                        g_cl = dict(grp)
+                        g_cl["params"] = cl_p
+                        g_cl["is_cauchylift"] = True
+                        g_cl.setdefault("base_lr", g_cl.get("lr", lr))
+                        expanded_groups.append(g_cl)
+
+                        g_adam = dict(grp)
+                        g_adam["params"] = adam_p
+                        g_adam["lr"] = grp.get("adamw_lr", adamw_lr)
+                        g_adam["betas"] = grp.get("adamw_betas", adamw_betas)
+                        g_adam["eps"] = grp.get("adamw_eps", adamw_eps)
+                        g_adam["weight_decay"] = grp.get("adamw_weight_decay", grp.get("weight_decay", adamw_weight_decay))
+                        g_adam["is_cauchylift"] = False
+                        g_adam.setdefault("base_lr", g_adam["lr"])
+                        expanded_groups.append(g_adam)
+                    elif cl_p:
+                        g_cl = dict(grp)
+                        g_cl["is_cauchylift"] = True
+                        g_cl.setdefault("base_lr", g_cl.get("lr", lr))
+                        expanded_groups.append(g_cl)
+                    elif adam_p:
+                        g_adam = dict(grp)
+                        g_adam.setdefault("lr", adamw_lr)
+                        g_adam["is_cauchylift"] = False
+                        g_adam.setdefault("base_lr", g_adam["lr"])
+                        expanded_groups.append(g_adam)
+                    else:
+                        expanded_groups.append(grp)
+                processed_params = _deduplicate_parameters(expanded_groups, lr)
+            else:
+                processed_params = _deduplicate_parameters(param_list, lr)
+        else:
+            # Single flat parameter list
+            if canonical_routing:
+                cl_params = []
+                adamw_params = []
+                for p in param_list:
+                    if is_2d_hidden_matrix(p):
+                        cl_params.append(p)
+                    else:
+                        adamw_params.append(p)
+
+                groups = []
+                if cl_params:
+                    groups.append({
+                        "params": cl_params,
+                        "lr": lr,
+                        "momentum": momentum,
+                        "weight_decay": weight_decay,
+                        "nesterov": nesterov,
+                        "is_cauchylift": True,
+                        "base_lr": lr,
+                    })
+                if adamw_params:
+                    groups.append({
+                        "params": adamw_params,
+                        "lr": adamw_lr,
+                        "betas": adamw_betas,
+                        "eps": adamw_eps,
+                        "weight_decay": adamw_weight_decay,
+                        "is_cauchylift": False,
+                        "base_lr": adamw_lr,
+                    })
+                processed_params = _deduplicate_parameters(groups, lr)
+            else:
+                processed_params = _deduplicate_parameters(param_list, lr)
+
         defaults = dict(
             lr=lr,
             momentum=momentum,
             weight_decay=weight_decay,
             nesterov=nesterov,
+            adamw_lr=adamw_lr,
+            adamw_betas=adamw_betas,
+            adamw_eps=adamw_eps,
+            adamw_weight_decay=adamw_weight_decay,
+            canonical_routing=canonical_routing,
         )
-        super().__init__(params, defaults)
+        super().__init__(processed_params, defaults)
+
+    def _is_xla_active(self) -> bool:
+        if self.backend in ("xla", "tpu"):
+            return True
+        if self.backend == "reference":
+            return False
+        for group in self.param_groups:
+            for p in group["params"]:
+                if p.device.type == "xla":
+                    return True
+        return is_tpu_available()
 
     @torch.no_grad()
     def step(self, closure: Any = None) -> Any:
@@ -102,13 +225,29 @@ class CauchyLift(torch.optim.Optimizer):
             with torch.enable_grad():
                 loss = closure()
 
-        for group in self.param_groups:
-            learning_rate = float(group["lr"])
-            momentum = float(group["momentum"])
-            weight_decay = float(group["weight_decay"])
-            nesterov = bool(group.get("nesterov", False))
+        use_xla = self._is_xla_active()
 
-            native_params: dict[torch.dtype, tuple[list[torch.Tensor], list[torch.Tensor], list[torch.Tensor]]] = {}
+        for group in self.param_groups:
+            group_is_cl = group.get("is_cauchylift", None)
+            lr_cl = float(group["lr"])
+            momentum = float(group.get("momentum", self.defaults.get("momentum", 0.95)))
+            weight_decay = float(group.get("weight_decay", self.defaults.get("weight_decay", 0.01)))
+            nesterov = bool(group.get("nesterov", self.defaults.get("nesterov", False)))
+
+            adamw_lr_val = float(group.get("adamw_lr", lr_cl if group_is_cl is False else self.defaults.get("adamw_lr", 6e-4)))
+            beta1, beta2 = group.get("adamw_betas", group.get("betas", self.defaults.get("adamw_betas", (0.9, 0.95))))
+            eps = float(group.get("adamw_eps", group.get("eps", self.defaults.get("adamw_eps", 1e-8))))
+            adamw_wd = float(group.get("adamw_weight_decay", weight_decay if group_is_cl is False else self.defaults.get("adamw_weight_decay", 0.0)))
+
+            xla_cl_p: list[torch.Tensor] = []
+            xla_cl_g: list[torch.Tensor] = []
+            xla_cl_m: list[torch.Tensor] = []
+
+            xla_adamw_p: list[torch.Tensor] = []
+            xla_adamw_g: list[torch.Tensor] = []
+            xla_adamw_ea: list[torch.Tensor] = []
+            xla_adamw_eas: list[torch.Tensor] = []
+            adamw_max_step = 0
 
             for parameter in group["params"]:
                 if parameter.grad is None:
@@ -118,56 +257,95 @@ class CauchyLift(torch.optim.Optimizer):
                     gradient = gradient.to_dense()
 
                 state = self.state[parameter]
-                if "momentum_buffer" not in state:
-                    state["momentum_buffer"] = torch.zeros_like(gradient)
-                momentum_buffer = state["momentum_buffer"]
 
-                is_xla = parameter.device.type == "xla"
-                use_xla = (self.backend in ("xla", "tpu") and is_xla) or (
-                    self.backend == "auto"
-                    and is_xla
-                    and is_tpu_available()
-                )
+                if group_is_cl is True:
+                    use_cl = True
+                elif group_is_cl is False:
+                    use_cl = False
+                else:
+                    use_cl = is_2d_hidden_matrix(parameter) if self.canonical_routing else True
 
-                if use_xla:
-                    if parameter.is_contiguous() and gradient.layout == torch.strided:
-                        params_list, grads_list, moms_list = native_params.setdefault(
-                            parameter.dtype, ([], [], [])
-                        )
-                        params_list.append(parameter)
-                        grads_list.append(gradient)
-                        moms_list.append(momentum_buffer)
+                if use_cl:
+                    # ================= Core CauchyLift 2D Update =================
+                    if "momentum_buffer" not in state:
+                        state["momentum_buffer"] = torch.zeros_like(gradient)
+                    momentum_buffer = state["momentum_buffer"]
+
+                    if use_xla and parameter.device.type == "xla":
+                        xla_cl_p.append(parameter)
+                        xla_cl_g.append(gradient)
+                        xla_cl_m.append(momentum_buffer)
                     else:
-                        cauchylift_xla_step_(
+                        cauchylift_reference_step(
                             parameter,
                             gradient,
                             momentum_buffer,
-                            learning_rate,
+                            lr_cl,
                             momentum=momentum,
                             weight_decay=weight_decay,
                             nesterov=nesterov,
                         )
                 else:
-                    cauchylift_reference_step(
-                        parameter,
-                        gradient,
-                        momentum_buffer,
-                        learning_rate,
-                        momentum=momentum,
-                        weight_decay=weight_decay,
-                        nesterov=nesterov,
-                    )
+                    # ================= Coordinate-wise AdamW Update =================
+                    if "step" not in state:
+                        state["step"] = 0
+                        state["exp_avg"] = torch.zeros_like(parameter, dtype=torch.float32)
+                        state["exp_avg_sq"] = torch.zeros_like(parameter, dtype=torch.float32)
+
+                    state["step"] += 1
+                    step_count = state["step"]
+                    exp_avg = state["exp_avg"]
+                    exp_avg_sq = state["exp_avg_sq"]
+
+                    if use_xla and parameter.device.type == "xla":
+                        xla_adamw_p.append(parameter)
+                        xla_adamw_g.append(gradient)
+                        xla_adamw_ea.append(exp_avg)
+                        xla_adamw_eas.append(exp_avg_sq)
+                        adamw_max_step = max(adamw_max_step, step_count)
+                    else:
+                        g_fp32 = gradient.to(torch.float32)
+                        exp_avg.mul_(beta1).add_(g_fp32, alpha=1.0 - beta1)
+                        exp_avg_sq.mul_(beta2).addcmul_(g_fp32, g_fp32, value=1.0 - beta2)
+
+                        bias_correction1 = 1.0 - beta1 ** step_count
+                        bias_correction2 = 1.0 - beta2 ** step_count
+
+                        denom = (exp_avg_sq.sqrt() / math.sqrt(bias_correction2)).add_(eps)
+                        step_size = adamw_lr_val / bias_correction1
+
+                        if adamw_wd != 0.0:
+                            parameter.mul_(1.0 - adamw_lr_val * adamw_wd)
+
+                        update = exp_avg / denom
+                        parameter.add_(update.to(parameter.dtype), alpha=-step_size)
 
             # Batch multi-tensor execution for eligible parameter tensors on TPU
-            for params_list, grads_list, moms_list in native_params.values():
+            if xla_cl_p:
                 cauchylift_xla_foreach_step_(
-                    params_list,
-                    grads_list,
-                    moms_list,
-                    learning_rate,
+                    xla_cl_p,
+                    xla_cl_g,
+                    xla_cl_m,
+                    learning_rate=lr_cl,
                     momentum=momentum,
                     weight_decay=weight_decay,
                     nesterov=nesterov,
+                    accumulation_dtype=torch.float32,
+                    mark_step=False,
+                )
+            if xla_adamw_p:
+                adamw_xla_foreach_step_(
+                    xla_adamw_p,
+                    xla_adamw_g,
+                    xla_adamw_ea,
+                    xla_adamw_eas,
+                    step=adamw_max_step,
+                    learning_rate=adamw_lr_val,
+                    beta1=beta1,
+                    beta2=beta2,
+                    eps=eps,
+                    weight_decay=adamw_wd,
+                    mark_step=False,
                 )
 
         return loss

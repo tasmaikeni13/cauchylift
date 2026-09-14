@@ -1,0 +1,108 @@
+{
+  "125m": {
+    "muon": {
+      "optimal_lr": 0.05,
+      "optimal_momentum": 0.95,
+      "optimal_wd": 0.01,
+      "optimal_adamw_lr": 0.0006,
+      "final_loss": 6.4111,
+      "final_loss_std": 0.0299,
+      "loss_reduction": 4.5372,
+      "avg_step_ms": 209.2,
+      "tokens_per_sec": 626518.0,
+      "mfu_percent": 10.6,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "cauchylift": {
+      "optimal_lr": 0.01,
+      "optimal_momentum": 0.95,
+      "optimal_wd": 0.01,
+      "optimal_adamw_lr": null,
+      "final_loss": 7.6541,
+      "final_loss_std": 0.0417,
+      "loss_reduction": 3.2942,
+      "avg_step_ms": 145.3,
+      "tokens_per_sec": 902373.0,
+      "mfu_percent": 15.2,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "adamw": {
+      "optimal_lr": 0.002,
+      "optimal_momentum": 0.95,
+      "optimal_wd": 0.01,
+      "optimal_adamw_lr": null,
+      "final_loss": 7.5601,
+      "final_loss_std": 0.0602,
+      "loss_reduction": 3.3883,
+      "avg_step_ms": 181.5,
+      "tokens_per_sec": 722148.0,
+      "mfu_percent": 12.2,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    }
+  },
+  "350m": {
+    "muon": {
+      "optimal_lr": 0.04,
+      "optimal_momentum": 0.95,
+      "optimal_wd": 0.01,
+      "optimal_adamw_lr": 0.0004,
+      "final_loss": 6.5622,
+      "final_loss_std": 0.0313,
+      "loss_reduction": 4.4631,
+      "avg_step_ms": 629.7,
+      "tokens_per_sec": 104067.0,
+      "mfu_percent": 5.1,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "cauchylift": {
+      "optimal_lr": 0.003,
+      "optimal_momentum": 0.95,
+      "optimal_wd": 0.01,
+      "optimal_adamw_lr": null,
+      "final_loss": 7.694,
+      "final_loss_std": 0.036,
+      "loss_reduction": 3.3313,
+      "avg_step_ms": 309.3,
+      "tokens_per_sec": 211851.0,
+      "mfu_percent": 10.4,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    },
+    "adamw": {
+      "optimal_lr": 0.0002,
+      "optimal_momentum": 0.95,
+      "optimal_wd": 0.01,
+      "optimal_adamw_lr": null,
+      "final_loss": 7.6615,
+      "final_loss_std": 0.0338,
+      "loss_reduction": 3.3638,
+      "avg_step_ms": 364.3,
+      "tokens_per_sec": 179914.0,
+      "mfu_percent": 8.8,
+      "seeds": [
+        42,
+        43,
+        44
+      ]
+    }
+  }
+}

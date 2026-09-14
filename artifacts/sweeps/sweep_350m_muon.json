@@ -1,0 +1,947 @@
+{
+  "model_scale": "350m",
+  "optimizer": "muon",
+  "token_budget": 7000000000,
+  "best_arm": {
+    "optimizer": "muon",
+    "label": "Muon LR 0.040",
+    "model_scale": "350m",
+    "parameters": 359794688,
+    "base_lr": 0.04,
+    "momentum": 0.95,
+    "weight_decay": 0.01,
+    "adamw_lr": 0.0004,
+    "total_steps": 60,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "tokens_evaluated": 11796480,
+    "initial_loss": 11.0253,
+    "final_loss": 6.5622,
+    "final_loss_std": 0.0313,
+    "loss_reduction": 4.4631,
+    "avg_step_ms": 629.7,
+    "tokens_per_sec": 104067.0,
+    "achieved_tflops": 224.656522776576,
+    "mfu_percent": 5.1,
+    "seed_runs": {
+      "42": {
+        "initial_loss": 11.066600000000001,
+        "final_loss": 6.6035,
+        "loss_reduction": 4.4631,
+        "loss_history": [
+          {
+            "step": 1,
+            "loss": 11.066600000000001,
+            "lr": 0.04
+          },
+          {
+            "step": 60,
+            "loss": 6.6035,
+            "lr": 0.004
+          }
+        ],
+        "diverged": false
+      },
+      "43": {
+        "initial_loss": 11.0184,
+        "final_loss": 6.5553,
+        "loss_reduction": 4.4631,
+        "loss_history": [
+          {
+            "step": 1,
+            "loss": 11.0184,
+            "lr": 0.04
+          },
+          {
+            "step": 60,
+            "loss": 6.5553,
+            "lr": 0.004
+          }
+        ],
+        "diverged": false
+      },
+      "44": {
+        "initial_loss": 10.9909,
+        "final_loss": 6.5278,
+        "loss_reduction": 4.4631,
+        "loss_history": [
+          {
+            "step": 1,
+            "loss": 10.9909,
+            "lr": 0.04
+          },
+          {
+            "step": 60,
+            "loss": 6.5278,
+            "lr": 0.004
+          }
+        ],
+        "diverged": false
+      }
+    },
+    "loss_history": [
+      {
+        "step": 1,
+        "loss": 11.066600000000001,
+        "lr": 0.04
+      },
+      {
+        "step": 60,
+        "loss": 6.6035,
+        "lr": 0.004
+      }
+    ],
+    "diverged": false
+  },
+  "arms": [
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.003",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.003,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0254,
+      "final_loss": 7.5408,
+      "final_loss_std": 0.0432,
+      "loss_reduction": 3.4846,
+      "avg_step_ms": 847.3,
+      "tokens_per_sec": 77345.0,
+      "achieved_tflops": 166.96992086016,
+      "mfu_percent": 3.8,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0725,
+          "final_loss": 7.5879,
+          "loss_reduction": 3.4846,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0725,
+              "lr": 0.003
+            },
+            {
+              "step": 60,
+              "loss": 7.5879,
+              "lr": 0.00030000000000000003
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0354,
+          "final_loss": 7.5508,
+          "loss_reduction": 3.4846,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0354,
+              "lr": 0.003
+            },
+            {
+              "step": 60,
+              "loss": 7.5508,
+              "lr": 0.00030000000000000003
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9682,
+          "final_loss": 7.4836,
+          "loss_reduction": 3.4846,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9682,
+              "lr": 0.003
+            },
+            {
+              "step": 60,
+              "loss": 7.4836,
+              "lr": 0.00030000000000000003
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0725,
+          "lr": 0.003
+        },
+        {
+          "step": 60,
+          "loss": 7.5879,
+          "lr": 0.00030000000000000003
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.008",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.008,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.025300000000001,
+      "final_loss": 6.9008,
+      "final_loss_std": 0.0427,
+      "loss_reduction": 4.1245,
+      "avg_step_ms": 631.5,
+      "tokens_per_sec": 103775.0,
+      "achieved_tflops": 224.0261624832,
+      "mfu_percent": 5.1,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0795,
+          "final_loss": 6.955,
+          "loss_reduction": 4.1245,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0795,
+              "lr": 0.008
+            },
+            {
+              "step": 60,
+              "loss": 6.955,
+              "lr": 0.0008
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0211,
+          "final_loss": 6.8966,
+          "loss_reduction": 4.1245,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0211,
+              "lr": 0.008
+            },
+            {
+              "step": 60,
+              "loss": 6.8966,
+              "lr": 0.0008
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9753,
+          "final_loss": 6.8508,
+          "loss_reduction": 4.1245,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9753,
+              "lr": 0.008
+            },
+            {
+              "step": 60,
+              "loss": 6.8508,
+              "lr": 0.0008
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0795,
+          "lr": 0.008
+        },
+        {
+          "step": 60,
+          "loss": 6.955,
+          "lr": 0.0008
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.015",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.025400000000001,
+      "final_loss": 6.714,
+      "final_loss_std": 0.028,
+      "loss_reduction": 4.3114,
+      "avg_step_ms": 631.0,
+      "tokens_per_sec": 103857.0,
+      "achieved_tflops": 224.203181469696,
+      "mfu_percent": 5.1,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.064,
+          "final_loss": 6.7526,
+          "loss_reduction": 4.3114,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.064,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.7526,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.013300000000001,
+          "final_loss": 6.7019,
+          "loss_reduction": 4.3114,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.013300000000001,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.7019,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9988,
+          "final_loss": 6.6874,
+          "loss_reduction": 4.3114,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9988,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.6874,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.064,
+          "lr": 0.015
+        },
+        {
+          "step": 60,
+          "loss": 6.7526,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.025",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.025,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 6.6159,
+      "final_loss_std": 0.0249,
+      "loss_reduction": 4.4094,
+      "avg_step_ms": 637.1,
+      "tokens_per_sec": 102874.0,
+      "achieved_tflops": 222.081112399872,
+      "mfu_percent": 5.0,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0564,
+          "final_loss": 6.647,
+          "loss_reduction": 4.4094,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0564,
+              "lr": 0.025
+            },
+            {
+              "step": 60,
+              "loss": 6.647,
+              "lr": 0.0025000000000000005
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.024000000000001,
+          "final_loss": 6.6146,
+          "loss_reduction": 4.4094,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.024000000000001,
+              "lr": 0.025
+            },
+            {
+              "step": 60,
+              "loss": 6.6146,
+              "lr": 0.0025000000000000005
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9956,
+          "final_loss": 6.5862,
+          "loss_reduction": 4.4094,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9956,
+              "lr": 0.025
+            },
+            {
+              "step": 60,
+              "loss": 6.5862,
+              "lr": 0.0025000000000000005
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0564,
+          "lr": 0.025
+        },
+        {
+          "step": 60,
+          "loss": 6.647,
+          "lr": 0.0025000000000000005
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "Muon LR 0.040",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.04,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 6.5622,
+      "final_loss_std": 0.0313,
+      "loss_reduction": 4.4631,
+      "avg_step_ms": 629.7,
+      "tokens_per_sec": 104067.0,
+      "achieved_tflops": 224.656522776576,
+      "mfu_percent": 5.1,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.066600000000001,
+          "final_loss": 6.6035,
+          "loss_reduction": 4.4631,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.066600000000001,
+              "lr": 0.04
+            },
+            {
+              "step": 60,
+              "loss": 6.6035,
+              "lr": 0.004
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0184,
+          "final_loss": 6.5553,
+          "loss_reduction": 4.4631,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0184,
+              "lr": 0.04
+            },
+            {
+              "step": 60,
+              "loss": 6.5553,
+              "lr": 0.004
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9909,
+          "final_loss": 6.5278,
+          "loss_reduction": 4.4631,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9909,
+              "lr": 0.04
+            },
+            {
+              "step": 60,
+              "loss": 6.5278,
+              "lr": 0.004
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.066600000000001,
+          "lr": 0.04
+        },
+        {
+          "step": 60,
+          "loss": 6.6035,
+          "lr": 0.004
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "momentum_0.90",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.9,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0004,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 6.6425,
+      "final_loss_std": 0.0285,
+      "loss_reduction": 4.3828,
+      "avg_step_ms": 816.6,
+      "tokens_per_sec": 80255.0,
+      "achieved_tflops": 173.25193611264,
+      "mfu_percent": 3.9,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0628,
+          "final_loss": 6.68,
+          "loss_reduction": 4.3828,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0628,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.68,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0194,
+          "final_loss": 6.6366,
+          "loss_reduction": 4.3828,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0194,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.6366,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9937,
+          "final_loss": 6.6109,
+          "loss_reduction": 4.3828,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9937,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.6109,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0628,
+          "lr": 0.015
+        },
+        {
+          "step": 60,
+          "loss": 6.68,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "adamw_lr_2e-4",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0002,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.0253,
+      "final_loss": 6.8763,
+      "final_loss_std": 0.031,
+      "loss_reduction": 4.149,
+      "avg_step_ms": 634.0,
+      "tokens_per_sec": 103373.0,
+      "achieved_tflops": 223.158337695744,
+      "mfu_percent": 5.1,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0623,
+          "final_loss": 6.9133,
+          "loss_reduction": 4.149,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0623,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.9133,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0272,
+          "final_loss": 6.8782,
+          "loss_reduction": 4.149,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0272,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.8782,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.9865,
+          "final_loss": 6.8375,
+          "loss_reduction": 4.149,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.9865,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.8375,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0623,
+          "lr": 0.015
+        },
+        {
+          "step": 60,
+          "loss": 6.9133,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "adamw_lr_8e-4",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.01,
+      "adamw_lr": 0.0008,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.025300000000001,
+      "final_loss": 6.6009,
+      "final_loss_std": 0.0275,
+      "loss_reduction": 4.4244,
+      "avg_step_ms": 634.1,
+      "tokens_per_sec": 103345.0,
+      "achieved_tflops": 223.09789218816,
+      "mfu_percent": 5.1,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.0624,
+          "final_loss": 6.638,
+          "loss_reduction": 4.4244,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0624,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.638,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0171,
+          "final_loss": 6.5927,
+          "loss_reduction": 4.4244,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0171,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.5927,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.996500000000001,
+          "final_loss": 6.5721,
+          "loss_reduction": 4.4244,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.996500000000001,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.5721,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.0624,
+          "lr": 0.015
+        },
+        {
+          "step": 60,
+          "loss": 6.638,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    },
+    {
+      "optimizer": "muon",
+      "label": "wd_0.00",
+      "model_scale": "350m",
+      "parameters": 359794688,
+      "base_lr": 0.015,
+      "momentum": 0.95,
+      "weight_decay": 0.0,
+      "adamw_lr": 0.0004,
+      "total_steps": 60,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "tokens_evaluated": 11796480,
+      "initial_loss": 11.025400000000001,
+      "final_loss": 6.7121,
+      "final_loss_std": 0.0287,
+      "loss_reduction": 4.3133,
+      "avg_step_ms": 719.1,
+      "tokens_per_sec": 91131.0,
+      "achieved_tflops": 196.730698272768,
+      "mfu_percent": 4.5,
+      "seed_runs": {
+        "42": {
+          "initial_loss": 11.065,
+          "final_loss": 6.7517,
+          "loss_reduction": 4.3133,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.065,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.7517,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "43": {
+          "initial_loss": 11.0131,
+          "final_loss": 6.6998,
+          "loss_reduction": 4.3133,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 11.0131,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.6998,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        },
+        "44": {
+          "initial_loss": 10.998000000000001,
+          "final_loss": 6.6847,
+          "loss_reduction": 4.3133,
+          "loss_history": [
+            {
+              "step": 1,
+              "loss": 10.998000000000001,
+              "lr": 0.015
+            },
+            {
+              "step": 60,
+              "loss": 6.6847,
+              "lr": 0.0015
+            }
+          ],
+          "diverged": false
+        }
+      },
+      "loss_history": [
+        {
+          "step": 1,
+          "loss": 11.065,
+          "lr": 0.015
+        },
+        {
+          "step": 60,
+          "loss": 6.7517,
+          "lr": 0.0015
+        }
+      ],
+      "diverged": false
+    }
+  ]
+}
