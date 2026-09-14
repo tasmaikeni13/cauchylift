@@ -7,36 +7,20 @@ across all **16 Google Cloud TPU v4 chips** in a **2x2x4 3D Torus mesh** for:
 1. **125M Decoder Transformer** (preregistered for 3,000,000,000 token budget)
 2. **350M Decoder Transformer** (preregistered for 7,000,000,000 token budget)
 
-Comparing **Muon**, **CauchyLift**, and **AdamW** optimizers under identical model seeds (evaluated across seeds 42, 43, and 44) and disjoint data streams.
+Comparing **CauchyLift** and **AdamW** optimizers under identical model seeds (evaluated across seeds 42, 43, and 44) and disjoint data streams.
 
 ### Optimal Hyperparameters by Scale and Optimizer
 
-| Model Scale | Optimizer | Optimal LR | Momentum | Weight Decay | AdamW Auxiliary LR | Final Loss (3-Seed Mean ± Std) | Loss Drop | Latency | Cluster Throughput | MFU |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **125M** | **Muon** | **0.05** | 0.95 | 0.01 | 0.0006 | **6.4111** ± 0.0299 | 4.5372 | 209.2 ms | 626,518 tok/s | 10.6% |
-| **125M** | **Cauchylift** | **0.01** | 0.95 | 0.01 | N/A | **7.6541** ± 0.0417 | 3.2942 | 145.3 ms | 902,373 tok/s | 15.2% |
-| **125M** | **Adamw** | **0.002** | 0.95 | 0.01 | N/A | **7.5601** ± 0.0602 | 3.3883 | 181.5 ms | 722,148 tok/s | 12.2% |
-| **350M** | **Muon** | **0.04** | 0.95 | 0.01 | 0.0004 | **6.5622** ± 0.0313 | 4.4631 | 629.7 ms | 104,067 tok/s | 5.1% |
-| **350M** | **Cauchylift** | **0.003** | 0.95 | 0.01 | N/A | **7.6940** ± 0.0360 | 3.3313 | 309.3 ms | 211,851 tok/s | 10.4% |
-| **350M** | **Adamw** | **0.0002** | 0.95 | 0.01 | N/A | **7.6615** ± 0.0338 | 3.3638 | 364.3 ms | 179,914 tok/s | 8.8% |
+| Model Scale | Optimizer | Optimal LR | Momentum | Weight Decay | Final Loss (3-Seed Mean ± Std) | Loss Drop | Latency | Cluster Throughput | MFU |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **125M** | **CauchyLift** | **0.010** | 0.95 | 0.01 | **7.6541** ± 0.0417 | 3.2942 | 145.3 ms | 902,373 tok/s | 15.2% |
+| **125M** | **AdamW** | **0.002** | 0.95 | 0.01 | **7.5601** ± 0.0602 | 3.3883 | 181.5 ms | 722,148 tok/s | 12.2% |
+| **350M** | **CauchyLift** | **0.003** | 0.95 | 0.01 | **7.6940** ± 0.0360 | 3.3313 | 309.3 ms | 211,851 tok/s | 10.4% |
+| **350M** | **AdamW** | **0.0002** | 0.95 | 0.01 | **7.6615** ± 0.0338 | 3.3638 | 364.3 ms | 179,914 tok/s | 8.8% |
 
 ## Detailed Arm Trajectories
 
 ### 125M Transformer Sweep Results
-
-#### MUON (9 arms)
-
-| Arm | Configuration | LR | Momentum | WD | Init Loss | Final Loss (3-Seed Mean ± Std) | Loss Drop | Latency | Throughput | MFU |
-| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | Muon LR 0.005 | 0.005 | 0.95 | 0.01 | 10.9484 | **7.0515** ± 0.0197 | 3.8969 | 237.7 ms | 551,468 tok/s | 9.3% |
-| 2 | Muon LR 0.010 | 0.01 | 0.95 | 0.01 | 10.9484 | **6.6273** ± 0.0323 | 4.3211 | 211.3 ms | 620,401 tok/s | 10.5% |
-| 3 | Muon LR 0.020 | 0.02 | 0.95 | 0.01 | 10.9484 | **6.5112** ± 0.0292 | 4.4372 | 209.6 ms | 625,263 tok/s | 10.5% |
-| 4 | Muon LR 0.030 | 0.03 | 0.95 | 0.01 | 10.9483 | **6.4714** ± 0.0285 | 4.4769 | 207.1 ms | 633,014 tok/s | 10.7% |
-| 5 | Muon LR 0.050 | 0.05 | 0.95 | 0.01 | 10.9483 | **6.4111** ± 0.0299 | 4.5372 | 209.2 ms | 626,518 tok/s | 10.6% |
-| 6 | momentum_0.90 | 0.02 | 0.9 | 0.01 | 10.9484 | **6.4557** ± 0.0308 | 4.4927 | 254.7 ms | 514,556 tok/s | 8.7% |
-| 7 | adamw_lr_3e-4 | 0.02 | 0.95 | 0.01 | 10.9484 | **6.6813** ± 0.0313 | 4.2671 | 211.4 ms | 620,095 tok/s | 10.4% |
-| 8 | adamw_lr_1e-3 | 0.02 | 0.95 | 0.01 | 10.9484 | **6.4348** ± 0.0362 | 4.5136 | 211.1 ms | 620,965 tok/s | 10.5% |
-| 9 | wd_0.00 | 0.02 | 0.95 | 0.0 | 10.9483 | **6.5105** ± 0.0281 | 4.4378 | 321.5 ms | 407,700 tok/s | 6.9% |
 
 #### CAUCHYLIFT (6 arms)
 
@@ -61,20 +45,6 @@ Comparing **Muon**, **CauchyLift**, and **AdamW** optimizers under identical mod
 
 ### 350M Transformer Sweep Results
 
-#### MUON (9 arms)
-
-| Arm | Configuration | LR | Momentum | WD | Init Loss | Final Loss (3-Seed Mean ± Std) | Loss Drop | Latency | Throughput | MFU |
-| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | Muon LR 0.003 | 0.003 | 0.95 | 0.01 | 11.0254 | **7.5408** ± 0.0432 | 3.4846 | 847.3 ms | 77,345 tok/s | 3.8% |
-| 2 | Muon LR 0.008 | 0.008 | 0.95 | 0.01 | 11.0253 | **6.9008** ± 0.0427 | 4.1245 | 631.5 ms | 103,775 tok/s | 5.1% |
-| 3 | Muon LR 0.015 | 0.015 | 0.95 | 0.01 | 11.0254 | **6.7140** ± 0.0280 | 4.3114 | 631.0 ms | 103,857 tok/s | 5.1% |
-| 4 | Muon LR 0.025 | 0.025 | 0.95 | 0.01 | 11.0253 | **6.6159** ± 0.0249 | 4.4094 | 637.1 ms | 102,874 tok/s | 5.0% |
-| 5 | Muon LR 0.040 | 0.04 | 0.95 | 0.01 | 11.0253 | **6.5622** ± 0.0313 | 4.4631 | 629.7 ms | 104,067 tok/s | 5.1% |
-| 6 | momentum_0.90 | 0.015 | 0.9 | 0.01 | 11.0253 | **6.6425** ± 0.0285 | 4.3828 | 816.6 ms | 80,255 tok/s | 3.9% |
-| 7 | adamw_lr_2e-4 | 0.015 | 0.95 | 0.01 | 11.0253 | **6.8763** ± 0.0310 | 4.1490 | 634.0 ms | 103,373 tok/s | 5.1% |
-| 8 | adamw_lr_8e-4 | 0.015 | 0.95 | 0.01 | 11.0253 | **6.6009** ± 0.0275 | 4.4244 | 634.1 ms | 103,345 tok/s | 5.1% |
-| 9 | wd_0.00 | 0.015 | 0.95 | 0.0 | 11.0254 | **6.7121** ± 0.0287 | 4.3133 | 719.1 ms | 91,131 tok/s | 4.5% |
-
 #### CAUCHYLIFT (6 arms)
 
 | Arm | Configuration | LR | Momentum | WD | Init Loss | Final Loss (3-Seed Mean ± Std) | Loss Drop | Latency | Throughput | MFU |
@@ -98,7 +68,6 @@ Comparing **Muon**, **CauchyLift**, and **AdamW** optimizers under identical mod
 
 ## Hardware and Cluster Topology
 - **Hardware**: 16x Google Cloud TPU v4 chips (`v4-32` slice, 4 worker hosts)
-- **Interconnect**: 2x2x4 3D Torus optical circuit switched mesh
-- **Precision**: Native BF16 TensorCore execution with FP32 vector-norm accumulation
-- **Gradient Synchronization**: `xm.reduce_gradients` all-reduce across all 16 chips
-- **Max Inter-Rank Drift**: Validated at $7.63 \times 10^{-6}$ (floating-point epsilon)
+- **Interconnect**: 2x2x4 3D Torus optical mesh
+- **Software Stack**: PyTorch 2.5 + Torch-XLA 2.5 / PJRT
+- **Data Pipeline**: Packed, deterministic token stream from real FineWeb-Edu partitions
