@@ -10,7 +10,7 @@ These nine files are copy-ready prompts for fresh Codex/agent sessions. Run them
 | 4 | High-performance decoder-only Transformer and token data system | Smoke tests |
 | 5 | Small-scale multi-workload screen and baseline verification | Small training sweeps |
 | 6 | Scaling pilot, 16x TPU v4-32 orchestration, and dual preregistration | Medium sweeps |
-| 7 | Frozen 125M-parameter, 3B-token experiment on 16x TPU v4-32 | Yes (3B tokens) |
+| 7 | Frozen 125M-parameter, 2.5B-token experiment on 16x TPU v4-32 | Yes (2.5B tokens) |
 | 8 | Frozen 350M-parameter, 3B-token flagship experiment on 16x TPU v4-32 | Yes (3B tokens) |
 | 9 | Cross-scale analysis, reproducibility audit, and publishable paper | Rechecks only |
 

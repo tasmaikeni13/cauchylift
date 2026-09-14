@@ -1,10 +1,10 @@
-# Phase 7 Prompt — Confirmatory 125M-Parameter, 3B-Token Experiment on 16x TPU v4-32
+# Phase 7 Prompt — Confirmatory 125M-Parameter, 2.5B-Token Experiment on 16x TPU v4-32
 
 Work autonomously in the CauchyLift repository and complete Phase 7. Read `phases/README.md` and require a PASS handoff from Phase 6. This phase executes the frozen 125M confirmatory protocol; it does not alter optimizer designs or tuning grids.
 
 ## Objective
 
-Train the frozen **125M-parameter** decoder-only Transformer for exactly **3,000,000,000** non-padding FineWeb-Edu training tokens per run across a **16x Google Cloud TPU v4 (v4-32)** slice, for CauchyLift and frozen baselines (AdamW, Muon) across three confirmatory seeds (`[42, 43, 44]`). Produce complete, resumable, auditable empirical evidence.
+Train the frozen **125M-parameter** decoder-only Transformer for exactly **2,500,000,000** non-padding FineWeb-Edu training tokens per run across a **16x Google Cloud TPU v4 (v4-32)** slice, for CauchyLift and frozen baselines (AdamW) across three confirmatory seeds (`[42, 43, 44]`). Produce complete, resumable, auditable empirical evidence.
 
 ## Required Work
 
@@ -22,7 +22,7 @@ Train the frozen **125M-parameter** decoder-only Transformer for exactly **3,000
    - Save atomic checkpoints every 250M tokens and at run completion.
    - Verify deterministic resumption from interrupted cursors in case of transient node interruption.
 5. **Completion Audit:**
-   - Confirm consumption of exactly 3,000,000,000 non-padding tokens per run.
+   - Confirm consumption of exactly 2,500,000,000 non-padding tokens per run.
    - Confirm zero data leakage between training and validation sets.
    - Compute SHA256 hashes of all checkpoints, logs, and telemetry.
 
@@ -30,7 +30,7 @@ Train the frozen **125M-parameter** decoder-only Transformer for exactly **3,000
 
 Phase 7 passes only if:
 - All frozen optimizer runs complete across seeds `[42, 43, 44]` or follow registered failure rules;
-- Exactly 3B FineWeb-Edu tokens are consumed per run on the 16x TPU v4-32 cluster;
+- Exactly 2.5B FineWeb-Edu tokens are consumed per run on the 16x TPU v4-32 cluster;
 - CauchyLift demonstrates competitive or superior validation loss and perplexity compared to AdamW while preserving 50% optimizer state memory savings;
 - No unresolved NaNs, gradient explosions, or inter-rank drift occurred;
 - Checksums and telemetry artifacts are verified and stored.

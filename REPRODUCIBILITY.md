@@ -84,20 +84,20 @@ python scripts/run_phase6_pilot_sweep.py
 
 ---
 
-## 6. Confirmatory 3B-Token Pretraining (Phase 7 Protocols)
+## 6. Confirmatory 2.5B-Token Pretraining (Phase 7 Protocols)
 
 Pretraining configurations are frozen in `experiments/protocols/protocol_125m_fineweb.json` and `experiments/protocols/protocol_350m_fineweb.json`.
 
-To run CauchyLift on 125M (3B tokens):
+To run CauchyLift on 125M (2.5B tokens):
 ```bash
 python scripts/train_transformer.py \
   --data_train data/fineweb_edu/train_tokens_350m.bin \
   --data_val data/fineweb_edu/val_tokens.bin \
-  --total_tokens 3000000000 \
+  --total_tokens 2500000000 \
   --seq_len 2048 \
   --batch_size 4 \
   --grad_accum 4 \
-  --lr 0.005 \
+  --lr 0.0010 \
   --momentum 0.95 \
   --weight_decay 0.01 \
   --optimizer cauchylift \
@@ -105,16 +105,16 @@ python scripts/train_transformer.py \
   --output_dir runs/cauchylift_125m_seed42
 ```
 
-To run AdamW on 125M (3B tokens):
+To run AdamW on 125M (2.5B tokens):
 ```bash
 python scripts/train_transformer.py \
   --data_train data/fineweb_edu/train_tokens_350m.bin \
   --data_val data/fineweb_edu/val_tokens.bin \
-  --total_tokens 3000000000 \
+  --total_tokens 2500000000 \
   --seq_len 2048 \
   --batch_size 4 \
   --grad_accum 4 \
-  --lr 0.0006 \
+  --lr 0.0020 \
   --momentum 0.95 \
   --weight_decay 0.01 \
   --optimizer adamw \

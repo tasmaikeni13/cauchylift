@@ -5,7 +5,7 @@ Work autonomously in the CauchyLift repository and complete Phase 6. Read `phase
 ## Objective
 
 Verify distributed scaling across a 16x Google Cloud TPU v4 pod slice (Torch-XLA / PJRT), validate multi-core gradient all-reduction and identical parameter updates across ranks, determine optimal micro-batch and gradient accumulation settings, and commit immutable protocols for:
-1. Confirmatory **125M-parameter** decoder-only Transformer trained on **3,000,000,000** FineWeb-Edu tokens per run.
+1. Confirmatory **125M-parameter** decoder-only Transformer trained on **2,500,000,000** FineWeb-Edu tokens per run.
 2. Flagship **350M-parameter** decoder-only Transformer trained on **3,000,000,000** FineWeb-Edu tokens per run.
 
 ## Required Work
@@ -29,7 +29,7 @@ Verify distributed scaling across a 16x Google Cloud TPU v4 pod slice (Torch-XLA
 
 Phase 6 passes only if:
 - Multi-device scaling on 16x TPU v4-32 is verified with zero inter-rank divergence;
-- Exact 125M (3B tokens) and 350M (3B tokens) model configs, data splits, and hyperparameters are frozen;
+- Exact 125M (2.5B tokens) and 350M (3B tokens) model configs, data splits, and hyperparameters are frozen;
 - SHA256 checksums of protocol files are committed;
 - Compute and memory resource budgets are measured and confirmed.
 

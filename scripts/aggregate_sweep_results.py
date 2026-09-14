@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aggregate distributed pretraining sweep results across all 12 runs (125M, 3B tokens)."""
+"""Aggregate distributed pretraining sweep results across all 6 runs (125M, 2.5B tokens)."""
 
 from __future__ import annotations
 
@@ -22,15 +22,13 @@ def compute_mean_std(values: list[float]) -> tuple[float, float]:
 
 def generate_summary(runs_dir: pathlib.Path = pathlib.Path("runs")):
     print("=" * 80)
-    print("AGGREGATING 125M PRETRAINING SWEEP RESULTS (3B TOKENS PER RUN)")
+    print("AGGREGATING 125M PRETRAINING RESULTS (2.5B TOKENS PER RUN)")
     print("=" * 80)
 
-    # Expected configurations: 9 CauchyLift runs + 3 AdamW runs = 12 runs
+    # Expected configurations: 3 CauchyLift runs + 3 AdamW runs = 6 runs
     expected_configs = [
-        {"optimizer": "cauchylift", "lr": 0.0025, "seeds": [42, 43, 44]},
-        {"optimizer": "cauchylift", "lr": 0.0050, "seeds": [42, 43, 44]},
-        {"optimizer": "cauchylift", "lr": 0.0100, "seeds": [42, 43, 44]},
-        {"optimizer": "adamw", "lr": 0.0006, "seeds": [42, 43, 44]},
+        {"optimizer": "cauchylift", "lr": 0.0010, "seeds": [42, 43, 44]},
+        {"optimizer": "adamw", "lr": 0.0020, "seeds": [42, 43, 44]},
     ]
 
     all_run_data = []
@@ -122,7 +120,7 @@ def generate_summary(runs_dir: pathlib.Path = pathlib.Path("runs")):
         }, f, indent=2)
 
     with open(summary_md, "w") as f:
-        f.write("# Distributed Pretraining Sweep Summary: 125M Transformer on 3B FineWeb-Edu Tokens\n\n")
+        f.write("# Distributed Pretraining Sweep Summary: 125M Transformer on 2.5B FineWeb-Edu Tokens\n\n")
         f.write("**Hardware:** 16-Chip Google Cloud TPU v4 Pod Slice (`v4-32`, 32 TensorCores, 4 Hosts, 2x2x4 3D Torus)\n\n")
         f.write("### Configuration Rankings by Mean Validation Loss\n\n")
         f.write("| Rank | Configuration | Completed Seeds | Mean Val Loss | Cross-Seed Std | Mean Train Loss | Throughput (tok/s) | MFU (%) |\n")

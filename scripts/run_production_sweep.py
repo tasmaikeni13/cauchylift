@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-"""Master Pretraining Sweep Runner for 125M Transformer on 16-Chip TPU v4-32 Pod Slice.
+"""Master Pretraining Runner for 125M Transformer on 16-Chip TPU v4-32 Pod Slice.
 
-Executes the exhaustive 12-run distributed pretraining sweep (3B tokens per run):
-- CauchyLift LR=0.0025 across seeds [42, 43, 44] (3 runs)
-- CauchyLift LR=0.0050 across seeds [42, 43, 44] (3 runs)
-- CauchyLift LR=0.0100 across seeds [42, 43, 44] (3 runs)
-- AdamW Baseline LR=0.0006 across seeds [42, 43, 44] (3 runs)
+Executes the distributed pretraining comparison (2.5B tokens per run, 6 runs total):
+- CauchyLift Optimal (LR=0.0010, adamw_lr=0.0006) across seeds [42, 43, 44] (3 runs)
+- AdamW Baseline Optimal (LR=0.0020, adamw_lr=0.0020) across seeds [42, 43, 44] (3 runs)
 
-Total: 12 complete pretraining runs (36 Billion total tokens trained).
+Total: 6 complete pretraining runs (15 Billion total tokens trained).
 Zero simulated runs, zero early breaks, full TPU memory cleanup and multi-host synchronization between runs.
 """
 
@@ -33,27 +31,19 @@ from launch_v4_32_distributed import (
 
 
 SWEEP_CONFIGS = [
-    # CauchyLift Grid
-    {"optimizer": "cauchylift", "lr": 0.0025, "adamw_lr": 0.0006, "seed": 42},
-    {"optimizer": "cauchylift", "lr": 0.0025, "adamw_lr": 0.0006, "seed": 43},
-    {"optimizer": "cauchylift", "lr": 0.0025, "adamw_lr": 0.0006, "seed": 44},
+    # CauchyLift Optimal Grid (LR=0.0010, adamw_lr=0.0006)
+    {"optimizer": "cauchylift", "lr": 0.0010, "adamw_lr": 0.0006, "seed": 42},
+    {"optimizer": "cauchylift", "lr": 0.0010, "adamw_lr": 0.0006, "seed": 43},
+    {"optimizer": "cauchylift", "lr": 0.0010, "adamw_lr": 0.0006, "seed": 44},
 
-    {"optimizer": "cauchylift", "lr": 0.0050, "adamw_lr": 0.0006, "seed": 42},
-    {"optimizer": "cauchylift", "lr": 0.0050, "adamw_lr": 0.0006, "seed": 43},
-    {"optimizer": "cauchylift", "lr": 0.0050, "adamw_lr": 0.0006, "seed": 44},
-
-    {"optimizer": "cauchylift", "lr": 0.0100, "adamw_lr": 0.0006, "seed": 42},
-    {"optimizer": "cauchylift", "lr": 0.0100, "adamw_lr": 0.0006, "seed": 43},
-    {"optimizer": "cauchylift", "lr": 0.0100, "adamw_lr": 0.0006, "seed": 44},
-
-    # AdamW Baseline
-    {"optimizer": "adamw", "lr": 0.0006, "adamw_lr": 0.0006, "seed": 42},
-    {"optimizer": "adamw", "lr": 0.0006, "adamw_lr": 0.0006, "seed": 43},
-    {"optimizer": "adamw", "lr": 0.0006, "adamw_lr": 0.0006, "seed": 44},
+    # AdamW Baseline Optimal Grid (LR=0.0020, adamw_lr=0.0020)
+    {"optimizer": "adamw", "lr": 0.0020, "adamw_lr": 0.0020, "seed": 42},
+    {"optimizer": "adamw", "lr": 0.0020, "adamw_lr": 0.0020, "seed": 43},
+    {"optimizer": "adamw", "lr": 0.0020, "adamw_lr": 0.0020, "seed": 44},
 ]
 
 
-def is_run_completed(out_dir: pathlib.Path, target_tokens: int = 3_000_000_000) -> bool:
+def is_run_completed(out_dir: pathlib.Path, target_tokens: int = 2_500_000_000) -> bool:
     summary_file = out_dir / "run_summary.json"
     if not summary_file.exists():
         sync_runs_back_from_workers()
@@ -69,7 +59,7 @@ def is_run_completed(out_dir: pathlib.Path, target_tokens: int = 3_000_000_000) 
 
 
 def run_sweep(
-    total_tokens: int = 3_000_000_000,
+    total_tokens: int = 2_500_000_000,
     batch_size: int = 8,
     seq_len: int = 2048,
     eval_interval: int = 500,
@@ -79,7 +69,7 @@ def run_sweep(
     filter_seed: int | None = None,
 ):
     print("\n" + "=" * 80)
-    print("STARTING 125M PRETRAINING SWEEP (12 RUNS x 3B TOKENS)")
+    print("STARTING 125M PRETRAINING RUNS (6 RUNS x 2.5B TOKENS)")
     print("Google Cloud TPU v4-32 (16 Chips, 4 Worker Nodes)")
     print(f"Total Target Tokens per Run: {total_tokens:,}")
     print(f"Global Batch: {batch_size * 16 * seq_len:,} tokens/step")
@@ -118,7 +108,7 @@ def run_sweep(
         print("#" * 80)
 
         if is_run_completed(out_dir, target_tokens=total_tokens):
-            print(f">>> [SKIPPING] Run {run_name} already completed 3B tokens! Skipping.")
+            print(f">>> [SKIPPING] Run {run_name} already completed 2.5B tokens! Skipping.")
             continue
 
         # Step 1: Clean up any dangling processes on TPU hardware
@@ -173,8 +163,8 @@ def run_sweep(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Full 125M Hyperparameter Sweep Runner on TPU v4-32")
-    parser.add_argument("--total_tokens", type=int, default=3_000_000_000, help="Total tokens per run (default: 3B)")
+    parser = argparse.ArgumentParser(description="Full 125M Pretraining Runner on TPU v4-32")
+    parser.add_argument("--total_tokens", type=int, default=2_500_000_000, help="Total tokens per run (default: 2.5B)")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size per chip (default: 8)")
     parser.add_argument("--seq_len", type=int, default=2048, help="Context length (default: 2048)")
     parser.add_argument("--eval_interval", type=int, default=500, help="Validation interval (default: 500)")

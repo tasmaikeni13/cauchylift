@@ -269,10 +269,10 @@ To guarantee a scientifically sound, apples-to-apples comparison between CauchyL
 1. **Optimal Learning Rates Discovered:** The sweep statistically confirms that the optimal learning rate for CauchyLift is $\text{LR}_{\text{CauchyLift}}^{*} = 0.0010$ (Mean Val Loss: $5.6019 \pm 0.0465$), and for AdamW is $\text{LR}_{\text{AdamW}}^{*} = 0.0020$ (Mean Val Loss: $4.7713 \pm 0.0460$).
 2. **Curvature Overshooting in CauchyLift:** As the base matrix learning rate increases past $0.0025$, CauchyLift exhibits curvature overshooting on 125M hidden matrices, leading to higher validation loss ($6.1627$ at $\text{LR}=0.0050$ and $6.4492$ at $\text{LR}=0.0100$). The tighter learning rate $\text{LR}=0.0010$ provides balanced, monotonic convergence.
 
-### 5.3 Full 3B-Token Production Pretraining Performance
+### 5.3 Full 2.5B-Token Production Pretraining Performance
 
-In full-scale 3,000,000,000-token pretraining (11,445 steps) on the 16-chip TPU v4 slice:
-- **CauchyLift** ($\text{LR}=0.0025$, Seeds 42 & 43) converged to a best validation loss of **3.1885** (Seed 42) and **3.1851** (Seed 43), corresponding to a validation perplexity of **24.2**.
+In full-scale 2,500,000,000-token pretraining (9,537 steps) on the 16-chip TPU v4 slice:
+- **CauchyLift** ($\text{LR}=0.0010$, Seeds 42, 43 & 44) and **AdamW** ($\text{LR}=0.0020$, Seeds 42, 43 & 44) are evaluated across 2.5B tokens of real FineWeb-Edu text.
 - **Sustained Cluster Throughput:** Reached **1,054,695 tokens/second** (248.5 ms per global macro-step of 262,144 tokens).
 - **Model FLOPs Utilization (MFU):** Sustained **17.8% MFU** across all 32 TensorCores in the 3D Torus optical mesh.
 

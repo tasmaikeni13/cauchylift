@@ -395,7 +395,7 @@ def main():
     parser = argparse.ArgumentParser(description="Distributed Multi-Chip Pretraining on Google Cloud TPU v4-32")
     parser.add_argument("--optimizer", type=str, default="cauchylift", choices=["cauchylift", "adamw", "muon"])
     parser.add_argument("--model_scale", type=str, default="125m", choices=["125m", "350m"])
-    parser.add_argument("--total_tokens", type=int, default=3_000_000_000)
+    parser.add_argument("--total_tokens", type=int, default=2_500_000_000)
     parser.add_argument("--seq_len", type=int, default=2048)
     parser.add_argument("--batch_size", type=int, default=8)
     parser.add_argument("--grad_accum", type=int, default=1)

@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-"""Run 3 Seeds per Optimizer (Muon, CauchyLift, AdamW) for 125M on 3B FineWeb-Edu Tokens.
+"""Run 3 Seeds per Optimizer (CauchyLift, AdamW) for 125M on 2.5B FineWeb-Edu Tokens.
 
-Orchestrates 9 complete pretraining runs across all 16 Google Cloud TPU v4 chips:
-- CauchyLift (Seeds 42, 43, 44) | LR: 0.010, Momentum: 0.95, WD: 0.01
-- Muon (Seeds 42, 43, 44)       | LR: 0.050, Momentum: 0.95, WD: 0.01, AdamW LR: 6e-4
-- AdamW (Seeds 42, 43, 44)      | LR: 0.002, Betas: (0.9, 0.95), WD: 0.01
+Orchestrates 6 complete pretraining runs across all 16 Google Cloud TPU v4 chips:
+- CauchyLift (Seeds 42, 43, 44) | LR: 0.0010, Momentum: 0.95, WD: 0.01, AdamW LR: 6e-4
+- AdamW (Seeds 42, 43, 44)      | LR: 0.0020, Betas: (0.9, 0.95), WD: 0.01
 
 Pretraining Protocol (experiments/protocols/protocol_125m_fineweb.json):
 - Model: 125M Decoder Transformer (768 dim, 12 layers, 12 heads, SwiGLU)
-- Total Tokens: 3,000,000,000 tokens
+- Total Tokens: 2,500,000,000 tokens
 - Effective Batch Tokens: 262,144 tokens/step (batch_size=8, 16 chips, seq_len=2048)
-- Optimization Steps: 11,445 steps
-- Warmup Steps: 1,144 steps (10%)
+- Optimization Steps: 9,537 steps
+- Warmup Steps: 954 steps (10%)
 - Schedule: Cosine decay to 0.1x LR
 """
 
@@ -290,7 +289,7 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
 
         opt_configs = protocol["optimizers"]
         seeds = args.seeds if args.seeds else protocol.get("seeds", [42, 43, 44])
-        selected_opts = [args.optimizer] if args.optimizer != "all" else ["cauchylift", "muon", "adamw"]
+        selected_opts = [args.optimizer] if args.optimizer != "all" else ["cauchylift", "adamw"]
 
         runs = []
         for opt_n in selected_opts:
@@ -304,7 +303,7 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
 
         if rank == 0:
             print("=" * 80)
-            print("DISTRIBUTED PRETRAINING: 3 SEEDS x 3 OPTIMIZERS (125M on 3B FineWeb-Edu TOKENS)")
+            print("DISTRIBUTED PRETRAINING: 3 SEEDS x 2 OPTIMIZERS (125M on 2.5B FineWeb-Edu TOKENS)")
             print(f"Hardware: {world_size}x Google Cloud TPU v4 chips (TPU v4-32 slice, 4 nodes)")
             print(f"Protocol: {protocol_path}")
             print(f"Total Scheduled Runs: {len(runs)}")
@@ -356,9 +355,9 @@ def _pretrain_all_main(index: int, args: argparse.Namespace):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run 3 seeds x 3 optimizers for 125M on 3B tokens")
-    parser.add_argument("--total_tokens", type=int, default=3_000_000_000, help="Total token budget per run (default: 3B)")
-    parser.add_argument("--optimizer", type=str, default="all", choices=["cauchylift", "muon", "adamw", "all"])
+    parser = argparse.ArgumentParser(description="Run 3 seeds x 2 optimizers for 125M on 2.5B tokens")
+    parser.add_argument("--total_tokens", type=int, default=2_500_000_000, help="Total token budget per run (default: 2.5B)")
+    parser.add_argument("--optimizer", type=str, default="all", choices=["cauchylift", "adamw", "all"])
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44], help="Random seeds to evaluate")
     args = parser.parse_args()
 

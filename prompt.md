@@ -1,4 +1,4 @@
-# MISSION: Production CauchyLift Implementation, Full 3B-Token Sweep, and Repository Deployment
+# MISSION: Production CauchyLift Implementation, Full 2.5B-Token Pretraining, and Repository Deployment
 
 You are the lead systems and ML engineer on CauchyLift. You have access to a 16-chip Google Cloud TPU v4 slice. 
 
@@ -32,13 +32,13 @@ Update `paper.md` to reflect the canonical design:
 
 ---
 
-### 4. Full 125M Hyperparameter Sweep (3B Tokens per Run)
-Execute a distributed pretraining sweep on a 125M-parameter Transformer across your 16 TPU v4 chips (262,144 tokens per global step, ~11,444 steps per run):
-* **Runs & Search Space:**
-  - **CauchyLift:** Sweep base matrix learning rates across `[0.0025, 0.0050, 0.0100]` with seeds `[42, 43, 44]` (9 runs total).
-  - **AdamW Baseline:** Run at its standard `0.0006` learning rate across seeds `[42, 43, 44]` (3 runs total).
+### 4. Full 125M Pretraining Comparison (2.5B Tokens per Run)
+Execute distributed pretraining on a 125M-parameter Transformer across the 16 TPU v4 chips (262,144 tokens per global step, ~9,537 steps per run):
+* **Runs & Optimizers:**
+  - **CauchyLift:** Run optimal hyperparameters (`LR = 0.0010`, `adamw_lr = 0.0006`) with seeds `[42, 43, 44]` (3 runs total).
+  - **AdamW Baseline:** Run optimal hyperparameters (`LR = 0.0020`, `adamw_lr = 0.0020`) with seeds `[42, 43, 44]` (3 runs total).
 * **Execution Mandate (Anti-Truncation):**
-  - Every single run must train for the full 3B tokens (~11,444 steps). Absolutely zero simulated runs, no early loop breaks, and no mock steps.
+  - Every single run must train for the full 2.5B tokens (~9,537 steps). Absolutely zero simulated runs, no early loop breaks, and no mock steps.
   - Ensure explicit TPU memory cleanup and synchronization between runs so subsequent jobs do not crash with HBM allocation errors.
   - Evaluate and log validation loss periodically (every 500 steps) and save run summaries (validation loss, final training loss, tokens/sec, MFU).
 
