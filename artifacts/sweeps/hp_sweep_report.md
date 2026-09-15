@@ -9,21 +9,21 @@ Both **CauchyLift** and **AdamW** were systematically tuned across candidate lea
 
 ### Optimal Hyperparameters Found
 
-- **Optimal CauchyLift Matrix LR**: `0.0010` (Mean Val Loss: **5.6019 ± 0.0465**)
-- **Optimal AdamW LR**: `0.0020` (Mean Val Loss: **4.7713 ± 0.0460**)
+- **Optimal CauchyLift Matrix LR**: `0.0025` (Mean Val Loss: **3.6687 ± 0.0059**)
+- **Optimal AdamW LR**: `0.0020` (Mean Val Loss: **3.4638 ± 0.0058**)
 
 ## Full Sweep Ranking Table
 
 | Optimizer | Learning Rate | Completed Seeds | Mean Val Loss | Val Loss Std | Mean Perplexity | Throughput (tok/s) | MFU (%) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **ADAMW** | `0.0020` | 3/3 | **4.7713** | 0.0460 | 118.16 | 1,063,519 | 17.9% |
-| **ADAMW** | `0.0010` | 3/3 | **4.9285** | 0.0231 | 138.20 | 1,095,096 | 18.5% |
-| **ADAMW** | `0.0006` | 3/3 | **5.1612** | 0.0534 | 174.54 | 1,041,589 | 17.5% |
-| **ADAMW** | `0.0003` | 3/3 | **5.5131** | 0.0277 | 247.99 | 1,067,377 | 18.0% |
-| **CAUCHYLIFT** | `0.0010` | 3/3 | **5.6019** | 0.0465 | 271.14 | 1,079,770 | 18.2% |
-| **CAUCHYLIFT** | `0.0025` | 3/3 | **5.7558** | 0.0271 | 316.11 | 1,098,791 | 18.5% |
-| **CAUCHYLIFT** | `0.0050` | 3/3 | **6.1627** | 0.0806 | 475.75 | 201,319 | 3.4% |
-| **CAUCHYLIFT** | `0.0100` | 3/3 | **6.4492** | 0.0555 | 632.87 | 1,104,244 | 18.6% |
+| **ADAMW** | `0.0020` | 3/3 | **3.4638** | 0.0058 | 31.94 | 1,073,652 | 18.1% |
+| **ADAMW** | `0.0010` | 3/3 | **3.5335** | 0.0027 | 34.24 | 1,068,209 | 18.0% |
+| **ADAMW** | `0.0006` | 3/3 | **3.6779** | 0.0068 | 39.56 | 1,062,903 | 17.9% |
+| **ADAMW** | `0.0003` | 3/3 | **4.1098** | 0.0039 | 60.94 | 1,022,709 | 17.2% |
+| **CAUCHYLIFT** | `0.0025` | 3/3 | **3.6687** | 0.0059 | 39.20 | 1,062,827 | 17.9% |
+| **CAUCHYLIFT** | `0.0050` | 3/3 | **3.7598** | 0.0434 | 42.97 | 1,067,436 | 18.0% |
+| **CAUCHYLIFT** | `0.0010` | 3/3 | **3.8412** | 0.0055 | 46.58 | 1,029,412 | 17.3% |
+| **CAUCHYLIFT** | `0.0100` | 3/3 | **6.2392** | 0.1365 | 515.65 | 1,033,017 | 17.4% |
 
 ## Hardware and Cluster Setup
 - **Cluster**: Google Cloud TPU v4-32 (16 chips, 32 TensorCores across 4 hosts in a 2x2x4 3D Torus optical mesh)

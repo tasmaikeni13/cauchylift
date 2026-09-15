@@ -6,7 +6,7 @@
   "total_steps": 9537,
   "best_val_loss": 3.130946636199951,
   "final_train_loss": 2.935093879699707,
-  "tokens_per_sec": 1047227.3206833162,
-  "mfu": 17.64357622561129,
-  "elapsed_minutes": 49.891960629483705
+  "tokens_per_sec": 1003711.4176220329,
+  "mfu": 16.91042484813664,
+  "elapsed_minutes": 50.36184571501605
 }

@@ -257,25 +257,26 @@ To guarantee a scientifically sound, apples-to-apples comparison between CauchyL
 | Optimizer | Learning Rate | Completed Seeds | Mean Val Loss ($\mu \pm \sigma$) | Mean Perplexity | Throughput (tok/s) | MFU (%) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **ADAMW** | `0.0020` | 3/3 | **4.7713 ± 0.0460** | **118.16** | 1,063,519 | 17.9% |
-| **ADAMW** | `0.0010` | 3/3 | **4.9285 ± 0.0231** | 138.20 | 1,095,096 | 18.5% |
-| **ADAMW** | `0.0006` | 3/3 | **5.1612 ± 0.0534** | 174.54 | 1,041,589 | 17.5% |
-| **ADAMW** | `0.0003` | 3/3 | **5.5131 ± 0.0277** | 247.99 | 1,067,377 | 18.0% |
-| **CAUCHYLIFT** | `0.0010` | 3/3 | **5.6019 ± 0.0465** | **271.14** | 1,079,770 | 18.2% |
-| **CAUCHYLIFT** | `0.0025` | 3/3 | **5.7558 ± 0.0271** | 316.11 | 1,098,791 | 18.5% |
-| **CAUCHYLIFT** | `0.0050` | 3/3 | **6.1627 ± 0.0806** | 475.75 | 201,319 | 3.4% |
-| **CAUCHYLIFT** | `0.0100` | 3/3 | **6.4492 ± 0.0555** | 632.87 | 1,104,244 | 18.6% |
+| **ADAMW** | `0.0020` | 3/3 | **3.4638 ± 0.0058** | **31.94** | 1,073,652 | 18.1% |
+| **ADAMW** | `0.0010` | 3/3 | **3.5335 ± 0.0027** | 34.24 | 1,068,209 | 18.0% |
+| **ADAMW** | `0.0006` | 3/3 | **3.6779 ± 0.0068** | 39.56 | 1,062,903 | 17.9% |
+| **ADAMW** | `0.0003` | 3/3 | **4.1098 ± 0.0039** | 60.94 | 1,022,709 | 17.2% |
+| **CAUCHYLIFT** | `0.0025` | 3/3 | **3.6687 ± 0.0059** | **39.20** | 1,062,827 | 17.9% |
+| **CAUCHYLIFT** | `0.0050` | 3/3 | **3.7598 ± 0.0434** | 42.97 | 1,067,436 | 18.0% |
+| **CAUCHYLIFT** | `0.0010` | 3/3 | **3.8412 ± 0.0055** | 46.58 | 1,029,412 | 17.3% |
+| **CAUCHYLIFT** | `0.0100` | 3/3 | **6.2392 ± 0.1365** | 515.65 | 1,033,017 | 17.4% |
 
 **Empirical Sweep Findings:**
-1. **Optimal Learning Rates Discovered:** The sweep statistically confirms that the optimal learning rate for CauchyLift is $\text{LR}_{\text{CauchyLift}}^{*} = 0.0010$ (Mean Val Loss: $5.6019 \pm 0.0465$), and for AdamW is $\text{LR}_{\text{AdamW}}^{*} = 0.0020$ (Mean Val Loss: $4.7713 \pm 0.0460$).
-2. **Curvature Overshooting in CauchyLift:** As the base matrix learning rate increases past $0.0025$, CauchyLift exhibits curvature overshooting on 125M hidden matrices, leading to higher validation loss ($6.1627$ at $\text{LR}=0.0050$ and $6.4492$ at $\text{LR}=0.0100$). The tighter learning rate $\text{LR}=0.0010$ provides balanced, monotonic convergence.
+1. **Optimal Learning Rates Discovered:** The 600M-token / 2,500-step sweep statistically confirms that the optimal learning rate for CauchyLift is $\text{LR}_{\text{CauchyLift}}^{*} = 0.0025$ (Mean Val Loss: $3.6687 \pm 0.0059$), and for AdamW is $\text{LR}_{\text{AdamW}}^{*} = 0.0020$ (Mean Val Loss: $3.4638 \pm 0.0058$).
+2. **Curvature Stability in CauchyLift:** The empirical calibration demonstrates that $\text{LR}=0.0025$ provides the optimal balance between curvature extraction and stable step sizes, outperforming both conservative rates ($\text{LR}=0.0010$) and aggressive overshooting regimes ($\text{LR}\ge 0.0050$).
 
 ### 5.3 Full 2.5B-Token Production Pretraining Performance
 
 In full-scale 2,500,000,000-token pretraining (9,537 macro-steps @ 262,144 tokens/step) across the 16-chip Google Cloud TPU v4 slice:
-- **CauchyLift** ($\text{LR}=0.0010$, Seeds 42, 43, 44) achieved a mean validation loss of **$3.4093 \pm 0.0022$** (validation perplexity: **$30.24$**) with exceptional cross-seed stability, reaching a best individual validation loss of **$3.4078$** (Seed 44).
+- **CauchyLift** ($\text{LR}=0.0025$, Seeds 42, 43, 44) achieved a mean validation loss of **$3.2228 \pm 0.0008$** (validation perplexity: **$25.10$**) with remarkable cross-seed consistency, reaching a best individual validation loss of **$3.2221$** (Seed 43).
 - **AdamW Baseline** ($\text{LR}=0.0020$, Seeds 42, 43, 44) converged to a mean validation loss of **$3.1303 \pm 0.0031$** (validation perplexity: **$22.88$**), with a best individual validation loss of **$3.1269$** (Seed 42).
-- **Sustained Cluster Throughput:** Averaged **$1,014,879\text{ tok/s}$** for CauchyLift and **$1,031,711\text{ tok/s}$** for AdamW across all 16 TPU chips (32 TensorCores in 2x2x4 3D Torus optical mesh).
-- **Model FLOPs Utilization (MFU):** Sustained **$17.1\%$ to $17.6\%$ MFU** with zero loss spikes, zero numerical instability, and bitwise identical cross-core synchronization across 15 Billion total trained tokens.
+- **Sustained Cluster Throughput:** Averaged **$1,016,928\text{ tok/s}$** for CauchyLift and **$1,021,742\text{ tok/s}$** for AdamW across all 16 TPU chips (32 TensorCores in 2x2x4 3D Torus optical mesh).
+- **Model FLOPs Utilization (MFU):** Sustained **$17.1\%$ to $17.2\%$ MFU** with zero loss spikes, zero numerical instability, and bitwise identical cross-core synchronization across 15 Billion total trained tokens.
 
 ### 5.4 Comparative Systems Throughput and Efficiency (16 TPU v4 Chips)
 

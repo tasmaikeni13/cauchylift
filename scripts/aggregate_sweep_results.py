@@ -25,43 +25,23 @@ def generate_summary(runs_dir: pathlib.Path = pathlib.Path("runs")):
     print("AGGREGATING 125M PRETRAINING RESULTS (2.5B TOKENS PER RUN)")
     print("=" * 80)
 
-    # Expected configurations: 3 CauchyLift runs + 3 AdamW runs = 6 runs
-    expected_configs = [
-        {"optimizer": "cauchylift", "lr": 0.0010, "seeds": [42, 43, 44]},
-        {"optimizer": "adamw", "lr": 0.0020, "seeds": [42, 43, 44]},
-    ]
-
     all_run_data = []
     config_groups = defaultdict(list)
 
-    for cfg in expected_configs:
-        opt = cfg["optimizer"]
-        lr = cfg["lr"]
-        group_key = f"{opt.upper()} (LR = {lr:.4f})"
-
-        for seed in cfg["seeds"]:
-            run_name = f"125m_{opt}_lr{lr:.4f}_seed{seed}"
-            # Also check alternative naming
-            candidates = [
-                runs_dir / run_name / "run_summary.json",
-                runs_dir / f"{opt}_125m_seed{seed}" / "run_summary.json",
-                runs_dir / f"125m_{opt}_seed{seed}" / "run_summary.json",
-            ]
-            found = False
-            for c in candidates:
-                if c.exists():
-                    try:
-                        with open(c) as f:
-                            data = json.load(f)
-                        data["run_dir"] = str(c.parent)
-                        all_run_data.append(data)
-                        config_groups[group_key].append(data)
-                        found = True
-                        break
-                    except Exception as e:
-                        print(f"Warning: Failed reading {c}: {e}")
-            if not found:
-                print(f"[MISSING] Run summary for {run_name} not found.")
+    # Automatically discover all 125m run summaries in runs_dir
+    summary_files = sorted(list(runs_dir.glob("125m_*/run_summary.json")))
+    for sf in summary_files:
+        try:
+            with open(sf) as f:
+                data = json.load(f)
+            data["run_dir"] = str(sf.parent)
+            opt = data.get("optimizer", "unknown").upper()
+            lr = float(data.get("base_lr", 0.0))
+            group_key = f"{opt} (LR = {lr:.4f})"
+            all_run_data.append(data)
+            config_groups[group_key].append(data)
+        except Exception as e:
+            print(f"Warning: Failed reading {sf}: {e}")
 
     summary_rows = []
     for group_key, runs in config_groups.items():

@@ -16,3 +16,6 @@ runs/
 *.parquet
 *.bin
 *.jsonl
+archive/
+*.tar.gz
+*.log

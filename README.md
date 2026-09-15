@@ -138,30 +138,38 @@ On the 125M decoder-only Transformer (`seq_len=2048`, BF16 mixed precision):
 
 ## Empirical Hyperparameter Sweep Results (16x TPU v4-32 Slice)
 
-A 24-arm systematic hyperparameter sweep was executed across all 16 Google Cloud TPU v4 chips on real FineWeb-Edu tokens (150M tokens per arm, 573 macro-steps @ 262,144 tokens/step) across 3 independent random seeds (`42`, `43`, `44`).
+A rigorous 24-arm systematic hyperparameter sweep was executed across all 16 Google Cloud TPU v4 chips on real FineWeb-Edu tokens (655.4M tokens per arm, 2,500 macro-steps @ 262,144 tokens/step) across 3 independent random seeds (`42`, `43`, `44`).
 
 Full reports and data:
 * **Markdown Report:** [`artifacts/sweeps/hp_sweep_report.md`](artifacts/sweeps/hp_sweep_report.md)
 * **Structured JSON Data:** [`artifacts/sweeps/hp_sweep_results.json`](artifacts/sweeps/hp_sweep_results.json)
+* **2.5B Pretraining Summary:** [`artifacts/sweep_summary.md`](artifacts/sweep_summary.md)
 
 ### Optimal Hyperparameters Found (Mean Val Loss ± Cross-Seed Std Dev)
 
 | Optimizer | Optimal Learning Rate | Cross-Seed Val Loss ($\mu \pm \sigma$) | Perplexity | Throughput (16 Chips) | Hardware MFU |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **AdamW Baseline** | **`0.0020`** | **`4.7713 ± 0.0460`** | **118.16** | 1,063,519 tok/s | 17.9% |
-| **CauchyLift (Canonical)** | **`0.0010`** | **`5.6019 ± 0.0465`** | **271.14** | 1,079,770 tok/s | 18.2% |
+| **AdamW Baseline** | **`0.0020`** | **`3.4638 ± 0.0058`** | **31.94** | 1,073,652 tok/s | 18.1% |
+| **CauchyLift (Canonical)** | **`0.0025`** | **`3.6687 ± 0.0059`** | **39.20** | 1,062,827 tok/s | 17.9% |
+
+### Confirmatory 2.5B-Token Pretraining Results (3 Seeds Each)
+
+| Rank | Configuration | Seeds | Mean Val Loss ($\mu \pm \sigma$) | Perplexity | Mean Train Loss | Throughput (tok/s) | MFU (%) |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1** | **ADAMW Baseline (`LR = 0.0020`)** | 3 / 3 | **`3.1303 ± 0.0031`** | **22.88** | 3.1155 | 1,021,742 | 17.2% |
+| **2** | **CAUCHYLIFT (`LR = 0.0025`)** | 3 / 3 | **`3.2228 ± 0.0008`** | **25.10** | 3.2004 | 1,016,928 | 17.1% |
 
 ### Commands to Run the Full 2.5B Pretraining Comparison (3 Seeds Each)
 
-#### 1. CauchyLift Optimal 2.5B Pretraining (`LR = 0.0010`, `adamw_lr = 0.0006`)
+#### 1. CauchyLift Optimal 2.5B Pretraining (`LR = 0.0025`, `adamw_lr = 0.0006`)
 ```bash
 python scripts/launch_v4_32_distributed.py scripts/train_distributed.py \
     --optimizer cauchylift \
-    --lr 0.0010 \
+    --lr 0.0025 \
     --adamw_lr 0.0006 \
     --seed 42 \
     --total_tokens 2500000000 \
-    --output_dir runs/125m_cauchylift_lr0.0010_seed42
+    --output_dir runs/125m_cauchylift_lr0.0025_seed42
 ```
 *(Repeat for `--seed 43` and `--seed 44`)*
 
