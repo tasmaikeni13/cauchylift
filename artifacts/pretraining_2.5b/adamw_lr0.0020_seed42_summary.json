@@ -1,0 +1,12 @@
+{
+  "optimizer": "adamw",
+  "seed": 42,
+  "base_lr": 0.002,
+  "total_tokens": 2500067328,
+  "total_steps": 9537,
+  "best_val_loss": 3.1269330978393555,
+  "final_train_loss": 3.3812477588653564,
+  "tokens_per_sec": 1009309.4571002763,
+  "mfu": 17.004740030998672,
+  "elapsed_minutes": 50.49839482698299
+}

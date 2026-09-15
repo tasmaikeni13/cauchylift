@@ -1,0 +1,106 @@
+{
+  "ranking": [
+    {
+      "config": "ADAMW (LR = 0.0020)",
+      "completed_seeds": "3/3",
+      "mean_val_loss": 3.1302925745646157,
+      "std_val_loss": 0.003084894755026379,
+      "mean_train_loss": 3.115461985270182,
+      "std_train_loss": 0.235022242525516,
+      "throughput_tok_s": 1031711.2045354964,
+      "mfu": 17.38216232571335,
+      "total_tokens_mean": 2500067328.0
+    },
+    {
+      "config": "CAUCHYLIFT (LR = 0.0010)",
+      "completed_seeds": "3/3",
+      "mean_val_loss": 3.4093072414398193,
+      "std_val_loss": 0.002196250882896116,
+      "mean_train_loss": 3.381153424580892,
+      "std_train_loss": 0.24337919381500425,
+      "throughput_tok_s": 1014879.2821806042,
+      "mfu": 17.09857986063945,
+      "total_tokens_mean": 2500067328.0
+    }
+  ],
+  "individual_runs": [
+    {
+      "optimizer": "cauchylift",
+      "seed": 42,
+      "base_lr": 0.001,
+      "total_tokens": 2500067328,
+      "total_steps": 9537,
+      "best_val_loss": 3.4083118438720703,
+      "final_train_loss": 3.6550073623657227,
+      "tokens_per_sec": 1017042.2063292331,
+      "mfu": 17.135020580178402,
+      "elapsed_minutes": 53.18499389073307,
+      "run_dir": "runs/125m_cauchylift_lr0.0010_seed42"
+    },
+    {
+      "optimizer": "cauchylift",
+      "seed": 43,
+      "base_lr": 0.001,
+      "total_tokens": 2500067328,
+      "total_steps": 9537,
+      "best_val_loss": 3.411824941635132,
+      "final_train_loss": 3.298874855041504,
+      "tokens_per_sec": 1012719.1350740294,
+      "mfu": 17.062185928414195,
+      "elapsed_minutes": 53.17911532133294,
+      "run_dir": "runs/125m_cauchylift_lr0.0010_seed43"
+    },
+    {
+      "optimizer": "cauchylift",
+      "seed": 44,
+      "base_lr": 0.001,
+      "total_tokens": 2500067328,
+      "total_steps": 9537,
+      "best_val_loss": 3.407784938812256,
+      "final_train_loss": 3.189578056335449,
+      "tokens_per_sec": 1014876.5051385501,
+      "mfu": 17.098533073325754,
+      "elapsed_minutes": 53.22529795093336,
+      "run_dir": "runs/125m_cauchylift_lr0.0010_seed44"
+    },
+    {
+      "optimizer": "adamw",
+      "seed": 42,
+      "base_lr": 0.002,
+      "total_tokens": 2500067328,
+      "total_steps": 9537,
+      "best_val_loss": 3.1269330978393555,
+      "final_train_loss": 3.3812477588653564,
+      "tokens_per_sec": 1009309.4571002763,
+      "mfu": 17.004740030998672,
+      "elapsed_minutes": 50.49839482698299,
+      "run_dir": "runs/125m_adamw_lr0.0020_seed42"
+    },
+    {
+      "optimizer": "adamw",
+      "seed": 43,
+      "base_lr": 0.002,
+      "total_tokens": 2500067328,
+      "total_steps": 9537,
+      "best_val_loss": 3.132997989654541,
+      "final_train_loss": 3.0300443172454834,
+      "tokens_per_sec": 1038596.8358228967,
+      "mfu": 17.498170720530087,
+      "elapsed_minutes": 50.3574003258332,
+      "run_dir": "runs/125m_adamw_lr0.0020_seed43"
+    },
+    {
+      "optimizer": "adamw",
+      "seed": 44,
+      "base_lr": 0.002,
+      "total_tokens": 2500067328,
+      "total_steps": 9537,
+      "best_val_loss": 3.130946636199951,
+      "final_train_loss": 2.935093879699707,
+      "tokens_per_sec": 1047227.3206833162,
+      "mfu": 17.64357622561129,
+      "elapsed_minutes": 49.891960629483705,
+      "run_dir": "runs/125m_adamw_lr0.0020_seed44"
+    }
+  ]
+}

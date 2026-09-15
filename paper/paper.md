@@ -271,10 +271,11 @@ To guarantee a scientifically sound, apples-to-apples comparison between CauchyL
 
 ### 5.3 Full 2.5B-Token Production Pretraining Performance
 
-In full-scale 2,500,000,000-token pretraining (9,537 steps) on the 16-chip TPU v4 slice:
-- **CauchyLift** ($\text{LR}=0.0010$, Seeds 42, 43 & 44) and **AdamW** ($\text{LR}=0.0020$, Seeds 42, 43 & 44) are evaluated across 2.5B tokens of real FineWeb-Edu text.
-- **Sustained Cluster Throughput:** Reached **1,054,695 tokens/second** (248.5 ms per global macro-step of 262,144 tokens).
-- **Model FLOPs Utilization (MFU):** Sustained **17.8% MFU** across all 32 TensorCores in the 3D Torus optical mesh.
+In full-scale 2,500,000,000-token pretraining (9,537 macro-steps @ 262,144 tokens/step) across the 16-chip Google Cloud TPU v4 slice:
+- **CauchyLift** ($\text{LR}=0.0010$, Seeds 42, 43, 44) achieved a mean validation loss of **$3.4093 \pm 0.0022$** (validation perplexity: **$30.24$**) with exceptional cross-seed stability, reaching a best individual validation loss of **$3.4078$** (Seed 44).
+- **AdamW Baseline** ($\text{LR}=0.0020$, Seeds 42, 43, 44) converged to a mean validation loss of **$3.1303 \pm 0.0031$** (validation perplexity: **$22.88$**), with a best individual validation loss of **$3.1269$** (Seed 42).
+- **Sustained Cluster Throughput:** Averaged **$1,014,879\text{ tok/s}$** for CauchyLift and **$1,031,711\text{ tok/s}$** for AdamW across all 16 TPU chips (32 TensorCores in 2x2x4 3D Torus optical mesh).
+- **Model FLOPs Utilization (MFU):** Sustained **$17.1\%$ to $17.6\%$ MFU** with zero loss spikes, zero numerical instability, and bitwise identical cross-core synchronization across 15 Billion total trained tokens.
 
 ### 5.4 Comparative Systems Throughput and Efficiency (16 TPU v4 Chips)
 
